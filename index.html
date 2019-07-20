@@ -6,9 +6,9 @@
             alpha: true,
             version: 0.1,
             kind: "component",
-            name: "texture-tab",
-            path: "/texture-tab/index.html",
-            description: "create textures from 'textures' cache.",
+            name: "cached-textures-tab",
+            path: "/texture-tab/cached-textures-tab.html",
+            description: "create textures from cache.",
         };
     })();
 
@@ -198,23 +198,24 @@
         return requests;
     });
 
-    debugMode && console.log(requests);
+//  debugMode && console.log(requests);
 
-    var urls = [];
+    var textureUrls = [];
     requests.forEach(function(request){
-        urls.push(request.url);
+        textureUrls.push(request.url);
     });
 
-    debugMode && console.log({"urls":urls});
+    debugMode && console.log({"textureUrls":textureUrls});
 
 //  Pager.
 
     const viewer = document.getElementById("viewer");
-
     const pager  = document.getElementById("texture-pager");
-    const pageSelector = "#texture-pager .page-btn";
+    const texturePanel = document.getElementById("texture-panel");
     const textureItems = document.getElementById("texture-items");
+
     const counter = $(textureItems).find("#counter").get(0);
+    const displayObjects = $(texturePanel).find("#textures-display").get(0);
 
     const firstPageBtn = $(pager).find(".first-page-btn").get(0);
     const lastPageBtn  = $(pager).find(".last-page-btn").get(0);
@@ -222,6 +223,7 @@
     const nextPageBtn  = $(pager).find(".get-next-btn").get(0);
     const prevGroupBtn = $(pager).find(".get-prev-group-btn").get(0);
     const nextGroupBtn = $(pager).find(".get-next-group-btn").get(0);
+    const pageSelector = "#texture-pager .page-btn";
 
 
 

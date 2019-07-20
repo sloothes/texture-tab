@@ -228,6 +228,8 @@
 
     const counter = $(textureItems).find("#counter").get(0);
     const displayObjects = $(texturePanel).find("#textures-display").get(0);
+    const outfitDroplist = $(texturePanel).find("#outfit-slot-droplist").get(0);
+    const texturePreview = $("#texture-viewer").find("img#texture-preview").get(0);
 
     const firstPageBtn = $(pager).find(".first-page-btn").get(0);
     const lastPageBtn  = $(pager).find(".last-page-btn").get(0);
@@ -253,6 +255,10 @@
     var pagebuttons = $(pager).find(".page-btn");
     var pageslength = $(pager).find(".page-btn").length;
 
+    var Signal = signals.Signal;
+    var pagerClicked = new Signal();
+    var droplistChanged = new Signal();
+    var cacheTextureSelected = new Signal();
 
     function reset(){
 
@@ -313,7 +319,83 @@
 
     }
 
+    cacheTextureSelected.add(function(url){
 
+        cache.match(url).then(function(response){
+            return response.blob();
+        }).then(function(blob){
+
+            new Promise(function(resolve, reject){
+                var reader = new FileReader();
+                reader.onload = function() {
+                    resolve( reader.result );
+                });
+                reader.readAsDataURL(blob);
+            }).then(function( result ){
+                return result;
+            });
+
+        }).then(function(dataUrl){
+            texturePreview.src = dataUrl;
+        });
+
+    });
+
+
+    cacheTextureSelected.add(function(url){
+
+        var data = {};
+
+        data.slot = outfitDroplist.value;
+        data.gender = viewer.contentWindow.localPlayer.outfit.getGender();
+
+        data.map = "map"; // TODO.
+        data.sourceFile = url;
+
+        debugMode && console.log(data);
+
+    /*
+
+        data.texture =  {
+            anisotropy: 1,
+            encoding: 3000,
+            flipY: true,
+            format: 1021,
+            generateMipmaps: true,
+            magFilter: 1006,
+            mapping: 300,
+            minFilter: 1008,
+            mipmaps: [],
+            name: "",
+            offset: [0, 0],
+            premultiplyAlpha: false,
+            repeat: [1, 1],
+            sourceFile: url,
+            type: 1009,
+            unpackAlignment: 4,
+            uuid: generateUUID(),
+            version: 0,
+            wrapS: 1001,
+            wrapT: 1001,
+            _id: ObjectId(),
+        };
+        if ( window.socket ) {
+            socket.publish(localPlayerMaterialMapChannel, data); // TODO.
+        } else {
+            viewer.contentWindow.localPlayerMaterialMap(data); // TODO. (beta)
+        }
+
+        function generateUUID(){
+            return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+            .replace(/[xy]/g, function(c) {
+                var r = Math.random()*16|0;
+                var v = c == 'x'?r:r&0x3|0x8;
+                return v.toString(16);
+            }).toLocaleUpperCase();
+        }
+    */
+
+    });
 
 
 

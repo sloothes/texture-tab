@@ -22,6 +22,65 @@
     <img id="texture-preview" width="290" height="290" style="margin:auto;">
 </div>
 
+<div id="outfit-texture-panel" class="tab-content">
+
+    <div>
+        <h4 style="height:35px;margin-bottom:20px;">
+            <span style="vertical-align:-0.5rem;">Select outfit slot:</span>
+            <div style="display:inline-block;width:50%;float:right;">
+                <select id="outfit-slot-droplist" class="form-control texture-outfit-droplist" readOnly>
+                    <option value="">Select slot:</option>
+                    <option value="body">body</option>
+                    <option value="eyes">eyes</option>
+                    <option value="hairs">hairs</option>
+                    <option value="stockings">stockings</option>
+                    <option value="underwears">underwears</option>
+                    <option value="costume">costume</option>
+                    <option value="tshirt">tshirt</option>
+                    <option value="trousers">trousers</option>
+                    <option value="dress">dress</option>
+                    <option value="shoes">shoes</option>
+                </select>
+            </div>
+        </h4>
+    </div>
+
+    <div id="texture-items" class="well">
+
+        <h4>Choose texture:
+            <div id="counter" class="pull-right small" style="margin-top:4px;color:#ddd;">
+                <span id="from">zero</span>
+                to <span id="upto">zero</span>
+                of <span id="count">none</span>
+            </div>
+        </h4>
+
+        <div id="texture-pager" class="pager">
+            <div style="margin:10px 0px 10px;height:35px;">
+                <li class="btn btn-primary get-prev-btn pull-left">&#9668;</li>
+                <div class="pager-buttons-holder" style="display:inline;">
+                    <a class="btn btn-default page-btn">1</a>
+                    <a class="btn btn-default page-btn">2</a>
+                    <a class="btn btn-default page-btn">3</a>
+                    <a class="btn btn-default page-btn">4</a>
+                </div>
+                <li class="btn btn-primary get-next-btn pull-right">&#9658;</li>
+            </div>
+
+            <div id="textures-display" class="well"></div>
+
+            <div style="margin:10px 0px 10px;height:35px;">
+                <li class="btn btn-primary btn-white-outline first-page-btn pull-left" style="margin-right:5px;">First</li>
+                <li class="btn btn-primary btn-white-outline get-prev-group-btn pull-left">&#9668;&#9668;</li>
+                <li class="btn btn-primary btn-white-outline last-page-btn pull-right" style="margin-left:5px;">Last</li>
+                <li class="btn btn-primary btn-white-outline get-next-group-btn pull-right">&#9658;&#9658;</li>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
 <div id="texture-controls" class="well" style="background:none;border-radius:8px;height:auto;display:none;">
 
     <h4 class="texture-checkbox">
@@ -105,7 +164,6 @@
 
     var cache = await caches.open("textures")
     .then(function(cache){ return cache; });
-
 //  debugMode && console.log({"cache":cache});
 
     var requests = await cache.keys()
@@ -113,7 +171,7 @@
         return requests;
     });
 
-    debugMode && console.log({"requests":requests});
+    debugMode && console.log(requests);
 
     var urls = [];
     requests.forEach(function(request){

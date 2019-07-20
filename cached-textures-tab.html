@@ -290,7 +290,7 @@
 
     function get_items(){
 
-        var urls = textureUrls.slice(skip, limit);
+        var urls = textureUrls.slice(skip, skip + limit);
 
         $(displayObjects).children().remove();
         debugMode && console.log({"urls":urls});

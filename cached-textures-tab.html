@@ -333,6 +333,7 @@
     cacheTextureSelected.add(function(url){
 
         json = newJsonTexture( url );
+        $(".texture-checkbox").attr({checked:false});
 
         cache.match(url).then(function(response){
             return response.blob();

@@ -244,11 +244,11 @@
     var selectors;
     var msec = 200;
 
-    const limit = 5;
+    const limit = 25;
 
-    var max = 0;
+    var max = textureUrls.length;
     var skip = 0;
-    var lastpage = 0;
+    var lastpage = parseInt(max / limit);
     var currentpage = 0;
     var currentindex = 0;
 
@@ -397,22 +397,200 @@
 
     });
 
+    pagerClicked.add(function(){
+
+    //  Get last page.
+        lastpage = parseInt( max / limit );
+
+    //  Get current page.
+        currentpage = parseInt( skip / limit );
+
+    //  Get current index.
+        currentindex = parseInt( currentpage % pageslength );
+
+    //  Page buttons numbering.
+        var num = parseInt( currentpage / pageslength ) * pageslength;
+
+        //  var num = parseInt( currentpage / pageslength );
+        //  pagebuttons.each(function(i){
+        //      var p = (num * pageslength) + 1;
+        //      $(pagebuttons[i]).text( p + i );
+        //  });
+
+        pagebuttons.each(function(i){
+            var page = num + i;
+            pagebuttons[i].skip = limit * page; // important!
+            $(pagebuttons[i]).text( page + 1 ); // important!
+        });
+
+    //  Current button setup.
+        pagebuttons.removeClass("btn-primary");
+        var currentButton = pagebuttons.get( currentindex );
+        $(currentButton).addClass("btn-primary");
+
+    //  Display info.
+
+        if ( max == 0 )
+            $(counter).find("#from").text("-"); 
+        else if ( skip == max )
+            $(counter).find("#from").text(skip);
+        else
+            $(counter).find("#from").text(skip + 1);
+
+        if ( max == 0 )
+            $(counter).find("#upto").text("-");
+        else if ( skip + limit > max )
+            $(counter).find("#upto").text( max );
+        else
+            $(counter).find("#upto").text(skip + limit);
+
+        $(counter).find("#count").text(max);
+
+        debugMode && console.log({
+            "max":max, "skip":skip, 
+            "index": currentindex,
+        });
+
+        if ( max && skip < max ) get_items();
+
+    });
+
+    $(pageSelector).on("click", function(){
+
+        if ( max && this.skip < max ) {
+
+            skip = this.skip;
+
+            pagerClicked.dispatch();
+        }
+
+    });
+
+    $(firstPageBtn).on("click", function(){
+
+        skip = 0;
+
+        pagerClicked.dispatch();
+
+    });
+
+    $(lastPageBtn).on("click", function(){
+
+        //  max = textureUrls.length;
+
+        if ( max && max > 0 ) {
+
+            var lastpage = parseInt(max / limit);
+
+            if ( limit * lastpage < max ) {
+
+                skip = limit * lastpage;          //  limit * parseInt(max / limit);
+
+            } else {
+
+                skip = limit * ( lastpage - 1 );  //  limit * ( parseInt(max / limit) - 1 );
+
+            }
+
+        } else {
+
+            skip = 0;
+
+        }
+
+        pagerClicked.dispatch();
 
 
+    });
 
+    $(prevPageBtn).on("click", function(){
 
+        if ( skip - limit < 0 ) {
 
+            skip = 0;
 
+        } else {
 
+            skip -= limit;
+        }
 
+        pagerClicked.dispatch();
 
+    });
 
+    $(nextPageBtn).on("click", function(){
 
+        var lastpage = parseInt(max / limit);
 
+        if ( skip + limit < max )
 
+            skip += limit;
 
+        else if ( skip + limit > max )
+            
+            skip = limit * lastpage;
 
+    //  else if ( skip + limit == max ) skip;
 
+        pagerClicked.dispatch();
+
+    });
+
+    $(prevGroupBtn).on("click", function(){
+
+        var offset = pageslength * limit;
+
+        if ( skip - offset < 0 ) {
+
+            skip = 0;
+
+        } else {
+
+            skip -= offset;
+        }
+
+        pagerClicked.dispatch();
+
+    });
+
+    $(nextGroupBtn).on("click", function(){
+
+        var offset = pageslength * limit;
+
+        if ( max > 0 ) {
+
+            var lastpage = parseInt(max / limit);
+
+            if ( skip + offset < max ) {
+
+                skip += offset;
+
+            } else if ( skip + offset > max ) {
+
+                if ( limit * lastpage < max ) {
+
+                    skip = limit * lastpage;
+
+                } else {
+
+                    skip = limit * ( lastpage - 1 );
+                }
+
+            } else if ( skip + offset == max ) {
+
+                skip = limit * ( lastpage - 1 );
+
+            }
+
+        } else {
+
+            skip = 0;
+
+        }
+
+        pagerClicked.dispatch();
+
+    });
 
 })();
 

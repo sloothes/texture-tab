@@ -225,8 +225,85 @@
     const nextGroupBtn = $(pager).find(".get-next-group-btn").get(0);
     const pageSelector = "#texture-pager .page-btn";
 
+    var timeout;
+    var interval;
+    var selectors;
+    var msec = 200;
+
+    const limit = 5;
+
+    var max = 0;
+    var skip = 0;
+    var lastpage = 0;
+    var currentpage = 0;
+    var currentindex = 0;
+
+    var pagebuttons = $(pager).find(".page-btn");
+    var pageslength = $(pager).find(".page-btn").length;
 
 
+    function reset(){
+
+        max = 0;
+        skip = 0;
+        lastpage = 0;
+        currentpage = 0;
+        currentindex = 0;
+
+    }
+
+    function init(){
+
+    //  Page buttons numbering.
+        pagebuttons.each(function(i){
+            pagebuttons[i].skip = limit * i;
+            $(pagebuttons[i]).text( i + 1 );
+        });
+
+    //  Current button setup.
+        pagebuttons.removeClass("btn-primary");
+        var currentButton = pagebuttons.get(0);
+        $(currentButton).addClass("btn-primary");
+
+    //  Clear listed objects.
+        $(displayObjects).children().remove();
+
+    }
+
+    function get_items(){
+
+        textureUrls.find(selectors).skip(skip)
+            .limit(limit).toArray(function(err){
+            if (err) throw err;
+        }).then(function(docs){
+
+            $(displayObjects).children().remove();
+            debugMode && console.log({"docs":docs});
+
+            docs.forEach(function(json){
+
+                var element = document.createElement("div");
+                element.innerText = element.title = json.name;
+                element.id = json._id; element.classList.add("material-item");
+
+                $(element).on("click", function(){
+                    clearTimeout(this.interval);
+                    this.interval = setTimeout( function(){
+                        $(".material-item").removeClass("selected");
+                        $(element).addClass("selected");
+                        materialSelected.dispatch(json);
+                    }, msec );
+                });
+
+                $(displayObjects).append( element );
+
+            });
+
+        }).catch(function(err){
+            console.error(err);
+        });
+
+    }
 
 
 

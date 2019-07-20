@@ -103,12 +103,42 @@
 
 (async function(){
 
-    cache = await caches.open("textures")
-    .then(function(cache){
-        return cache;
+    var cache = await caches.open("textures")
+    .then(function(cache){ return cache; });
+
+//  debugMode && console.log({"cache":cache});
+
+    var requests = await cache.keys()
+    .then(function(requests){
+        return requests;
     });
 
-    debugMode && console.log({"cache":cache});
+    debugMode && console.log({"requests":requests});
+
+    var urls = [];
+    requests.forEach(function(request){
+        urls.push(request.url);
+    });
+
+    debugMode && console.log({"urls":urls});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

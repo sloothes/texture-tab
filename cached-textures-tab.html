@@ -320,16 +320,14 @@
 
         cache.match(url).then(function(response){
             return response.blob();
-        }).then(function(blob){
+        }).then(async function(blob){
 
-            new Promise(function(resolve, reject){
+            return new Promise(function(resolve, reject){
                 var reader = new FileReader();
                 reader.onload = function() {
                     resolve( reader.result );
                 };
                 reader.readAsDataURL(blob);
-            }).then(function( result ){
-                return result;
             });
 
         }).then(function(dataUrl){

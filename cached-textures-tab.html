@@ -212,7 +212,6 @@
 (async function(){
 
     var json;
-    var sourceFile;
 
     var cache = await caches.open("textures")
     .then(function(cache){ return cache; });
@@ -259,7 +258,7 @@
     var selectors;
     var msec = 200;
 
-    const limit = 25;
+    const limit = 20;
 
     var max = textureUrls.length;
     var skip = 0;
@@ -596,6 +595,12 @@
 
         });
     });
+
+
+    $(outfitDroplist).on("change", function(){
+        $(".texture-checkbox").attr({checked:false});
+    });
+
 
     function generateUUID(){
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"

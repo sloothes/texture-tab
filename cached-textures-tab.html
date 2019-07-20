@@ -290,30 +290,27 @@
 
     function get_items(){
 
-        textureUrls.slice(skip, limit)
-        .forEach(function(urls){
+        var urls = textureUrls.slice(skip, limit);
 
-            $(displayObjects).children().remove();
-            debugMode && console.log({"urls":urls});
+        $(displayObjects).children().remove();
+        debugMode && console.log({"urls":urls});
 
-            urls.forEach(function(url){
+        urls.forEach(function(url){
 
-                var element = document.createElement("div");
-                element.innerText = element.url = url;
-                element.classList.add("texture-item");
+            var element = document.createElement("div");
+            element.innerText = element.url = url;
+            element.classList.add("texture-item");
 
-                $(element).on("click", function(){
-                    clearTimeout(this.interval);
-                    this.interval = setTimeout( function(){
-                        $(".texture-item").removeClass("selected");
-                        $(element).addClass("selected");
-                        cacheTextureSelected.dispatch(element.url);
-                    }, msec );
-                });
-
-                $(displayObjects).append( element );
-
+            $(element).on("click", function(){
+                clearTimeout(this.interval);
+                this.interval = setTimeout( function(){
+                    $(".texture-item").removeClass("selected");
+                    $(element).addClass("selected");
+                    cacheTextureSelected.dispatch(element.url);
+                }, msec );
             });
+
+            $(displayObjects).append( element );
 
         });
 
@@ -591,6 +588,8 @@
         pagerClicked.dispatch();
 
     });
+
+    pagerClicked.dispatch();
 
 })();
 

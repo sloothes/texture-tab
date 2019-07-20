@@ -13,3 +13,103 @@
     })();
 
 </script>
+
+<div class="helpers-header texture-header">
+    <h2 style="margin-bottom:20px;">Texture:</h2>
+</div>
+
+<div id="texture-viewer" style="width:100%;text-align:center;margin-bottom:20px;">
+    <img id="texture-preview" width="290" height="290" style="margin:auto;">
+</div>
+
+<div id="material-texture-controls" class="well" style="background:none;border-radius:8px;height:auto;display:none;">
+
+    <h4 class="texture-checkbox">
+        <span style="vertical-align:-0.7rem;">Map:</span>
+        <input type="checkbox" id="map" class="form-control pull-right material-checkbox material-texture-checkbox">
+    </h4>
+    <h4 class="texture-checkbox">
+        <span style="vertical-align:-0.7rem;">BumpMap:</span>
+        <input type="checkbox" id="bumpMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+    </h4>
+    <h4 class="texture-checkbox">
+        <span style="vertical-align:-0.7rem;">EmissiveMap:</span>
+        <input type="checkbox" id="emissiveMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+    </h4>
+    <h4 class="texture-checkbox">
+        <span style="vertical-align:-0.7rem;">MetalnessMap:</span>
+        <input type="checkbox" id="metalnessMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+    </h4>
+    <h4 class="texture-checkbox">
+        <span style="vertical-align:-0.7rem;">RoughnessMap:</span>
+        <input type="checkbox" id="roughnessMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+    </h4>
+    <h4 class="texture-checkbox">
+        <span style="vertical-align:-0.7rem;">DisplacementMap:</span>
+        <input type="checkbox" id="displacementMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+    </h4>
+    <h4 class="texture-checkbox">
+        <span style="vertical-align:-0.7rem;">AOMap:</span>
+        <input type="checkbox" id="aoMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+    </h4>
+    <h4 class="texture-checkbox">
+        <span style="vertical-align:-0.7rem;">AlphaMap:</span>
+        <input type="checkbox" id="alphaMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+    </h4>
+    <h4 class="texture-checkbox">
+        <span style="vertical-align:-0.7rem;">LightMap:</span>
+        <input type="checkbox" id="lightMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+    </h4>
+    <h4 class="texture-checkbox">
+        <span style="vertical-align:-0.7rem;">NormalMap:</span>
+        <input type="checkbox" id="normalMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+    </h4>
+
+</div>
+
+<script>
+
+(function(){
+
+    const textureHeaderSelector = ".texture-header";
+    const helpersHeaderSelector = ".helpers-header";
+    const textureControlSelector = "#material-texture-controls";
+
+    var Signal = signals.Signal;
+    var dblclicked = new Signal();
+
+//  Event handlers.
+    function onDoubleClickEventHandler( element ){
+        if ( $(element).css("display") == "none" ) {
+            $(element).slideDown();
+        } else {
+            $(element).slideUp();
+        }
+    }
+
+//  Event listeners.
+    dblclicked.add(onDoubleClickEventHandler);
+
+//  Dispatch events.
+    $(textureHeaderSelector).on("dblclick", function(){
+        dblclicked.dispatch( $(textureControlSelector).get(0) );
+    });
+
+})();
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -18,6 +18,18 @@
 
     .helpers-header h3 { cursor:pointer; }
 
+    .texture-item {
+        padding: 4px 15px;
+        text-align: left;
+        vertical-align: middle;
+        cursor: pointer;
+    }
+
+    .selected {
+        color:#fff;
+        background-color:#73b8f3;
+    }
+
     #texture-items {
         max-width:475px;
         max-height:660px;
@@ -272,26 +284,24 @@
 
     function get_items(){
 
-        textureUrls.find(selectors).skip(skip)
-            .limit(limit).toArray(function(err){
-            if (err) throw err;
-        }).then(function(docs){
+        textureUrls.slice(skip, limit)
+        .forEach(function(urls){
 
             $(displayObjects).children().remove();
-            debugMode && console.log({"docs":docs});
+            debugMode && console.log({"urls":urls});
 
-            docs.forEach(function(json){
+            urls.forEach(function(url){
 
                 var element = document.createElement("div");
-                element.innerText = element.title = json.name;
-                element.id = json._id; element.classList.add("material-item");
+                element.innerText = element.url = url;
+                element.classList.add("texture-item");
 
                 $(element).on("click", function(){
                     clearTimeout(this.interval);
                     this.interval = setTimeout( function(){
-                        $(".material-item").removeClass("selected");
+                        $(".texture-item").removeClass("selected");
                         $(element).addClass("selected");
-                        materialSelected.dispatch(json);
+                        cacheTextureSelected.dispatch(element.url);
                     }, msec );
                 });
 
@@ -299,8 +309,6 @@
 
             });
 
-        }).catch(function(err){
-            console.error(err);
         });
 
     }

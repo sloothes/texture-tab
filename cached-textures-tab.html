@@ -592,7 +592,11 @@
             data.slot   = outfitDroplist.value;
             data.gender = viewer.contentWindow.localPlayer.outfit.getGender();
 
-            viewer.contentWindow.localPlayerMaterialHandler(data);
+            if ( window.socket ) {
+            //   socket.publish(localPlayerMaterialChannel, data);
+            } else {
+                viewer.contentWindow.localPlayerMaterialHandler(data);
+            }
 
         });
     });

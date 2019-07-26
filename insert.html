@@ -293,27 +293,28 @@
         <div style="width:40%;display:inline-block;float:right;">
             <select id="texture-property" class="form-control texture-property-droplist" readonly>
                 <option value="">Select key:</option>
-                <option value="anisotropy">anisotropy</option>
-                <option value="encoding">encoding</option>
-                <option value="flipY">flipY</option>
-                <option value="format">format</option>
-                <option value="generateMipmaps">mipmaps</option>
-                <option value="magFilter">magFilter</option>
-                <option value="mapping">mapping</option>
-                <option value="minFilter">minFilter</option>
-                <option value="mipmaps">mipmaps</option>
-                <option value="name">name</option>
-                <option value="offset">offset</option>
-                <option value="premultiplyAlpha">premultiply</option>
-                <option value="repeat">repeat</option>
-                <option value="sourceFile">sourceFile</option>
-                <option value="type">type</option>
-                <option value="unpackAlignment">unpack</option>
-                <option value="uuid">uuid</option>
-                <option value="version">version</option>
-                <option value="wrapS">wrapS</option>
-                <option value="wrapT">wrapT</option>
                 <option value="_id">_id</option>
+                <option value="uuid">uuid</option>
+                <option value="name">name</option>
+                <option value="flipY">flipY</option>
+                <option value="offset">offset</option>
+                <option value="repeat">repeat</option>
+                <option value="version">version</option>
+                <option value="generateMipmaps">generate</option>
+                <option value="premultiplyAlpha">premultiply</option>
+                <option>-----------------</option>
+                <option value="type" style="display:none;">type</option>
+                <option value="wrapS" style="display:none;">wrapS</option>
+                <option value="wrapT" style="display:none;">wrapT</option>
+                <option value="unpackAlignment" style="display:none;">unpack</option>
+                <option value="anisotropy" style="display:none;">anisotropy</option>
+                <option value="encoding" style="display:none;">encoding</option>
+                <option value="format" style="display:none;">format</option>
+                <option value="magFilter" style="display:none;">magFilter</option>
+                <option value="mapping" style="display:none;">mapping</option>
+                <option value="minFilter" style="display:none;">minFilter</option>
+                <option value="mipmaps" style="display:none;">mipmaps</option>
+                <option value="sourceFile" style="display:none;">sourceFile</option>
             </select>
         </div>
     </h4>
@@ -521,7 +522,7 @@
         span.innerText = "name"; span.style.cssText = "vertical-align:-0.7rem;";
 
         var input = document.createElement("input"); 
-        input.id = "texture-input_name"; input.type = "text";
+        input.id = `texture-input_${key}`; input.type = "text";
         input.classList.add("form-control", "pull-right", "texture-textfield");
 
         input.value = json[key]; // name.
@@ -570,7 +571,7 @@
         span.innerText = "repeat"; span.style.cssText = "vertical-align:-0.7rem;";
 
         var input = document.createElement("input"); 
-        input.id = "texture-input_repeat"; input.type = "number"; input.step = 1;
+        input.id = `texture-input_${key}`; input.type = "number"; input.step = 1;
         input.classList.add("form-control", "pull-right", "texture-input-number");
 
         if ( json[key] && Array.isArray(json[key]) ) {
@@ -617,7 +618,7 @@
         button.id = "texture-button_uuid"; button.innerText = "⟳"; button.style.cssText = "width:fit-content;";
 
         var input = document.createElement("input");
-        input.id = "texture-input_uuid"; input.type = "text"; input.readOnly = true;
+        input.id = `texture-input_${key}`; input.type = "text"; input.readOnly = true;
         input.classList.add("form-control", "pull-right", "uuid-texture-textfield");
 
         input.value = json[key]; // generateUUID();
@@ -640,7 +641,8 @@
         span.innerText = "version"; span.style.cssText = "vertical-align:-0.7rem;";
 
         var input = document.createElement("input"); 
-        input.id = "texture-input_version"; input.type = "number"; input.step = 1;
+        input.id = `texture-input_${key}`; 
+        input.type = "number"; input.min = 1; input.step = 1;
         input.classList.add("form-control", "pull-right", "texture-input-number");
 
         input.value = json[key];

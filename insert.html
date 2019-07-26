@@ -446,8 +446,11 @@
         input.value = json.name;
 
         $(input).on("input", function(){
-            titleTextfield.value = json.name = this.value;
-            $(propDroplist).find("option#name").val( this.value );
+            json.name = this.value;
+        });
+
+        $(input).on("change", function(){
+            debugMode && console.log({"name":json.name});
         });
 
         $(propControls).slideDown();
@@ -466,21 +469,22 @@
         if ( !key || key != "repeat" ) return;
 
         var span = document.createElement("span");
-        span.innerText = "normalScale"; span.style.cssText = "vertical-align:-0.7rem;";
+        span.innerText = "repeat"; span.style.cssText = "vertical-align:-0.7rem;";
 
         var input = document.createElement("input"); 
-        input.id = "input_normalScale"; input.type = "number"; input.step = 0.01;
+        input.id = "texture-input_repeat"; input.type = "number"; input.step = 1;
         input.classList.add("form-control", "pull-right", "texture-input-number");
 
-        if ( json.normalScale && Array.isArray(json.normalScale) ) {
-            input.value = json.normalScale[0];
+        if ( json.repeat && Array.isArray(json.repeat) ) {
+            input.value = json.repeat[0];
         }
 
         $(input).on("input", function(){
-            var value = round(this.value, 2);
-            propertyValueChanged.dispatch(key, value );
-            json.normalScale[0] = json.normalScale[1] = value;
-            $(propDroplist).find("option#normalScale").val( value );
+            json.repeat[0] = json.repeat[1] = parseInt(this.value);
+        });
+
+        $(input).on("change", function(){
+            debugMode && console.log({"repeat":json.repeat});
         });
 
         $(propControls).slideDown();
@@ -522,6 +526,7 @@
 
         $(button).on("click", function(){
             input.value = json.uuid = generateUUID();
+            debugMode && console.log({"uuid":json.uuid});
         });
 
         $(propControls).slideDown();
@@ -563,6 +568,7 @@
 
         $(button).on("click", function(){
             input.value = json._id = ObjectId();
+            debugMode && console.log({"_id":json._id});
         });
 
         $(propControls).slideDown();

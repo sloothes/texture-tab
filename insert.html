@@ -1140,9 +1140,9 @@
 
             $(option).remove();
 
+            $(textureDroplist).change(); // or ...dispatch();
             $(textureControlSelector).slideUp();
             $(textureCheckboxSelector).attr({checked:false});
-            $(textureDroplist).change(); // or ...dispatch();
 
         //  Optional.
 
@@ -1168,6 +1168,7 @@
             option.value = "";  option.innerText = "Select imported texture:";
             $(textureDroplist).append(option);
 
+            $(textureDroplist).change(); // or ...dispatch();
             $(textureControlSelector).slideUp();
             $(textureCheckboxSelector).attr({checked:false});
 

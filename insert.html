@@ -173,10 +173,11 @@
     const textureDroplist  = $("select#imported-textures").get(0);
     const textureControls  = $("#material-texture-controls").get(0);
 
+    const THREE = viewer.contentWindow.THREE;
+
     const textureControlSelector = "#material-texture-controls";
     const textureCheckboxSelector = "input[type=checkbox].material-texture-checkbox";
-
-    const THREE = viewer.contentWindow.THREE;
+    const texturePropertyControls = document.getElementById("texture-property-controls");
 
     const generateUUID = function (){
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"

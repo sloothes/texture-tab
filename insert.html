@@ -160,9 +160,9 @@
     });
 */
 
-    var files = {};
-    var uploads = [];
-    var textures = {};
+    const files = {};
+    const uploads = [];
+    const textures = {};
 
     const viewer = document.getElementById("viewer");
     const textureImportBtn = $("#import-texture-button").get(0);
@@ -176,15 +176,41 @@
     const textureControlSelector = "#material-texture-controls";
     const textureCheckboxSelector = "input[type=checkbox].material-texture-checkbox";
 
-    var THREE = viewer.contentWindow.THREE; // important!
+    const THREE = viewer.contentWindow.THREE;
 
-    function generateUUID(){
+    const generateUUID = function (){
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
         .replace(/[xy]/g, function(c) {
             var r = Math.random()*16|0;
             var v = c == 'x'?r:r&0x3|0x8;
             return v.toString(16);
         }).toLocaleUpperCase();
+    }
+
+    const jsonTexture = function () {
+        return {
+            anisotropy: 1,
+            encoding: 3000,
+            flipY: true,
+            format: 1021,
+            generateMipmaps: true,
+            magFilter: 1006,
+            mapping: 300,
+            minFilter: 1008,
+            mipmaps: [],
+            name: "",
+            offset: [0, 0],
+            premultiplyAlpha: false,
+            repeat: [1, 1],
+            sourceFile: "",
+            type: 1009,
+            unpackAlignment: 4,
+            uuid: generateUUID(),
+            version: 0,
+            wrapS: 1001,
+            wrapT: 1001,
+            _id: ObjectId(),
+        };
     }
 
     const maps = [
@@ -441,33 +467,6 @@
 
     });
 
-
-    function newJsonTexture() {
-        return {
-            anisotropy: 1,
-            encoding: 3000,
-            flipY: true,
-            format: 1021,
-            generateMipmaps: true,
-            magFilter: 1006,
-            mapping: 300,
-            minFilter: 1008,
-            mipmaps: [],
-            name: "",
-            offset: [0, 0],
-            premultiplyAlpha: false,
-            repeat: [1, 1],
-            sourceFile: "",
-            type: 1009,
-            unpackAlignment: 4,
-            uuid: generateUUID(),
-            version: 0,
-            wrapS: 1001,
-            wrapT: 1001,
-            _id: ObjectId(),
-        };
-    }
-
 //  deepCopy.js
 
     function deepCopy(obj) {
@@ -488,7 +487,6 @@
         return obj;
     }
 
-
 //  round.js  source: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round"
 
     function round(number, precision) {
@@ -501,23 +499,6 @@
         };
         return shift(Math.round(shift(number, precision, false)), precision, true);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 })();
 

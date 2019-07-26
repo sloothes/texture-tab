@@ -751,6 +751,19 @@
 
     });
 
+
+
+
+    $("#new-texture-button").on("click", function(){
+        clearTimeout(this.interval);
+        this.interval = setTimeout(function(){
+            json = new jsonTexture();
+            debugMode && console.log({"new":json});
+        }, 200);
+    });
+
+
+
 /*
     anisotropy: 1,
     encoding: 3000,

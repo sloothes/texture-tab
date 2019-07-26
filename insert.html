@@ -294,7 +294,7 @@
             <select id="texture-property" class="form-control texture-property-droplist" readonly>
                 <option value="">Select key:</option>
                 <option value="anisotropy">anisotropy</option>
-                <option value="encoding">anisotropy</option>
+                <option value="encoding">encoding</option>
                 <option value="flipY">flipY</option>
                 <option value="format">format</option>
                 <option value="generateMipmaps">generateMipmaps</option>
@@ -443,14 +443,14 @@
         input.id = "texture-input_name"; input.type = "text";
         input.classList.add("form-control", "pull-right", "texture-textfield");
 
-        input.value = json.name;
+        input.value = json[key]; // name.
 
         $(input).on("input", function(){
-            json.name = this.value;
+            json[key] = this.value;
         });
 
         $(input).on("change", function(){
-            debugMode && console.log({"name":json.name});
+            debugMode && console.log({[key]:json[key]});
         });
 
         $(propControls).slideDown();
@@ -475,16 +475,16 @@
         input.id = "texture-input_repeat"; input.type = "number"; input.step = 1;
         input.classList.add("form-control", "pull-right", "texture-input-number");
 
-        if ( json.repeat && Array.isArray(json.repeat) ) {
-            input.value = json.repeat[0];
+        if ( json[key] && Array.isArray(json[key]) ) {
+            input.value = json[key][0];
         }
 
         $(input).on("input", function(){
-            json.repeat[0] = json.repeat[1] = parseInt(this.value);
+            json[key][0] = json[key][1] = parseInt(this.value);
         });
 
         $(input).on("change", function(){
-            debugMode && console.log({"repeat":json.repeat});
+            debugMode && console.log({[key]:json[key]});
         });
 
         $(propControls).slideDown();
@@ -522,11 +522,11 @@
         input.id = "texture-input_uuid"; input.type = "text"; input.readOnly = true;
         input.classList.add("form-control", "pull-right", "uuid-texture-textfield");
 
-        input.value = json.uuid; // generateUUID();
+        input.value = json[key]; // generateUUID();
 
         $(button).on("click", function(){
-            input.value = json.uuid = generateUUID();
-            debugMode && console.log({"uuid":json.uuid});
+            input.value = json[key] = generateUUID();
+            debugMode && console.log({[key]:json[key]});
         });
 
         $(propControls).slideDown();
@@ -537,6 +537,26 @@
     propertiesDroplistChanged.add(function (key){
 
         if ( !key || key != "version" ) return;
+
+        var span = document.createElement("span");
+        span.innerText = "version"; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.id = "texture-input_version"; input.type = "number"; input.step = 1;
+        input.classList.add("form-control", "pull-right", "texture-input-number");
+
+        input.value = json[key];
+
+        $(input).on("input", function(){
+            json[key] = parseInt(this.value);
+        });
+
+        $(input).on("change", function(){
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(propControls).slideDown();
+        $(propControls).append(span, input);
 
     });
 
@@ -564,11 +584,11 @@
         input.id = "texture-input_id"; input.type = "text"; input.readOnly = true;
         input.classList.add("form-control", "text-center", "pull-right", "uuid-texture-textfield");
 
-        input.value = json._id; // ObjectId();
+        input.value = json[key]; // ObjectId();
 
         $(button).on("click", function(){
-            input.value = json._id = ObjectId();
-            debugMode && console.log({"_id":json._id});
+            input.value = json[key] = ObjectId();
+            debugMode && console.log({[key]:json[key]});
         });
 
         $(propControls).slideDown();

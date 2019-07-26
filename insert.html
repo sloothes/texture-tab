@@ -570,19 +570,19 @@
         var span = document.createElement("span");
         span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
 
+        var divY = document.createElement("div"); divY.innerText = "y:";
+        var inputy = document.createElement("input"); 
+        inputy.id = `texture-input_${key}-y`; inputy.type = "number"; inputy.step = 0.01;
+        inputy.classList.add("form-control", "texture-input-number");
+        inputy.style.cssText = "display:inline;"; 
+        divY.classList.add("pull-right"); $(divY).append(inputy);
+
         var divX = document.createElement("div"); divX.innerText = "x:";
         var inputx = document.createElement("input"); 
         inputx.id = `texture-input_${key}-x`; inputx.type = "number"; inputx.step = 0.01;
         inputx.classList.add("form-control", "texture-input-number");
         inputx.style.cssText = "display:inline;"; 
-        $(divX).append(inputx);
-
-        var divY = document.createElement("div"); divY.innerText = "y:";
-        var inputy = document.createElement("input"); 
-        inputy.id = `texture-input_${key}-y`; inputy.type = "number"; inputy.step = 0.01;
-        inputy.classList.add("form-control", "texture-input-number");
-        inputy.style.cssText = "display:inline;"; inputy.classList.add("pull-right"); 
-        $(divY).append(inputy);
+        divX.classList.add("pull-right"); $(divX).append(inputx);
 
         if ( json[key] && Array.isArray(json[key]) ) {
             inputx.value = json[key][0];

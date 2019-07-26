@@ -363,8 +363,8 @@
     const textures = {};
 
     const viewer = document.getElementById("viewer");
-    const slotDroplist   = $("#texture-outfit-slot").get(0);
-    const genderDroplist = $("#texture-gender-droplist").get(0);
+    const slotDroplist     = $("#texture-outfit-slot").get(0);
+    const genderDroplist   = $("#texture-gender-droplist").get(0);
     const textureControls  = $("#texture-map-controls").get(0);
     const textureImportBtn = $("#import-texture-button").get(0);
     const textureFileinput = $("input#texture-fileinput").get(0);
@@ -372,6 +372,7 @@
     const texturesClearBtn = $("#clear-imported-textures").get(0);
     const textureUploadBtn = $("#upload-selected-texture").get(0);
     const textureDroplist  = $("select#imported-textures").get(0);
+    const texturePreviewImg = $("img#texture-preview").get(0);
 
     const THREE = viewer.contentWindow.THREE;
 
@@ -424,8 +425,8 @@
         "alphaMap", 
         "normalMap", 
         "lightMap", 
+    //  "envMap",
         "aoMap", 
-        "envMap",
     ];
 
     maps.forEach(function( key ){
@@ -521,7 +522,7 @@
         if ( this.value ) {
 
             var src = textures[ this.value ].sourceFile;
-            $("img#material-texture-preview").attr({"src":src});
+            $(texturePreviewImg).attr({"src":src});
 
         } else {
 
@@ -539,7 +540,7 @@
                 var geometry = viewer.contentWindow[gender][slot].geometry;
                 var src = THREE.UVsDebug(geometry, 512).toDataURL();
 
-                $("img#material-texture-preview").attr({"src":src});
+                $(texturePreviewImg).attr({"src":src});
 
             })();
 

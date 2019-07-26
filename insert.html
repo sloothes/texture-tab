@@ -297,18 +297,18 @@
                 <option value="encoding">encoding</option>
                 <option value="flipY">flipY</option>
                 <option value="format">format</option>
-                <option value="generateMipmaps">generateMipmaps</option>
+                <option value="generateMipmaps">mipmaps</option>
                 <option value="magFilter">magFilter</option>
                 <option value="mapping">mapping</option>
                 <option value="minFilter">minFilter</option>
                 <option value="mipmaps">mipmaps</option>
                 <option value="name">name</option>
                 <option value="offset">offset</option>
-                <option value="premultiplyAlpha">premultiplyAlpha</option>
+                <option value="premultiplyAlpha">premultiply</option>
                 <option value="repeat">repeat</option>
                 <option value="sourceFile">sourceFile</option>
                 <option value="type">type</option>
-                <option value="unpackAlignment">unpackAlignment</option>
+                <option value="unpackAlignment">unpack</option>
                 <option value="uuid">uuid</option>
                 <option value="version">version</option>
                 <option value="wrapS">wrapS</option>
@@ -329,16 +329,18 @@
     const propDroplist = $("select#texture-property").get(0);
     const propControls = $("#texture-property-controls").get(0);
 
-    const generateUUID = function (){
+    var json = new jsonTexture();
+
+    function generateUUID(){
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
         .replace(/[xy]/g, function(c) {
             var r = Math.random()*16|0;
             var v = c == 'x'?r:r&0x3|0x8;
             return v.toString(16);
         }).toLocaleUpperCase();
-    }
+    };
 
-    const jsonTexture = function () {
+    function jsonTexture() {
         return {
             anisotropy: 1,
             encoding: 3000,
@@ -362,9 +364,34 @@
             wrapT: 1001,
             _id: ObjectId(),
         };
-    }
+    };
 
-    var json = new jsonTexture();
+    function propertyDroplistReset(){
+
+        $(propDroplist).children().remove();
+        $(propControls).children().remove();
+
+        var option = document.createElement("option");
+        option.value = ""; option.innerText = "Select key:";
+        $(propDroplist).append(option);
+
+        json = new jsonTexture();
+
+    //  Sort json keys.
+        var sortedKeys = Object.keys(json).sort();
+        for ( var i = 0; i < sortedKeys.length; i++ ) {
+
+            var key = sortedKeys[i];
+            var option = document.createElement("option");
+
+            option.value = key; 
+            option.innerText = key;
+
+            $(propDroplist).append(option);
+
+        }
+
+    }
 
     var Signal = signals.Signal;
     var propertiesDroplistChanged = new Signal();
@@ -382,6 +409,26 @@
 
         if ( !key || key != "anisotropy" ) return;
 
+        var span = document.createElement("span");
+        span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.classList.add("form-control", "pull-right", "texture-input-number");
+        input.id = `texture-input_${key}`; input.type = "number"; input.step = 0.1;
+
+        input.value = json[key];
+
+        $(input).on("input", function(){
+            json[key] = round(this.value, 2);
+        });
+
+        $(input).on("change", function(){
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(propControls).slideDown();
+        $(propControls).append(span, input);
+
     });
 
     propertiesDroplistChanged.add(function (key){
@@ -394,6 +441,23 @@
 
         if ( !key || key != "flipY" ) return;
 
+        var span = document.createElement("span");
+        span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.id = `texture-input_${key}`; input.type = "checkbox"; 
+        input.classList.add("form-control", "pull-right", "texture-checkbox");
+
+        input.checked = json[key] || "";
+
+        $(input).on("click", function(){
+            json[key] = this.checked;
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(propControls).slideDown();
+        $(propControls).append(span, input);
+
     });
 
     propertiesDroplistChanged.add(function (key){
@@ -405,6 +469,23 @@
     propertiesDroplistChanged.add(function (key){
 
         if ( !key || key != "generateMipmaps" ) return;
+
+        var span = document.createElement("span");
+        span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.id = `texture-input_${key}`; input.type = "checkbox"; 
+        input.classList.add("form-control", "pull-right", "texture-checkbox");
+
+        input.checked = json[key] || "";
+
+        $(input).on("click", function(){
+            json[key] = this.checked;
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(propControls).slideDown();
+        $(propControls).append(span, input);
 
     });
 
@@ -461,6 +542,23 @@
     propertiesDroplistChanged.add(function (key){
 
         if ( !key || key != "premultiplyAlpha" ) return;
+
+        var span = document.createElement("span");
+        span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.id = `texture-input_${key}`; input.type = "checkbox"; 
+        input.classList.add("form-control", "pull-right", "texture-checkbox");
+
+        input.checked = json[key] || "";
+
+        $(input).on("click", function(){
+            json[key] = this.checked;
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(propControls).slideDown();
+        $(propControls).append(span, input);
 
     });
 

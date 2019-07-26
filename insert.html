@@ -14,6 +14,24 @@
 
 </script>
 
+<style>
+
+    .helpers-header h2 { 
+        cursor:pointer; 
+    }
+
+    .texture-checkbox {
+        width:34px;
+    }
+
+    #texture-property-controls {
+        background:none;
+        border-radius:8px;
+        height:73px;
+    }
+
+</style>
+
 <div class="helpers-header texture-header">
     <h2 style="margin-bottom:20px;">Texture:</h2>
 </div>
@@ -28,47 +46,49 @@
     </select>
 </div>
 
+<div id="texture-property-controls" class="well"></div>
+
 <div id="material-texture-controls" class="well" style="background:none;border-radius:8px;height:auto;display:none;">
 
     <h4 class="texture-checkbox-helper">
         <span style="vertical-align:-0.7rem;">Map:</span>
-        <input type="checkbox" id="map" class="form-control pull-right material-checkbox material-texture-checkbox">
+        <input type="checkbox" id="map" class="form-control pull-right texture-checkbox texture-checkbox-control">
     </h4>
     <h4 class="texture-checkbox-helper">
         <span style="vertical-align:-0.7rem;">BumpMap:</span>
-        <input type="checkbox" id="bumpMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+        <input type="checkbox" id="bumpMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
     </h4>
     <h4 class="texture-checkbox-helper">
         <span style="vertical-align:-0.7rem;">EmissiveMap:</span>
-        <input type="checkbox" id="emissiveMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+        <input type="checkbox" id="emissiveMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
     </h4>
     <h4 class="texture-checkbox-helper">
         <span style="vertical-align:-0.7rem;">MetalnessMap:</span>
-        <input type="checkbox" id="metalnessMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+        <input type="checkbox" id="metalnessMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
     </h4>
     <h4 class="texture-checkbox-helper">
         <span style="vertical-align:-0.7rem;">RoughnessMap:</span>
-        <input type="checkbox" id="roughnessMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+        <input type="checkbox" id="roughnessMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
     </h4>
     <h4 class="texture-checkbox-helper">
         <span style="vertical-align:-0.7rem;">DisplacementMap:</span>
-        <input type="checkbox" id="displacementMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+        <input type="checkbox" id="displacementMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
     </h4>
     <h4 class="texture-checkbox-helper">
         <span style="vertical-align:-0.7rem;">AOMap:</span>
-        <input type="checkbox" id="aoMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+        <input type="checkbox" id="aoMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
     </h4>
     <h4 class="texture-checkbox-helper">
         <span style="vertical-align:-0.7rem;">AlphaMap:</span>
-        <input type="checkbox" id="alphaMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+        <input type="checkbox" id="alphaMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
     </h4>
     <h4 class="texture-checkbox-helper">
         <span style="vertical-align:-0.7rem;">LightMap:</span>
-        <input type="checkbox" id="lightMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+        <input type="checkbox" id="lightMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
     </h4>
     <h4 class="texture-checkbox-helper">
         <span style="vertical-align:-0.7rem;">NormalMap:</span>
-        <input type="checkbox" id="normalMap" class="form-control pull-right material-checkbox material-texture-checkbox">
+        <input type="checkbox" id="normalMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
     </h4>
 
 </div>
@@ -167,7 +187,320 @@
         }).toLocaleUpperCase();
     }
 
+    const maps = [
+        "map", 
+        "bumpMap", 
+        "emissiveMap", 
+        "metalnessMap", 
+        "roughnessMap", 
+        "displacementMap", 
+        "alphaMap", 
+        "normalMap", 
+        "lightMap", 
+        "aoMap", 
+        "envMap",
+    ];
 
+    maps.forEach(function( key ){
+        $(textureControls).find(`input#${key}`).on("click", function(){
+
+            if (!textureDroplist.value) return;
+
+            var name = textureDroplist.value;
+
+            if ( !this.checked ) {
+
+                var texture = null;
+                delete json[ key ];
+
+            } else {
+
+                var texture = textures[ name ];  //  json texture.
+                json[ key ] = textures[ name ];
+
+            }
+
+            propertyValueChanged.dispatch( key, texture );
+
+        });
+    });
+
+//  BUTTON IMPORT.
+
+    $(textureImportBtn).on("click", function(){
+        $(textureFileinput).val("");
+        $(textureFileinput).click();
+    });
+
+    $(textureFileinput).on("change", function(){
+        if ( this.files.length == 0 ) return;
+
+        $(textureCheckboxSelector).attr({checked:false});
+
+        for (var i = 0; i < this.files.length; i++ ) {
+
+            (function(){
+
+                var file = textureFileinput.files[i];
+                var name = textureFileinput.files[i].name;
+
+                if ( name in files && file.lastModified == files[name].lastModified 
+                    && file.size == files[name].size && file.type == files[name].type ) {
+
+                        // (WHATEVER) //
+
+                } else {
+
+                    files[ name ] = file;
+
+                    var reader = new FileReader();
+                    reader.onload = function() {
+
+                        textures[ name ] = newJsonTexture();
+                        textures[ name ].sourceFile = reader.result;
+                        textures[ name ].name = name;
+
+                        var option = document.createElement("option");
+                        option.value = option.innerText = name;
+                        option.id = textures[ name ]._id;
+
+                        $(textureDroplist).append(option);
+                        //  textureDroplist.value = name;
+
+                    };
+
+                    reader.readAsDataURL(files[ name ]);
+
+                }
+
+            })();
+
+        }
+
+        debugMode && console.log({
+            "files": files, 
+            "textures": textures,
+        });
+
+    });
+
+
+//  SELECT TEXTURE DROPLIST.
+
+    $(textureDroplist).on("change", function(){
+
+        $(textureCheckboxSelector).attr({checked:false});
+
+        if ( this.value ) {
+
+            var src = textures[ this.value ].sourceFile;
+            $("img#material-texture-preview").attr({"src":src});
+
+        } else {
+
+            (function(){
+
+                if ( !slotDroplist.value ) return;
+                if ( !genderDroplist.value ) return;
+
+                var slot = slotDroplist.value;
+                var gender = genderDroplist.value;
+
+                if ( !viewer.contentWindow[gender][slot] ) return;
+
+                var THREE = viewer.contentWindow.THREE; // important!
+                var geometry = viewer.contentWindow[gender][slot].geometry;
+                var src = THREE.UVsDebug(geometry, 512).toDataURL();
+
+                $("img#material-texture-preview").attr({"src":src});
+
+            })();
+
+        }
+
+        if ( this.value ) {
+            $(textureControlSelector).slideDown();
+        } else {
+            $(textureControlSelector).slideUp();
+        }
+
+    });
+
+
+//  BUTTON DELETE.
+
+    $(textureDeleteBtn).on("click", function(){
+        var option = textureDroplist.selectedOptions[0];
+
+        if ( !option ) return;
+        if ( !option.value ) return;
+
+        clearTimeout(this.interval);
+        this.interval = setTimeout( function(){
+
+            $(option).remove();
+
+            $(textureControlSelector).slideUp();
+            $(textureCheckboxSelector).attr({checked:false});
+            $(textureDroplist).change(); // or ...dispatch();
+
+        //  Optional.
+
+            delete files[ option.value ];
+            delete textures[ option.value ];
+            debugMode && console.log({"files":files, "textures": textures});
+
+        }, 250 );
+
+    });
+
+
+//  BUTTON CLEAR.
+
+    $(texturesClearBtn).on("click", function(){
+
+        clearTimeout(this.interval);
+        this.interval = setTimeout( function(){
+            debugMode && console.log({"files":files, "textures": textures});
+
+            $(textureDroplist).children().remove();
+            var option = document.createElement("option");
+            option.value = "";  option.innerText = "Select imported texture:";
+            $(textureDroplist).append(option);
+
+            $(textureControlSelector).slideUp();
+            $(textureCheckboxSelector).attr({checked:false});
+
+        //  Optional.
+
+            for (var name in textures){
+                delete files[name];
+                delete textures[name];
+            }
+
+            files = {}; textures = {};
+
+        }, 250 );
+
+    });
+
+
+//  BUTTON UPLOAD.
+
+    $(textureUploadBtn).on("click", function(){
+        debugMode && console.log({"uploads":uploads});
+
+        if ( !uploads.length ) {
+            var msg = "There is nothing to upload.";
+            return bootbox.dialog({
+                size: "small",
+                className: "middle",
+                title: `<div class="alert-icon icon-warning"></div>`
+                     + `<h2 style="margin:auto;">Sorry!</h2>`,
+                message: `<div>${msg}</div>`,
+                buttons: {
+                    cancel: {
+                        label: "Close",
+                        className: "btn-default",
+                        callback: function(){
+                            debugMode && console.log(msg);
+                        },
+                    },
+                },
+            });
+        }
+
+        if ( !navigator.onLine ) {
+            var msg = "Your connection to the internet is down.";
+            return bootbox.dialog({
+                size: "small",
+                className: "middle",
+                title: `<div class="alert-icon icon-error"></div>`
+                     + `<h2 style="margin:auto;">Sorry!</h2>`,
+                message: `<div>${msg}</div>`,
+                buttons: {
+                    cancel: {
+                        label: "Close",
+                        className: "btn-default",
+                        callback: function(){
+                            debugMode && console.log(msg);
+                        },
+                    },
+                },
+            });
+        }
+
+        clearTimeout(this.interval);
+        this.interval = setTimeout( function(){
+
+            while( uploads.length ){
+                uploads.shift().call();
+            }
+
+        }, 250 );
+
+    });
+
+
+    function newJsonTexture() {
+        return {
+            anisotropy: 1,
+            encoding: 3000,
+            flipY: true,
+            format: 1021,
+            generateMipmaps: true,
+            magFilter: 1006,
+            mapping: 300,
+            minFilter: 1008,
+            mipmaps: [],
+            name: "",
+            offset: [0, 0],
+            premultiplyAlpha: false,
+            repeat: [1, 1],
+            sourceFile: "",
+            type: 1009,
+            unpackAlignment: 4,
+            uuid: generateUUID(),
+            version: 0,
+            wrapS: 1001,
+            wrapT: 1001,
+            _id: ObjectId(),
+        };
+    }
+
+//  deepCopy.js
+
+    function deepCopy(obj) {
+        if (Object.prototype.toString.call(obj) === "[object Array]") {
+            var out = [], i = 0, len = obj.length;
+            for ( ; i < len; i++ ) {
+                out[i] = arguments.callee(obj[i]);
+            }
+            return out;
+        }
+        if (typeof obj === "object") {
+            var out = {}, i;
+            for ( i in obj ) {
+                out[i] = arguments.callee(obj[i]);
+            }
+            return out;
+        }
+        return obj;
+    }
+
+
+//  round.js  source: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round"
+
+    function round(number, precision) {
+        var shift = function (number, precision, reverseShift) {
+            if (reverseShift) {
+                precision = -precision;
+            }  
+            numArray = ("" + number).split("e");
+            return +(numArray[0] + "e" + (numArray[1] ? (+numArray[1] + precision) : precision));
+        };
+        return shift(Math.round(shift(number, precision, false)), precision, true);
+    }
 
 
 

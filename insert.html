@@ -283,7 +283,7 @@
                     var reader = new FileReader();
                     reader.onload = function() {
 
-                        textures[ name ] = newJsonTexture();
+                        textures[ name ] = new jsonTexture();
                         textures[ name ].sourceFile = reader.result;
                         textures[ name ].name = name;
 

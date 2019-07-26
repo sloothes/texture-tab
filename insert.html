@@ -111,10 +111,9 @@
 
     genderChanged.add(function(){
 
-        if ( importedTextures.value ) return;
-
         if ( !slotDroplist.value ) return;
         if ( !genderDroplist.value ) return;
+        if ( importedTextures.value ) return;
 
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;
@@ -180,7 +179,7 @@
         //  Reset texture preview.
         //  https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src
 
-            texturePreview.src = "//:0"; 
+            $(texturePreview).attr({src: "//:0"}); 
 
         }
 
@@ -192,7 +191,17 @@
 
     outfitSlotChanged.add(function(value){
 
+        if ( !value ) {
+
+        //  Reset texture preview.
+        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+
+            $(texturePreview).attr({src: "//:0"}); 
+
+        };
+
     //  Null value IS allowed!
+
         var data = "/select/" + value;
         viewer.contentWindow.localPlayerHandler(data);
 
@@ -200,10 +209,9 @@
 
     outfitSlotChanged.add(function(){
 
-        if ( importedTextures.value ) return;
-
         if ( !slotDroplist.value ) return;
         if ( !genderDroplist.value ) return;
+        if ( importedTextures.value ) return;
 
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;

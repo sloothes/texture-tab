@@ -1064,7 +1064,8 @@
                         option.id = textures[ name ]._id;
 
                         $(textureDroplist).append(option);
-                        //  textureDroplist.value = name;
+                        textureDroplist.value = option.value;
+                        $(textureDroplist).change();
 
                     };
 
@@ -1075,9 +1076,6 @@
             })();
 
         }
-
-        textureDroplist.selectedIndex = 1;
-        $("select#imported-textures").change();
 
         debugMode && console.log({
             "files": files, 

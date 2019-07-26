@@ -565,10 +565,47 @@
 
     propertiesDroplistChanged.add(function (key){
 
+        if ( !key || key != "offset" ) return;
+
+        var span = document.createElement("span");
+        span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var inputx = document.createElement("input"); 
+        inputx.id = `texture-input_${key}-x`; inputx.type = "number"; inputx.step = 0.01;
+        inputx.classList.add("form-control", "pull-right", "texture-input-number");
+
+        var inputy = document.createElement("input"); 
+        inputy.id = `texture-input_${key}-y`; inputy.type = "number"; inputy.step = 0.01;
+        inputy.classList.add("form-control", "pull-right", "texture-input-number");
+
+        if ( json[key] && Array.isArray(json[key]) ) {
+            inputx.value = json[key][0];
+            inputy.value = json[key][1];
+        }
+
+        $(inputx).on("input", function(){
+            json[key][0] = round(this.value, 2);
+        });
+
+        $(inputy).on("input", function(){
+            json[key][1] = round(this.value, 2);
+        });
+
+        $(input).on("change", function(){
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(propControls).slideDown();
+        $(propControls).append(span, inputx, inputy);
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
         if ( !key || key != "repeat" ) return;
 
         var span = document.createElement("span");
-        span.innerText = "repeat"; span.style.cssText = "vertical-align:-0.7rem;";
+        span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
 
         var input = document.createElement("input"); 
         input.id = `texture-input_${key}`; input.type = "number"; input.step = 1;

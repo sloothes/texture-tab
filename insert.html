@@ -3,7 +3,7 @@
     (function(){
         var component_ID = {
             type: "tab",
-            demo: false,
+            beta: true,
             version: 2.1,
             kind: "component",
             name: "insert.html",
@@ -22,6 +22,50 @@
 
     .texture-checkbox {
         width:34px;
+    }
+
+    .texture-value {
+        text-align: center;
+        font-size: x-large;
+        font-weight: bold;
+    }
+
+    .x-large {
+        font-size: x-large;
+    }
+    
+    .texture-property-controls {
+        height:72px;
+    }
+
+    .uuid-texture-textfield {
+        width:80%;
+    }
+
+    .texture-textfield {
+        width:75%;
+        float:right;
+    }
+
+    .texture-checkbox {
+        width:34px;
+    }
+
+    .texture-checkbox-helper {
+        height:40px;
+        margin-top:0px;
+        margin-bottom:0px;
+    }
+
+    .texture-input-number {
+        width: 60px;
+        padding: 0;
+        text-align: right;
+        background: none;
+        font-weight: bold;
+        font-size: 18px;
+        border: none;
+        color: #ffff;
     }
 
     #texture-property-controls {
@@ -244,7 +288,349 @@
 
 </script>
 
+<div style="height:35px;margin-bottom:10px;">
+    <h4><span style="vertical-align:-0.5rem;">Select property:</span>
+        <div style="width:40%;display:inline-block;float:right;">
+            <select id="texture-property" class="form-control texture-property-droplist" readonly>
+                <option value="">Select key:</option>
+                <option value="anisotropy">anisotropy</option>
+                <option value="encoding">anisotropy</option>
+                <option value="flipY">flipY</option>
+                <option value="format">format</option>
+                <option value="generateMipmaps">generateMipmaps</option>
+                <option value="magFilter">magFilter</option>
+                <option value="mapping">mapping</option>
+                <option value="minFilter">minFilter</option>
+                <option value="mipmaps">mipmaps</option>
+                <option value="name">name</option>
+                <option value="offset">offset</option>
+                <option value="premultiplyAlpha">premultiplyAlpha</option>
+                <option value="repeat">repeat</option>
+                <option value="sourceFile">sourceFile</option>
+                <option value="type">type</option>
+                <option value="unpackAlignment">unpackAlignment</option>
+                <option value="uuid">uuid</option>
+                <option value="version">version</option>
+                <option value="wrapS">wrapS</option>
+                <option value="wrapT">wrapT</option>
+                <option value="_id">_id</option>
+            </select>
+        </div>
+    </h4>
+</div>
+
 <div id="texture-property-controls" class="well"></div>
+
+<script>
+
+(function(){
+
+    var json;
+
+    const viewer = document.getElementById("viewer");
+    const propDroplist = $("select#texture-property").get(0);
+    const propControls = $("#texture-property-controls").get(0);
+
+    const generateUUID = function (){
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+        .replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0;
+            var v = c == 'x'?r:r&0x3|0x8;
+            return v.toString(16);
+        }).toLocaleUpperCase();
+    }
+
+    const jsonTexture = function () {
+        return {
+            anisotropy: 1,
+            encoding: 3000,
+            flipY: true,
+            format: 1021,
+            generateMipmaps: true,
+            magFilter: 1006,
+            mapping: 300,
+            minFilter: 1008,
+            mipmaps: [],
+            name: "",
+            offset: [0, 0],
+            premultiplyAlpha: false,
+            repeat: [1, 1],
+            sourceFile: "",
+            type: 1009,
+            unpackAlignment: 4,
+            uuid: generateUUID(),
+            version: 0,
+            wrapS: 1001,
+            wrapT: 1001,
+            _id: ObjectId(),
+        };
+    }
+
+    var Signal = signals.Signal;
+    var propertiesDroplistChanged = new Signal();
+
+    $(propDroplist).on("change", function(){
+        propertiesDroplistChanged.dispatch(this.value);
+    });
+
+    propertiesDroplistChanged.add(function (){
+        $(propControls).css({height:""});
+        $(propControls).children().remove();
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "anisotropy" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "encoding" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "flipY" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "format" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "generateMipmaps" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "magFilter" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "mapping" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "minFilter" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "mipmaps" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "name" ) return;
+
+        var span = document.createElement("span");
+        span.innerText = "name"; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.id = "texture-input_name"; input.type = "text";
+        input.classList.add("form-control", "pull-right", "texture-textfield");
+
+        input.value = json.name;
+
+        $(input).on("input", function(){
+            titleTextfield.value = json.name = this.value;
+            $(propDroplist).find("option#name").val( this.value );
+        });
+
+        $(propControls).slideDown();
+        $(propControls).append(span, input);
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "premultiplyAlpha" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "repeat" ) return;
+
+        var span = document.createElement("span");
+        span.innerText = "normalScale"; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.id = "input_normalScale"; input.type = "number"; input.step = 0.01;
+        input.classList.add("form-control", "pull-right", "texture-input-number");
+
+        if ( json.normalScale && Array.isArray(json.normalScale) ) {
+            input.value = json.normalScale[0];
+        }
+
+        $(input).on("input", function(){
+            var value = round(this.value, 2);
+            propertyValueChanged.dispatch(key, value );
+            json.normalScale[0] = json.normalScale[1] = value;
+            $(propDroplist).find("option#normalScale").val( value );
+        });
+
+        $(propControls).slideDown();
+        $(propControls).append(span, input);
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "sourceFile" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "type" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "unpackAlignment" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "uuid" ) return;
+
+        var button = document.createElement("div");
+        button.classList.add("form-control", "btn", "btn-info", "btn-white-outline", "gradient-btn");
+        button.id = "texture-button_uuid"; button.innerText = "⟳"; button.style.cssText = "width:fit-content;";
+
+        var input = document.createElement("input");
+        input.id = "texture-input_uuid"; input.type = "text"; input.readOnly = true;
+        input.classList.add("form-control", "pull-right", "uuid-texture-textfield");
+
+        input.value = json.uuid; // generateUUID();
+
+        $(button).on("click", function(){
+            input.value = json.uuid = generateUUID();
+        });
+
+        $(propControls).slideDown();
+        $(propControls).append(button, input);
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "version" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "wrapS" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "wrapT" ) return;
+
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key || key != "_id" ) return;
+
+        var button = document.createElement("div");
+        button.classList.add("form-control", "btn", "btn-info", "btn-white-outline", "gradient-btn");
+        button.id = "texture-button_id"; button.innerText = "⟳"; button.style.cssText = "width:fit-content;";
+
+        var input = document.createElement("input");
+        input.id = "texture-input_id"; input.type = "text"; input.readOnly = true;
+        input.classList.add("form-control", "text-center", "pull-right", "uuid-texture-textfield");
+
+        input.value = json._id; // ObjectId();
+
+        $(button).on("click", function(){
+            input.value = json._id = ObjectId();
+        });
+
+        $(propControls).slideDown();
+        $(propControls).append(button, input);
+
+    });
+
+/*
+    anisotropy: 1,
+    encoding: 3000,
+    flipY: true,
+    format: 1021,
+    generateMipmaps: true,
+    magFilter: 1006,
+    mapping: 300,
+    minFilter: 1008,
+    mipmaps: [],
+    name: "",
+    offset: [0, 0],
+    premultiplyAlpha: false,
+    repeat: [1, 1],
+    sourceFile: "",
+    type: 1009,
+    unpackAlignment: 4,
+    uuid: generateUUID(),
+    version: 0,
+    wrapS: 1001,
+    wrapT: 1001,
+    _id: ObjectId(),
+*/
+
+//  deepCopy.js
+
+    function deepCopy(obj) {
+        if (Object.prototype.toString.call(obj) === "[object Array]") {
+            var out = [], i = 0, len = obj.length;
+            for ( ; i < len; i++ ) {
+                out[i] = arguments.callee(obj[i]);
+            }
+            return out;
+        }
+        if (typeof obj === "object") {
+            var out = {}, i;
+            for ( i in obj ) {
+                out[i] = arguments.callee(obj[i]);
+            }
+            return out;
+        }
+        return obj;
+    }
+
+//  round.js  source: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round"
+
+    function round(number, precision) {
+        var shift = function (number, precision, reverseShift) {
+            if (reverseShift) {
+                precision = -precision;
+            }  
+            numArray = ("" + number).split("e");
+            return +(numArray[0] + "e" + (numArray[1] ? (+numArray[1] + precision) : precision));
+        };
+        return shift(Math.round(shift(number, precision, false)), precision, true);
+    }
+
+})();
+
+</script>
+
 
 <div id="texture-map-controls" class="well" style="background:none;border-radius:8px;height:auto;display:none;">
 
@@ -358,9 +744,9 @@
     });
 */
 
-    const files = {};
-    const uploads = [];
-    const textures = {};
+    var files = {};
+    var uploads = [];
+    var textures = {};
 
     const viewer = document.getElementById("viewer");
     const slotDroplist     = $("#texture-outfit-slot").get(0);
@@ -518,41 +904,39 @@
 
 //  SELECT TEXTURE DROPLIST.
 
-    textureDroplistChanged.add(function(){
-
-
+    $(textureDroplist).on("change", function(){
+        textureDroplistChanged.dispatch(this.value);
     });
 
-    $(textureDroplist).on("change", function(){
+    textureDroplistChanged.add(function(value){
 
-        $(textureCheckboxSelector).attr({checked:false});
+        if ( value ) {
 
-        if ( this.value ) {
-
-            var src = textures[ this.value ].sourceFile;
+            var src = textures[ value ].sourceFile;
             $(texturePreviewImg).attr({"src":src});
 
         } else {
 
-            (function(){
+            var slot = slotDroplist.value;
+            var gender = genderDroplist.value = viewer.contentWindow.localPlayer.outft.getGender();
 
-                if ( !slotDroplist.value ) return;
-                if ( !genderDroplist.value ) return;
+            if ( !viewer.contentWindow[gender][slot] ) {
+                $(texturePreviewImg).attr({src: "//:0"});  return;
+            }
 
-                var slot = slotDroplist.value;
-                var gender = genderDroplist.value;
-
-                if ( !viewer.contentWindow[gender][slot] ) return;
-
-                var THREE = viewer.contentWindow.THREE; // important!
-                var geometry = viewer.contentWindow[gender][slot].geometry;
-                texturePreviewImg.src = THREE.UVsDebug(geometry, 512).toDataURL();
-
-            })();
+            var THREE = viewer.contentWindow.THREE; // important!
+            var geometry = viewer.contentWindow[gender][slot].geometry;
+            texturePreviewImg.src = THREE.UVsDebug(geometry, 512).toDataURL();
 
         }
 
-        if ( !this.value ) {
+    });
+
+    textureDroplistChanged.add(function(value){
+
+        $(textureCheckboxSelector).attr({checked:false});
+
+        if ( !value ) {
             $(textureControlSelector).slideUp();
         } else {
             $(textureControlSelector).slideDown();

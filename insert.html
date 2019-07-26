@@ -325,8 +325,6 @@
 
 (function(){
 
-    var json;
-
     const viewer = document.getElementById("viewer");
     const propDroplist = $("select#texture-property").get(0);
     const propControls = $("#texture-property-controls").get(0);
@@ -365,6 +363,8 @@
             _id: ObjectId(),
         };
     }
+
+    var json = new jsonTexture();
 
     var Signal = signals.Signal;
     var propertiesDroplistChanged = new Signal();

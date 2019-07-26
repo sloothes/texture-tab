@@ -89,22 +89,22 @@
 
         if ( importedTextures.value ) return;
 
-        if ( !slotDroplist.value ) return;
-        if ( !genderDroplist.value ) return;
-
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;
 
-        if ( !viewer.contentWindow[gender][slot] ) return;
+        if ( !gender || !slot ) {
+        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+            texturePreview.src = "//:0"; return;
+        }
+
+        if ( !viewer.contentWindow[gender][slot] ) {
+        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+            texturePreview.src = "//:0"; return;
+        }
 
         var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;
-
-        if ( gender && slot ) 
-            texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
-        else
-            texturePreview.src = "//:0"; 
-        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+        texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
 
     });
 
@@ -165,22 +165,22 @@
 
         if ( importedTextures.value ) return;
 
-        if ( !slotDroplist.value ) return;
-        if ( !genderDroplist.value ) return;
-
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;
 
-        if ( !viewer.contentWindow[gender][slot] ) return;
+        if ( !gender || !slot ) {
+        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+            texturePreview.src = "//:0"; return;
+        }
+
+        if ( !viewer.contentWindow[gender][slot] ) {
+        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+            texturePreview.src = "//:0"; return;
+        }
 
         var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;
-
-        if ( gender && slot ) 
-            texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
-        else
-            texturePreview.src = "//:0"; 
-        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+        texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
 
     });
 

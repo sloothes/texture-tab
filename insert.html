@@ -36,8 +36,149 @@
     <h2 style="margin-bottom:20px;">Texture:</h2>
 </div>
 
-<div id="material-texture-viewer" style="width:100%;text-align:center;margin-bottom:20px;">
-    <img id="material-texture-preview" width="290" height="290" style="margin:auto;">
+<div style="height:35px;margin-bottom:10px;">
+    <h4><span style="vertical-align:-0.5rem;">Select gender:</span>
+        <div style="width:40%;display:inline-block;float:right;">
+            <select id="texture-gender-droplist" class="form-control gender-droplist" readonly>
+                <option value="">Select sex:</option>
+                <option value="male">male</option>
+                <option value="female">female</option>
+            </select>
+        </div>
+    </h4>
+</div>
+
+<script>
+
+(function(){
+
+    const viewer = document.getElementById("viewer");
+    const titleTextfield = $("input#material-title").get(0);
+    const slotDroplist   = $("#texture-outfit-slot").get(0);
+    const genderDroplist = $("#texture-gender-droplist").get(0);
+    const texturePreview = $("img#material-texture-preview").get(0);
+
+    var Signal = signals.Signal;
+    var genderChanged = new Signal();
+
+    genderChanged.add(function(value){
+
+        if ( !value ) return;
+
+    //  Null values not allowed.
+
+        var data = "/gender/" + value;
+        viewer.contentWindow.localPlayerHandler(data);
+
+        store( "Sex", data );
+
+    });
+
+    genderChanged.add(function(){
+
+        if ( $("#imported-textures").val() ) return;
+
+        if ( !slotDroplist.value ) return;
+        if ( !genderDroplist.value ) return;
+
+        var slot = slotDroplist.value;
+        var gender = genderDroplist.value;
+
+        if ( !viewer.contentWindow[gender][slot] ) return;
+
+        var THREE = viewer.contentWindow.THREE; // important!
+        var geometry = viewer.contentWindow[gender][slot].geometry;
+        var src = THREE.UVsDebug(geometry, 512).toDataURL();
+
+        $(texturePreview).attr({"src":src});
+
+    });
+
+    $(genderDroplist).on("change", function(){
+
+    //  Null values not allowed.
+        if ( !this.value ) return;
+        genderChanged.dispatch( this.value );
+
+    });
+
+})();
+
+</script>
+
+<div style="height:35px;margin-bottom:10px;">
+    <h4><span style="vertical-align:-0.5rem;">Select outfit slot:</span>
+        <div style="width:40%;display:inline-block;float:right;">
+            <select id="texture-outfit-slot" class="form-control outfit-slot-droplist" readonly>
+                <option value="">Select slot:</option>
+                <option value="body">body</option>
+                <option value="eyes">eyes</option>
+                <option value="hairs">hairs</option>
+                <option value="stockings">stockings</option>
+                <option value="underwears">underwears</option>
+                <option value="costume">costume</option>
+                <option value="tshirt">tshirt</option>
+                <option value="trousers">trousers</option>
+                <option value="dress">dress</option>
+                <option value="shoes">shoes</option>
+            </select>
+        </div>
+    </h4>
+</div>
+
+<script>
+
+(function(){
+
+    const viewer = document.getElementById("viewer");
+    const slotDroplist   = $("#texture-outfit-slot").get(0);
+    const genderDroplist = $("#texture-gender-droplist").get(0);
+
+    var Signal = signals.Signal;
+    var outfitSlotChanged = new Signal();
+
+    outfitSlotChanged.add(function(value){
+
+    //  Null values are allowed!
+        var data = "/select/" + value;
+        viewer.contentWindow.localPlayerHandler(data);
+
+    });
+
+    outfitSlotChanged.add(function(){
+
+        if ( $("#imported-textures").val() ) return;
+
+        if ( !slotDroplist.value ) return;
+        if ( !genderDroplist.value ) return;
+
+        var slot = slotDroplist.value;
+        var gender = genderDroplist.value;
+
+        if ( !viewer.contentWindow[gender][slot] ) return;
+
+        var THREE = viewer.contentWindow.THREE; // important!
+        var geometry = viewer.contentWindow[gender][slot].geometry;
+        var src = THREE.UVsDebug(geometry, 512).toDataURL();
+
+        $("img#texture-preview").attr({"src":src});
+
+    });
+
+    $(slotDroplist).on("change", function(){
+
+    //  Null values are allowed!
+        outfitSlotChanged.dispatch(this.value);
+
+    });
+
+})();
+
+</script>
+
+
+<div id="texture-viewer" style="width:100%;text-align:center;margin-bottom:20px;">
+    <img id="texture-preview" width="290" height="290" style="margin:auto;">
 </div>
 
 <div style="height:45px;margin-bottom:10px;">
@@ -48,7 +189,7 @@
 
 <div id="texture-property-controls" class="well"></div>
 
-<div id="material-texture-controls" class="well" style="background:none;border-radius:8px;height:auto;display:none;">
+<div id="texture-map-controls" class="well" style="background:none;border-radius:8px;height:auto;display:none;">
 
     <h4 class="texture-checkbox-helper">
         <span style="vertical-align:-0.7rem;">Map:</span>
@@ -97,7 +238,7 @@
     <input id="texture-fileinput" type="file" class="hidden" multiple>
     <div id="clear-imported-textures" class="form-control btn btn-danger btn-white-outline gradient-btn pull-left" style="width:24%;">Clear</div>
     <div id="import-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn" style="width:24%;margin:0 1%;">Import</div>
-    <div id="upload-material-textures" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;">Upload</div>
+    <div id="upload-selected-texture" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;">Upload</div>
     <div id="delete-selected-texture" class="form-control btn btn-danger btn-white-outline gradient-btn pull-right" style="width:24%;">Delete</div>
 </div>
 
@@ -109,7 +250,7 @@
 
     const textureHeaderSelector = ".texture-header";
     const helpersHeaderSelector = ".helpers-header";
-    const textureControlSelector = "#material-texture-controls";
+    const textureControlSelector = "#texture-map-controls";
 
     var Signal = signals.Signal;
     var dblclicked = new Signal();
@@ -165,17 +306,17 @@
     const textures = {};
 
     const viewer = document.getElementById("viewer");
+    const textureControls  = $("#texture-map-controls").get(0);
     const textureImportBtn = $("#import-texture-button").get(0);
     const textureFileinput = $("input#texture-fileinput").get(0);
     const textureDeleteBtn = $("#delete-selected-texture").get(0);
     const texturesClearBtn = $("#clear-imported-textures").get(0);
-    const textureUploadBtn = $("#upload-material-textures").get(0);
+    const textureUploadBtn = $("#upload-selected-texture").get(0);
     const textureDroplist  = $("select#imported-textures").get(0);
-    const textureControls  = $("#material-texture-controls").get(0);
 
     const THREE = viewer.contentWindow.THREE;
 
-    const textureControlSelector = "#material-texture-controls";
+    const textureControlSelector = "#texture-map-controls";
     const textureCheckboxSelector = "input[type=checkbox].material-texture-checkbox";
     const texturePropertyControls = document.getElementById("texture-property-controls");
 

@@ -81,6 +81,8 @@
     <div id="upload-material-textures" class="form-control btn btn-success btn-white-outline gradient-btn pull-right hidden" style="width:24%;">Upload</div>
 </div>
 
+<hr/>
+
 <script>
 
 (function(){
@@ -113,3 +115,77 @@
 
 </script>
 
+<script>
+
+(function(){
+
+/*
+//  const VERSION = 4;
+    const NAME = "USER";
+
+    var db = new zango.Db( NAME, {
+        animations: true,
+        outfits:    true,
+        materials:  true,
+        textures:   true,
+        products:   true,
+    });
+
+    db.open(function(err, database){
+        if (err) console.error(err);
+    }).then( function(){
+        debugMode && console.log(`Database ${db.name} (v${db.version}) opened.`);
+    }).catch(function(err){
+        console.error(err);
+    });
+*/
+
+    var files = {};
+    var uploads = [];
+    var textures = {};
+
+    const viewer = document.getElementById("viewer");
+    const textureImportBtn = $("#import-texture-button").get(0);
+    const textureFileinput = $("input#texture-fileinput").get(0);
+    const textureDeleteBtn = $("#delete-selected-texture").get(0);
+    const texturesClearBtn = $("#clear-imported-textures").get(0);
+    const textureUploadBtn = $("#upload-material-textures").get(0);
+    const textureDroplist  = $("select#imported-textures").get(0);
+    const textureControls  = $("#material-texture-controls").get(0);
+
+    const textureControlSelector = "#material-texture-controls";
+    const textureCheckboxSelector = "input[type=checkbox].material-texture-checkbox";
+
+    var THREE = viewer.contentWindow.THREE; // important!
+
+    function generateUUID(){
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+        .replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0;
+            var v = c == 'x'?r:r&0x3|0x8;
+            return v.toString(16);
+        }).toLocaleUpperCase();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+})();
+
+</script>

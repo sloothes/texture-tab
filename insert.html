@@ -36,8 +36,8 @@
     <h2 style="margin-bottom:20px;">Texture:</h2>
 </div>
 
-<div id="texture-viewer" style="width:100%;text-align:center;margin-bottom:20px;">
-    <img id="texture-preview" width="290" height="290" style="margin:auto;">
+<div id="texture-viewer" style="text-align:center;margin-bottom:10px;border:1px solid;">
+    <img id="texture-preview" style="max-width:100%;max-height:300px;margin:auto;">
 </div>
 
 <div style="height:45px;margin-bottom:10px;">
@@ -374,11 +374,14 @@
     const textureDroplist  = $("select#imported-textures").get(0);
     const texturePreviewImg = $("img#texture-preview").get(0);
 
-    const THREE = viewer.contentWindow.THREE;
+//  const THREE = viewer.contentWindow.THREE;
 
     const textureControlSelector = "#texture-map-controls";
     const textureCheckboxSelector = "input[type=checkbox].material-texture-checkbox";
     const texturePropertyControls = document.getElementById("texture-property-controls");
+
+    var Signal = signals.Signal;
+    var textureDroplistChanged = new Signal();
 
     const generateUUID = function (){
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
@@ -515,6 +518,11 @@
 
 //  SELECT TEXTURE DROPLIST.
 
+    textureDroplistChanged.add(function(){
+
+
+    });
+
     $(textureDroplist).on("change", function(){
 
         $(textureCheckboxSelector).attr({checked:false});
@@ -538,18 +546,16 @@
 
                 var THREE = viewer.contentWindow.THREE; // important!
                 var geometry = viewer.contentWindow[gender][slot].geometry;
-                var src = THREE.UVsDebug(geometry, 512).toDataURL();
-
-                $(texturePreviewImg).attr({"src":src});
+                texturePreviewImg.src = THREE.UVsDebug(geometry, 512).toDataURL();
 
             })();
 
         }
 
-        if ( this.value ) {
-            $(textureControlSelector).slideDown();
-        } else {
+        if ( !this.value ) {
             $(textureControlSelector).slideUp();
+        } else {
+            $(textureControlSelector).slideDown();
         }
 
     });

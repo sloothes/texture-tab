@@ -570,13 +570,17 @@
         var span = document.createElement("span");
         span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
 
+        var x_span = document.createElement("span"); x_span.innerText = "x: ";
         var inputx = document.createElement("input"); 
         inputx.id = `texture-input_${key}-x`; inputx.type = "number"; inputx.step = 0.01;
-        inputx.classList.add("form-control", "pull-right", "texture-input-number");
+        inputx.classList.add("form-control", "texture-input-number");
+        x_span.style.cssText = "vertical-align:-0.7rem;"; $(x_span).append(inputx);
 
+        var y_span = document.createElement("span"); y_span.innerText = "y: ";
         var inputy = document.createElement("input"); 
         inputy.id = `texture-input_${key}-y`; inputy.type = "number"; inputy.step = 0.01;
-        inputy.classList.add("form-control", "pull-right", "texture-input-number");
+        inputy.classList.add("form-control", "texture-input-number");
+        y_span.style.cssText = "vertical-align:-0.7rem;float:right;"; $(y_span).append(inputy);
 
         if ( json[key] && Array.isArray(json[key]) ) {
             inputx.value = json[key][0];
@@ -600,7 +604,7 @@
         });
 
         $(propControls).slideDown();
-        $(propControls).append(span, inputx, inputy);
+        $(propControls).append(span, x_span, y_span);
 
     });
 

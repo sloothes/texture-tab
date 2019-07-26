@@ -86,7 +86,7 @@
 
 <div style="height:45px;margin-bottom:10px;">
     <select id="imported-textures" class="form-control material-texture-droplist" readonly>
-        <option value="">Select imported texture:</option>
+        <option value="">Import textures:</option>
     </select>
 </div>
 
@@ -1233,13 +1233,14 @@
 //  BUTTON DELETE.
 
     $(textureDeleteBtn).on("click", function(){
-        var option = textureDroplist.selectedOptions[0];
-
-        if ( !option ) return;
-        if ( !option.value ) return;
 
         clearTimeout(this.interval);
         this.interval = setTimeout( function(){
+
+            var option = textureDroplist.selectedOptions[0];
+
+            if ( !option ) return;
+            if ( !option.value ) return;
 
             $(option).remove();
 
@@ -1259,7 +1260,7 @@
             delete textures[ option.value ];
             debugMode && console.log({"files":files, "textures": textures});
 
-        }, 250 );
+        }, 200 );
 
     });
 

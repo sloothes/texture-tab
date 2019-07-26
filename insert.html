@@ -72,11 +72,26 @@
     var Signal = signals.Signal;
     var genderChanged = new Signal();
 
+    $(genderDroplist).on("change", function(){
+
+        if ( !this.value ) {
+
+        //  Reset texture preview.
+        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+
+            texturePreview.src = "//:0"; 
+
+            return;  //  Null values NOT allowed.
+
+        }
+
+        genderChanged.dispatch( this.value );
+
+    });
+
     genderChanged.add(function(value){
 
-        if ( !value ) return;
-
-    //  Null values not allowed.
+        if ( !value ) return;  //  Null values NOT allowed.
 
         var data = "/gender/" + value;
         viewer.contentWindow.localPlayerHandler(data);
@@ -86,34 +101,20 @@
     });
 
     genderChanged.add(function(){
-        debugMode && console.log("testing genderChanged after return;");
 
         if ( importedTextures.value ) return;
+
+        if ( !slotDroplist.value ) return;
+        if ( !genderDroplist.value ) return;
 
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;
 
-        if ( !gender || !slot ) {
-        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
-            texturePreview.src = "//:0"; return;
-        }
-
-        if ( !viewer.contentWindow[gender][slot] ) {
-        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
-            texturePreview.src = "//:0"; return;
-        }
+        if ( !viewer.contentWindow[gender][slot] ) return;
 
         var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;
         texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
-
-    });
-
-    $(genderDroplist).on("change", function(){
-
-    //  Null values not allowed.
-        if ( !this.value ) return;
-        genderChanged.dispatch( this.value );
 
     });
 
@@ -154,9 +155,26 @@
     var Signal = signals.Signal;
     var outfitSlotChanged = new Signal();
 
+    $(slotDroplist).on("change", function(){
+
+        if ( !this.value ) {
+
+        //  Reset texture preview.
+        //  https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src
+
+            texturePreview.src = "//:0"; 
+
+        }
+
+    //  Null values ARE allowed!
+
+        outfitSlotChanged.dispatch(this.value);
+
+    });
+
     outfitSlotChanged.add(function(value){
 
-    //  Null values allowed!
+    //  Null value IS allowed!
         var data = "/select/" + value;
         viewer.contentWindow.localPlayerHandler(data);
 
@@ -166,29 +184,17 @@
 
         if ( importedTextures.value ) return;
 
+        if ( !slotDroplist.value ) return;
+        if ( !genderDroplist.value ) return;
+
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;
 
-        if ( !gender || !slot ) {
-        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
-            texturePreview.src = "//:0"; return;
-        }
-
-        if ( !viewer.contentWindow[gender][slot] ) {
-        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
-            texturePreview.src = "//:0"; return;
-        }
+        if ( !viewer.contentWindow[gender][slot] ) return;
 
         var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;
         texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
-
-    });
-
-    $(slotDroplist).on("change", function(){
-
-    //  Null values are allowed!
-        outfitSlotChanged.dispatch(this.value);
 
     });
 

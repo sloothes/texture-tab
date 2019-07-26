@@ -99,7 +99,11 @@
 
         var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;
-        texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
+
+        if ( gender && slot ) 
+            texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
+        else
+            texturePreview.src = "//:0"; // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
 
     });
 
@@ -170,7 +174,11 @@
 
         var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;
-        texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
+
+        if ( gender && slot ) 
+            texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
+        else
+            texturePreview.src = "//:0"; // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
 
     });
 

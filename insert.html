@@ -591,7 +591,11 @@
             json[key][1] = round(this.value, 2);
         });
 
-        $(input).on("change", function(){
+        $(inputx).on("change", function(){
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(inputy).on("change", function(){
             debugMode && console.log({[key]:json[key]});
         });
 

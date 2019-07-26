@@ -334,10 +334,6 @@
 
 (function(){
 
-    const viewer = document.getElementById("viewer");
-    const propDroplist = $("select#texture-property").get(0);
-    const propControls = $("#texture-property-controls").get(0);
-
     var json = new jsonTexture();
 
     function generateUUID(){
@@ -374,6 +370,12 @@
             _id: ObjectId(),
         };
     };
+
+    const viewer = document.getElementById("viewer");
+    const propDroplist = $("select#texture-property").get(0);
+    const propControls = $("#texture-property-controls").get(0);
+    const texturePreview = $("img#texture-preview").get(0);
+    const importedTextures = $("select#imported-textures").get(0);
 
     function propertyDroplistReset(){
 
@@ -441,9 +443,7 @@
     });
 
     propertiesDroplistChanged.add(function (key){
-
         if ( !key || key != "encoding" ) return;
-
     });
 
     propertiesDroplistChanged.add(function (key){
@@ -470,9 +470,7 @@
     });
 
     propertiesDroplistChanged.add(function (key){
-
         if ( !key || key != "format" ) return;
-
     });
 
     propertiesDroplistChanged.add(function (key){
@@ -499,27 +497,19 @@
     });
 
     propertiesDroplistChanged.add(function (key){
-
         if ( !key || key != "magFilter" ) return;
-
     });
 
     propertiesDroplistChanged.add(function (key){
-
         if ( !key || key != "mapping" ) return;
-
     });
 
     propertiesDroplistChanged.add(function (key){
-
         if ( !key || key != "minFilter" ) return;
-
     });
 
     propertiesDroplistChanged.add(function (key){
-
         if ( !key || key != "mipmaps" ) return;
-
     });
 
     propertiesDroplistChanged.add(function (key){
@@ -647,21 +637,15 @@
     });
 
     propertiesDroplistChanged.add(function (key){
-
         if ( !key || key != "sourceFile" ) return;
-
     });
 
     propertiesDroplistChanged.add(function (key){
-
         if ( !key || key != "type" ) return;
-
     });
 
     propertiesDroplistChanged.add(function (key){
-
         if ( !key || key != "unpackAlignment" ) return;
-
     });
 
     propertiesDroplistChanged.add(function (key){
@@ -716,15 +700,11 @@
     });
 
     propertiesDroplistChanged.add(function (key){
-
         if ( !key || key != "wrapS" ) return;
-
     });
 
     propertiesDroplistChanged.add(function (key){
-
         if ( !key || key != "wrapT" ) return;
-
     });
 
     propertiesDroplistChanged.add(function (key){
@@ -752,7 +732,7 @@
     });
 
 
-
+//  BUTTONS.
 
     $("#new-texture-button").on("click", function(){
         clearTimeout(this.interval);
@@ -762,6 +742,113 @@
         }, 200);
     });
 
+    $("#upload-selected-texture").on("click", function(){
+        clearTimeout(this.interval);
+        this.interval = setTimeout( function(){
+
+            if ( !navigator.onLine ) {
+                var err = "Your connection to the internet is down.";
+                debugMode && console.error(err);
+                return bootbox.dialog( errorDialogOptions(err) );
+            }
+
+            if ( !importedTextures.value ) {
+                var err = "There is not selected texture to upload.";
+                debugMode && console.error(err);
+                return bootbox.dialog( errorDialogOptions(err) );
+            }
+
+        //  make power of two?
+
+            var name = importedTextures.value;
+            var data = texturePreview.src.split(";base64,").pop(); // important!
+            var type = texturePreview.src.split(";base64,").shift().replace("data:", "");
+
+            new Promise(function(resolve, reject){
+
+                var formdata = new FormData();
+                formdata.append("type",  type);
+                formdata.append("image", data);
+                formdata.append("name",  name);
+                formdata.append("title", name);
+
+                var xhttp = new XMLHttpRequest();
+                var clientid = "60db267c697bb33";  // textures.
+                var endpoint = "https://api.imgur.com/3/image";
+                xhttp.open('POST', endpoint, true);
+                xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState === 4) {
+                        var response = "";
+                        if (this.status >= 200 && this.status < 300) {
+                            response = JSON.parse(this.responseText);
+                            resolve( response ); // resolve promise.
+                        } else {
+                            var err = JSON.parse(this.responseText).data.error;
+                            console.error( err.type, err );
+                            throw err;
+                        }
+                    }
+                };
+
+                xhttp.send(formdata);
+                xhttp = null;
+
+            }).then( function( response ){
+
+                var data = response.data;
+                debugMode && console.log({"data": data});
+
+            //  Add to cache.
+                caches.open("textures").then(function(cache){
+                    cache.add(data.link);
+                });
+
+            //  Success.
+                var msg = `Texture ${name} uploaded successfully!`
+                bootbox.dialog( successDialogOptions(msg) );
+
+            }).catch(function(err){
+                console.error(err);
+                bootbox.dialog( errorDialogOptions(err) );
+            });
+
+
+        }, 200 );
+
+        function errorDialogOptions(err){
+            return {
+                size: "small",
+                className: "middle",
+                title: `<div class="alert-icon icon-warning">` 
+                + `</div><h2 style="margin:auto;">Error!</h2>`,
+                message: `<div>Sorry! An error occurred.</div><div>${err}</div>`,
+                buttons: {
+                    cancel: {
+                        label: "Close",
+                        className: "btn-default",
+                    },
+                },
+            };
+        }
+
+        function successDialogOptions(msg){
+            return {
+                size: "small",
+                className: "middle",
+                title: `<div class="alert-icon icon-success">`
+                + `</div><h2 style="margin:auto;">Success</h2>`,
+                message: `<div>${msg}</div>`,
+                buttons: {
+                    success: {
+                        label: "Close",
+                        className: "btn-success",
+                    },
+                },
+            };
+        }
+
+    });
 
 
 /*
@@ -939,6 +1026,7 @@
     });
 */
 
+    var json;
     var files = {};
     var uploads = [];
     var textures = {};
@@ -951,6 +1039,7 @@
     const textureFileinput = $("input#texture-fileinput").get(0);
     const textureDeleteBtn = $("#delete-selected-texture").get(0);
     const texturesClearBtn = $("#clear-imported-textures").get(0);
+    const textureNewButton = $("#new-texture-button").get(0);
     const textureUploadBtn = $("#upload-selected-texture").get(0);
     const textureDroplist  = $("select#imported-textures").get(0);
     const texturePreviewImg = $("img#texture-preview").get(0);
@@ -964,7 +1053,7 @@
     var Signal = signals.Signal;
     var textureDroplistChanged = new Signal();
 
-    const generateUUID = function (){
+    function generateUUID(){
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
         .replace(/[xy]/g, function(c) {
             var r = Math.random()*16|0;
@@ -973,7 +1062,7 @@
         }).toLocaleUpperCase();
     }
 
-    const jsonTexture = function () {
+    function jsonTexture() {
         return {
             anisotropy: 1,
             encoding: 3000,
@@ -1254,6 +1343,22 @@
 
         }, 250 );
 
+    });
+
+
+
+
+
+
+
+//  BUTTON NEW.
+
+    $(textureNewButton).on("click", function(){
+        clearTimeout(this.interval);
+        this.interval = setTimeout(function(){
+            json = new jsonTexture();
+            debugMode && console.log({"new":json});
+        }, 200);
     });
 
 //  deepCopy.js

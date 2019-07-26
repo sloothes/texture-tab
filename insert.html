@@ -1243,6 +1243,12 @@
 
             $(option).remove();
 
+            if (textureDroplist.options.length == 0) {
+                var option = document.createElement("option");
+                option.value = "";  option.innerText = "Import textures:";
+                $(textureDroplist).append(option);
+            }
+
             $(textureDroplist).change(); // or ...dispatch();
             $(textureControlSelector).slideUp();
             $(textureCheckboxSelector).attr({checked:false});
@@ -1267,9 +1273,12 @@
             debugMode && console.log({"files":files, "textures": textures});
 
             $(textureDroplist).children().remove();
-            var option = document.createElement("option");
-            option.value = "";  option.innerText = "Select imported texture:";
-            $(textureDroplist).append(option);
+
+            if (textureDroplist.options.length == 0) {
+                var option = document.createElement("option");
+                option.value = "";  option.innerText = "Import textures:";
+                $(textureDroplist).append(option);
+            }
 
             $(textureDroplist).change(); // or ...dispatch();
             $(textureControlSelector).slideUp();

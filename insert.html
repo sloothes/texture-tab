@@ -40,6 +40,12 @@
     <img id="texture-preview" width="290" height="290" style="margin:auto;">
 </div>
 
+<div style="height:45px;margin-bottom:10px;">
+    <select id="imported-textures" class="form-control material-texture-droplist" readonly>
+        <option value="">Select imported texture:</option>
+    </select>
+</div>
+
 <div style="height:35px;margin-bottom:10px;">
     <h4><span style="vertical-align:-0.5rem;">Select gender:</span>
         <div style="width:40%;display:inline-block;float:right;">
@@ -60,7 +66,8 @@
     const titleTextfield = $("input#material-title").get(0);
     const slotDroplist   = $("#texture-outfit-slot").get(0);
     const genderDroplist = $("#texture-gender-droplist").get(0);
-    const texturePreview = $("img#material-texture-preview").get(0);
+    const texturePreview = $("img#texture-preview").get(0);
+    const importedTextures = $("select#imported-textures").get(0);
 
     var Signal = signals.Signal;
     var genderChanged = new Signal();
@@ -80,7 +87,7 @@
 
     genderChanged.add(function(){
 
-        if ( $("#imported-textures").val() ) return;
+        if ( importedTextures.value ) return;
 
         if ( !slotDroplist.value ) return;
         if ( !genderDroplist.value ) return;
@@ -92,9 +99,7 @@
 
         var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;
-        var src = THREE.UVsDebug(geometry, 512).toDataURL();
-
-        $(texturePreview).attr({"src":src});
+        texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
 
     });
 
@@ -137,13 +142,15 @@
     const viewer = document.getElementById("viewer");
     const slotDroplist   = $("#texture-outfit-slot").get(0);
     const genderDroplist = $("#texture-gender-droplist").get(0);
+    const texturePreview = $("img#texture-preview").get(0);
+    const importedTextures = $("select#imported-textures").get(0);
 
     var Signal = signals.Signal;
     var outfitSlotChanged = new Signal();
 
     outfitSlotChanged.add(function(value){
 
-    //  Null values are allowed!
+    //  Null values allowed!
         var data = "/select/" + value;
         viewer.contentWindow.localPlayerHandler(data);
 
@@ -151,7 +158,7 @@
 
     outfitSlotChanged.add(function(){
 
-        if ( $("#imported-textures").val() ) return;
+        if ( importedTextures.value ) return;
 
         if ( !slotDroplist.value ) return;
         if ( !genderDroplist.value ) return;
@@ -163,9 +170,7 @@
 
         var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;
-        var src = THREE.UVsDebug(geometry, 512).toDataURL();
-
-        $("img#texture-preview").attr({"src":src});
+        texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
 
     });
 
@@ -181,12 +186,6 @@
 </script>
 
 <div id="texture-property-controls" class="well"></div>
-
-<div style="height:45px;margin-bottom:10px;">
-    <select id="imported-textures" class="form-control material-texture-droplist" readonly>
-        <option value="">Select imported texture:</option>
-    </select>
-</div>
 
 <div id="texture-map-controls" class="well" style="background:none;border-radius:8px;height:auto;display:none;">
 

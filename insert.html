@@ -253,18 +253,16 @@
         //  Overwrite gender value.
             this.value = viewer.contentWindow.localPlayer.outfit.getGender();
 
-        }
-
-        if ( !this.value ) {
-
         //  Reset texture preview.
-        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+            // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
 
             $(texturePreview).attr({src: "//:0"}); 
 
-            return;  //  Null values NOT allowed.
-
         }
+
+    //  Null values NOT allowed.
+
+        if ( !this.value ) return;
 
         genderChanged.dispatch( this.value );
 
@@ -272,16 +270,14 @@
 
     genderChanged.add(function(value){
 
-        if ( !value ) {
-
-        //  Reset texture preview.
+    //  Reset texture preview.
         // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
 
-            $(texturePreview).attr({src: "//:0"}); 
+        if ( !value )  $(texturePreview).attr({src: "//:0"}); 
 
-            return;  //  Null values NOT allowed.
+    //  Null values NOT allowed.
 
-        };
+        if ( !value ) return;
 
         var data = "/gender/" + value;
         viewer.contentWindow.localPlayerHandler(data);
@@ -299,16 +295,16 @@
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;
 
-        if ( !viewer.contentWindow[gender][slot] ) {
-
-        //  Reset texture preview.
+    //  Reset texture preview.
         // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+
+        if ( !viewer.contentWindow[gender][slot] ) {
 
             $(texturePreview).attr({src: "//:0"}); 
 
-            return;  //  Null outfit NOT allowed.
+            return;   //  Null values NOT allowed.
 
-        };
+        }
 
         var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;

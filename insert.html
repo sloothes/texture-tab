@@ -427,11 +427,101 @@
 
 <div id="texture-property-controls" class="well"></div>
 
+<div id="texture-map-controls" class="well" style="background:none;border-radius:8px;height:auto;display:none;">
+
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">Map:</span>
+        <input type="checkbox" id="map" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">BumpMap:</span>
+        <input type="checkbox" id="bumpMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">EmissiveMap:</span>
+        <input type="checkbox" id="emissiveMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">MetalnessMap:</span>
+        <input type="checkbox" id="metalnessMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">RoughnessMap:</span>
+        <input type="checkbox" id="roughnessMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">DisplacementMap:</span>
+        <input type="checkbox" id="displacementMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">AOMap:</span>
+        <input type="checkbox" id="aoMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">AlphaMap:</span>
+        <input type="checkbox" id="alphaMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">LightMap:</span>
+        <input type="checkbox" id="lightMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">NormalMap:</span>
+        <input type="checkbox" id="normalMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+
+</div>
+
+<hr/>
+
 <script>
 
 (function(){
 
-    var json = new jsonTexture();
+    const textureHeaderSelector = ".texture-header";
+    const helpersHeaderSelector = ".helpers-header";
+    const textureControlSelector = "#texture-map-controls";
+
+    var Signal = signals.Signal;
+    var dblclicked = new Signal();
+
+//  Event handlers.
+    function onDoubleClickEventHandler( element ){
+        if ( $(element).css("display") == "none" ) {
+            $(element).slideDown();
+        } else {
+            $(element).slideUp();
+        }
+    }
+
+//  Event listeners.
+    dblclicked.add(onDoubleClickEventHandler);
+
+//  Dispatch events.
+    $(textureHeaderSelector).on("dblclick", function(){
+        dblclicked.dispatch( $(textureControlSelector).get(0) );
+    });
+
+})();
+
+</script>
+
+<div style="margin-bottom:10px;">
+    <div id="new-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn pull-left" style="width:24%;">New</div>
+    <div id="copy-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn" style="width:24%;margin-left:1%;">Copy</div>
+    <div id="apply-texture-button" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;">Apply</div>
+    <div id="save-texture-button" class="form-control btn btn-success btn-white-outline gradient-btn pull-right" style="width:24%;">Save</div>
+</div>
+
+<script>
+
+(function(){
+
+    const viewer = document.getElementById("viewer");
+    const propDroplist = $("select#texture-property").get(0);
+    const propControls = $("#texture-property-controls").get(0);
+    const texturePreview = $("img#texture-preview").get(0);
+    const importedTextures = $("select#imported-textures").get(0);
 
     function generateUUID(){
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
@@ -468,11 +558,7 @@
         };
     };
 
-    const viewer = document.getElementById("viewer");
-    const propDroplist = $("select#texture-property").get(0);
-    const propControls = $("#texture-property-controls").get(0);
-    const texturePreview = $("img#texture-preview").get(0);
-    const importedTextures = $("select#imported-textures").get(0);
+    var json = new jsonTexture();
 
     function propertyDroplistReset(){
 
@@ -828,29 +914,18 @@
 
     });
 
-/*
-    anisotropy: 1,
-    encoding: 3000,
-    flipY: true,
-    format: 1021,
-    generateMipmaps: true,
-    magFilter: 1006,
-    mapping: 300,
-    minFilter: 1008,
-    mipmaps: [],
-    name: "",
-    offset: [0, 0],
-    premultiplyAlpha: false,
-    repeat: [1, 1],
-    sourceFile: "",
-    type: 1009,
-    unpackAlignment: 4,
-    uuid: generateUUID(),
-    version: 0,
-    wrapS: 1001,
-    wrapT: 1001,
-    _id: ObjectId(),
-*/
+    const textureNewButton = $("#new-texture-button").get(0);
+    const textureUploadBtn = $("#upload-selected-texture").get(0);
+
+//  BUTTON NEW.
+
+    $(textureNewButton).on("click", function(){
+        clearTimeout(this.interval);
+        this.interval = setTimeout(function(){
+            json = new jsonTexture();
+            debugMode && console.log({"new":json});
+        }, 200);
+    });
 
 //  deepCopy.js
 
@@ -888,92 +963,6 @@
 })();
 
 </script>
-
-<div id="texture-map-controls" class="well" style="background:none;border-radius:8px;height:auto;display:none;">
-
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">Map:</span>
-        <input type="checkbox" id="map" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">BumpMap:</span>
-        <input type="checkbox" id="bumpMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">EmissiveMap:</span>
-        <input type="checkbox" id="emissiveMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">MetalnessMap:</span>
-        <input type="checkbox" id="metalnessMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">RoughnessMap:</span>
-        <input type="checkbox" id="roughnessMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">DisplacementMap:</span>
-        <input type="checkbox" id="displacementMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">AOMap:</span>
-        <input type="checkbox" id="aoMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">AlphaMap:</span>
-        <input type="checkbox" id="alphaMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">LightMap:</span>
-        <input type="checkbox" id="lightMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">NormalMap:</span>
-        <input type="checkbox" id="normalMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-
-</div>
-
-<hr/>
-
-<script>
-
-(function(){
-
-    const textureHeaderSelector = ".texture-header";
-    const helpersHeaderSelector = ".helpers-header";
-    const textureControlSelector = "#texture-map-controls";
-
-    var Signal = signals.Signal;
-    var dblclicked = new Signal();
-
-//  Event handlers.
-    function onDoubleClickEventHandler( element ){
-        if ( $(element).css("display") == "none" ) {
-            $(element).slideDown();
-        } else {
-            $(element).slideUp();
-        }
-    }
-
-//  Event listeners.
-    dblclicked.add(onDoubleClickEventHandler);
-
-//  Dispatch events.
-    $(textureHeaderSelector).on("dblclick", function(){
-        dblclicked.dispatch( $(textureControlSelector).get(0) );
-    });
-
-})();
-
-</script>
-
-<div style="margin-bottom:10px;">
-    <div id="new-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn pull-left" style="width:24%;">New</div>
-    <div id="copy-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn" style="width:24%;margin-left:1%;">Copy</div>
-    <div id="apply-texture-button" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;">Apply</div>
-    <div id="save-texture-button" class="form-control btn btn-success btn-white-outline gradient-btn pull-right" style="width:24%;">Save</div>
-</div>
 
 <script>
 
@@ -1331,7 +1320,6 @@
         }, 250 );
 
     });
-*/
 
 //  BUTTON NEW.
 
@@ -1342,6 +1330,8 @@
             debugMode && console.log({"new":json});
         }, 200);
     });
+
+*/
 
 //  deepCopy.js
 

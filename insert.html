@@ -103,6 +103,7 @@
 (function(){
 
     const viewer = document.getElementById("viewer");
+    const texturePreview = $("img#texture-preview").get(0);
     const importedTextures = $("select#imported-textures").get(0);
     const textureUploadButton = $("#upload-selected-texture").get(0);
 
@@ -140,7 +141,7 @@
             var xhttp = new XMLHttpRequest();
             var clientid = "60db267c697bb33";  // textures.
             var endpoint = "https://api.imgur.com/3/image";
-            xhttp.open('POST', endpoint, true);
+            xhttp.open("POST", endpoint, true);
             xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
             xhttp.onreadystatechange = function () {
                 if (this.readyState === 4) {
@@ -164,12 +165,12 @@
             var data = response.data;
             debugMode && console.log({"data": data});
 
-            //  Add to cache.
+        //  Add to cache.
             caches.open("textures").then(function(cache){
 
                 cache.add(data.link);
 
-                //  Success.
+            //  Success.
                 var msg = `Texture ${name} uploaded successfully!`;
                 bootbox.dialog({
                     size: "small",

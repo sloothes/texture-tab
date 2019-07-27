@@ -759,6 +759,7 @@
             }
 
             var option = importedTextures.selectedOptions[0];
+            debugMode && console.log(option);
 
             var name = option.value;
             var data = texturePreview.src.split(";base64,").pop(); // important!

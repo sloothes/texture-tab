@@ -758,9 +758,9 @@
                 return bootbox.dialog( errorDialogOptions(err) );
             }
 
-        //  make power of two?
+            var option = importedTextures.selectedOptions[0];
 
-            var name = importedTextures.value;
+            var name = option.value;
             var data = texturePreview.src.split(";base64,").pop(); // important!
             var type = texturePreview.src.split(";base64,").shift().replace("data:", "");
 
@@ -801,12 +801,30 @@
 
             //  Add to cache.
                 caches.open("textures").then(function(cache){
-                    cache.add(data.link);
-                });
 
-            //  Success.
-                var msg = `Texture ${name} uploaded successfully!`
-                bootbox.dialog( successDialogOptions(msg) );
+                    cache.add(data.link);
+
+                //  Success.
+                    var msg = `Texture ${name} uploaded successfully!`;
+                    bootbox.dialog({
+                        size: "small",
+                        className: "middle",
+                        title: `<div class="alert-icon icon-success">`
+                        + `</div><h2 style="margin:auto;">Success</h2>`,
+                        message: `<div>${msg}</div>`,
+                        buttons: {
+                            success: {
+                                label: "Close",
+                                className: "btn-success",
+                                callback: function(){
+                                    $(option).remove();
+                                    $(importedTextures).change();
+                                }
+                            },
+                        },
+                    });
+
+                });
 
             }).catch(function(err){
                 console.error(err);
@@ -827,22 +845,6 @@
                     cancel: {
                         label: "Close",
                         className: "btn-default",
-                    },
-                },
-            };
-        }
-
-        function successDialogOptions(msg){
-            return {
-                size: "small",
-                className: "middle",
-                title: `<div class="alert-icon icon-success">`
-                + `</div><h2 style="margin:auto;">Success</h2>`,
-                message: `<div>${msg}</div>`,
-                buttons: {
-                    success: {
-                        label: "Close",
-                        className: "btn-success",
                     },
                 },
             };

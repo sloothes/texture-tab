@@ -348,14 +348,9 @@
 
     $(slotDroplist).on("change", function(){
 
-        if ( !this.value ) {
-
-        //  Reset texture preview.
+    //  Reset texture preview.
         //  https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src
-
-            $(texturePreview).attr({src: "//:0"}); 
-
-        }
+    //  if ( !this.value ) $(texturePreview).attr({src: "//:0"}); 
 
     //  Null value IS allowed!
 
@@ -365,14 +360,9 @@
 
     outfitSlotChanged.add(function(value){
 
-        if ( !value ) {
-
-        //  Reset texture preview.
+    //  Reset texture preview.
         // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
-
-            $(texturePreview).attr({src: "//:0"}); 
-
-        };
+    //  if ( !value ) $(texturePreview).attr({src: "//:0"}); 
 
     //  Null value IS allowed!
 
@@ -390,16 +380,8 @@
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;
 
-        if ( !viewer.contentWindow[gender][slot] ) {
-
-        //  Reset texture preview.
-        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
-
-            $(texturePreview).attr({src: "//:0"}); 
-
-            return;  //  Null outfit NOT allowed.
-
-        };
+    //  Null outfit NOT allowed.
+        if ( !viewer.contentWindow[gender][slot] ) return;  
 
         var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;
@@ -425,7 +407,7 @@
                 <option value="version">version</option>
                 <option value="generateMipmaps">generate</option>
                 <option value="premultiplyAlpha">premultiply</option>
-                <option>-----------------</option>
+                <!-- ----------------------------------------------- -->
                 <option value="type" style="display:none;">type</option>
                 <option value="wrapS" style="display:none;">wrapS</option>
                 <option value="wrapT" style="display:none;">wrapT</option>

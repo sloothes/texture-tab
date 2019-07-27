@@ -98,6 +98,128 @@
     <div id="delete-selected-texture" class="form-control btn btn-danger btn-white-outline gradient-btn pull-right" style="width:24%;">Delete</div>
 </div>
 
+<script>
+
+(function(){
+
+    const viewer = document.getElementById("viewer");
+    const importedTextures = $("select#imported-textures").get(0);
+    const textureUploadButton = $("#upload-selected-texture").get(0);
+
+    $(textureUploadButton).one("click", uploadSelectedTexture );
+
+    function uploadSelectedTexture(){
+
+        if ( !navigator.onLine ) {
+            var err = "Your connection to the internet is down.";
+            debugMode && console.error(err);
+            return bootbox.dialog( errorDialogOptions(err) );
+        }
+
+        if ( !importedTextures.value ) {
+            var err = "There is not selected texture to upload.";
+            debugMode && console.error(err);
+            return bootbox.dialog( errorDialogOptions(err) );
+        }
+
+        var option = importedTextures.selectedOptions[0];
+        debugMode && console.log("selected option:", option);
+
+        var name = option.value;
+        var data = texturePreview.src.split(";base64,").pop(); // important!
+        var type = texturePreview.src.split(";base64,").shift().replace("data:", "");
+
+        new Promise(function(resolve, reject){
+
+            var formdata = new FormData();
+            formdata.append("type",  type);
+            formdata.append("image", data);
+            formdata.append("name",  name);
+            formdata.append("title", name);
+
+            var xhttp = new XMLHttpRequest();
+            var clientid = "60db267c697bb33";  // textures.
+            var endpoint = "https://api.imgur.com/3/image";
+            xhttp.open('POST', endpoint, true);
+            xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    var response = "";
+                    if (this.status >= 200 && this.status < 300) {
+                        response = JSON.parse(this.responseText);
+                        resolve( response ); // resolve promise.
+                    } else {
+                        var err = JSON.parse(this.responseText).data.error;
+                        console.error( err.type, err );
+                        throw err;
+                    }
+                }
+            };
+
+            xhttp.send(formdata);
+            xhttp = null;
+
+        }).then( function( response ){
+
+            var data = response.data;
+            debugMode && console.log({"data": data});
+
+            //  Add to cache.
+            caches.open("textures").then(function(cache){
+
+                cache.add(data.link);
+
+                //  Success.
+                var msg = `Texture ${name} uploaded successfully!`;
+                bootbox.dialog({
+                    size: "small",
+                    className: "middle",
+                    title: `<div class="alert-icon icon-success">`
+                    + `</div><h2 style="margin:auto;">Success</h2>`,
+                    message: `<div>${msg}</div>`,
+                    buttons: {
+                        success: {
+                            label: "Close",
+                            className: "btn-success",
+                            callback: function(){
+                                $(option).remove();
+                                $(importedTextures).change();
+                            }
+                        },
+                    },
+                });
+
+            });
+
+        }).catch(function(err){
+            console.error(err);
+            bootbox.dialog( errorDialogOptions(err) );
+        }).then(function(){
+            $(textureUploadButton).one("click", uploadSelectedTexture );
+        });
+
+        function errorDialogOptions(err){
+            return {
+                size: "small",
+                className: "middle",
+                title: `<div class="alert-icon icon-warning">` 
+                + `</div><h2 style="margin:auto;">Error!</h2>`,
+                message: `<div>Sorry! An error occurred.</div><div>${err}</div>`,
+                buttons: {
+                    cancel: {
+                        label: "Close",
+                        className: "btn-default",
+                    },
+                },
+            };
+        }
+
+    }
+
+})();
+
+</script>
+
 <div style="height:35px;margin-bottom:10px;">
     <h4><span style="vertical-align:-0.5rem;">Select gender:</span>
         <div style="width:40%;display:inline-block;float:right;">
@@ -731,129 +853,6 @@
 
     });
 
-
-//  BUTTONS.
-
-    $("#new-texture-button").on("click", function(){
-        clearTimeout(this.interval);
-        this.interval = setTimeout(function(){
-            json = new jsonTexture();
-            debugMode && console.log({"new":json});
-        }, 200);
-    });
-
-    $("#upload-selected-texture").on("click", function(){
-        clearTimeout(this.interval);
-        this.interval = setTimeout( function(){
-
-            if ( !navigator.onLine ) {
-                var err = "Your connection to the internet is down.";
-                debugMode && console.error(err);
-                return bootbox.dialog( errorDialogOptions(err) );
-            }
-
-            if ( !importedTextures.value ) {
-                var err = "There is not selected texture to upload.";
-                debugMode && console.error(err);
-                return bootbox.dialog( errorDialogOptions(err) );
-            }
-
-            var option = importedTextures.selectedOptions[0];
-            debugMode && console.log(option);
-
-            var name = option.value;
-            var data = texturePreview.src.split(";base64,").pop(); // important!
-            var type = texturePreview.src.split(";base64,").shift().replace("data:", "");
-
-            new Promise(function(resolve, reject){
-
-                var formdata = new FormData();
-                formdata.append("type",  type);
-                formdata.append("image", data);
-                formdata.append("name",  name);
-                formdata.append("title", name);
-
-                var xhttp = new XMLHttpRequest();
-                var clientid = "60db267c697bb33";  // textures.
-                var endpoint = "https://api.imgur.com/3/image";
-                xhttp.open('POST', endpoint, true);
-                xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
-                xhttp.onreadystatechange = function () {
-                    if (this.readyState === 4) {
-                        var response = "";
-                        if (this.status >= 200 && this.status < 300) {
-                            response = JSON.parse(this.responseText);
-                            resolve( response ); // resolve promise.
-                        } else {
-                            var err = JSON.parse(this.responseText).data.error;
-                            console.error( err.type, err );
-                            throw err;
-                        }
-                    }
-                };
-
-                xhttp.send(formdata);
-                xhttp = null;
-
-            }).then( function( response ){
-
-                var data = response.data;
-                debugMode && console.log({"data": data});
-
-            //  Add to cache.
-                caches.open("textures").then(function(cache){
-
-                    cache.add(data.link);
-
-                //  Success.
-                    var msg = `Texture ${name} uploaded successfully!`;
-                    bootbox.dialog({
-                        size: "small",
-                        className: "middle",
-                        title: `<div class="alert-icon icon-success">`
-                        + `</div><h2 style="margin:auto;">Success</h2>`,
-                        message: `<div>${msg}</div>`,
-                        buttons: {
-                            success: {
-                                label: "Close",
-                                className: "btn-success",
-                                callback: function(){
-                                    $(option).remove();
-                                    $(importedTextures).change();
-                                }
-                            },
-                        },
-                    });
-
-                });
-
-            }).catch(function(err){
-                console.error(err);
-                bootbox.dialog( errorDialogOptions(err) );
-            });
-
-
-        }, 200 );
-
-        function errorDialogOptions(err){
-            return {
-                size: "small",
-                className: "middle",
-                title: `<div class="alert-icon icon-warning">` 
-                + `</div><h2 style="margin:auto;">Error!</h2>`,
-                message: `<div>Sorry! An error occurred.</div><div>${err}</div>`,
-                buttons: {
-                    cancel: {
-                        label: "Close",
-                        className: "btn-default",
-                    },
-                },
-            };
-        }
-
-    });
-
-
 /*
     anisotropy: 1,
     encoding: 3000,
@@ -915,7 +914,6 @@
 
 </script>
 
-
 <div id="texture-map-controls" class="well" style="background:none;border-radius:8px;height:auto;display:none;">
 
     <h4 class="texture-checkbox-helper">
@@ -963,13 +961,6 @@
 
 <hr/>
 
-<div style="margin-bottom:10px;">
-    <div id="new-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn pull-left" style="width:24%;">New</div>
-    <div id="copy-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn" style="width:24%;margin-left:1%;">Copy</div>
-    <div id="apply-texture-button" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;">Apply</div>
-    <div id="save-texture-button" class="form-control btn btn-success btn-white-outline gradient-btn pull-right" style="width:24%;">Save</div>
-</div>
-
 <script>
 
 (function(){
@@ -1001,6 +992,13 @@
 })();
 
 </script>
+
+<div style="margin-bottom:10px;">
+    <div id="new-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn pull-left" style="width:24%;">New</div>
+    <div id="copy-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn" style="width:24%;margin-left:1%;">Copy</div>
+    <div id="apply-texture-button" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;">Apply</div>
+    <div id="save-texture-button" class="form-control btn btn-success btn-white-outline gradient-btn pull-right" style="width:24%;">Save</div>
+</div>
 
 <script>
 

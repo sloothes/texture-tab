@@ -92,7 +92,7 @@
 
     $(texturePreview).on("load", function(){
         window.URL.revokeObjectURL(this.src); // important!
-        debugMode && console.log({"revoked":this.src});
+        debugMode && console.log("revoked:", this.src);
     });
 
 })();

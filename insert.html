@@ -84,6 +84,21 @@
     <img id="texture-preview" style="max-width:100%;max-height:300px;margin:auto;">
 </div>
 
+<script>
+
+(function(){
+
+    const texturePreview = document.getElementById("texture-preview");
+
+    $(texturePreview).on("load", function(){
+        window.URL.revokeObjectURL(this.src); // important!
+    });
+
+})();
+
+</script>
+
+
 <div style="height:45px;margin-bottom:10px;">
     <select id="imported-textures" class="form-control material-texture-droplist" readonly>
         <option value="">Import textures:</option>
@@ -306,7 +321,12 @@
 
         var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;
-        texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
+    //  texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
+
+    //  Using window.URL.createObjectURL().
+        THREE.UVsDebug(geometry, 512).toBlob(function(blob){
+            texturePreview.src = window.URL.createObjectURL(blob);
+        }, "image/jpeg");
 
     });
 
@@ -386,7 +406,12 @@
 
         var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;
-        texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
+    //  texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
+
+    //  Using window.URL.createObjectURL().
+        THREE.UVsDebug(geometry, 512).toBlob(function(blob){
+            texturePreview.src = window.URL.createObjectURL(blob);
+        }, "image/jpeg");
 
     });
 
@@ -938,10 +963,7 @@
 
     var textureDroplistChanged = new Signal();
 
-    $(texturePreview).on("load", function(){
-        window.URL.revokeObjectURL(this.src); // important!
-    });
-
+ 
 //  BUTTON NEW.
 
     $(textureNewButton).on("click", function(){

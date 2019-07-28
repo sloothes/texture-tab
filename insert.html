@@ -1283,6 +1283,7 @@
                                 delete files[ file.name ];
                             //  delete textures[ file.name ];
 
+                                debugMode && console.log("removing", $option.get(0) );
                                 $option.remove();
 
                                 if (textureDroplist.options.length == 0) {

@@ -1413,6 +1413,23 @@
                 debugMode && console.log( data.link );
 
             //  Success.
+
+                debugMode && console.log(`deleting "${file.name}" from files.`);
+
+                delete files[ file.name ];
+            //  delete textures[ file.name ];
+
+                debugMode && console.log( "removing", $option.get(0) );
+
+                $option.remove();
+
+                if (textureDroplist.options.length == 0) {
+                    var option = document.createElement("option");
+                    option.value = "";  option.innerText = "Import textures:";
+                    $(textureDroplist).append(option);
+                }
+
+                textureDroplistChanged.dispatch( textureDroplist.value );
                 var msg = `Texture ${file.name} uploaded successfully!`;
                 bootbox.dialog({
                     size: "small",
@@ -1425,24 +1442,6 @@
                         success: {
                             label: "Close",
                             className: "btn-success",
-                            callback: function(){
-
-                                debugMode && console.log(`deleting "${file.name}" from files.`);
-
-                                delete files[ file.name ];
-                            //  delete textures[ file.name ];
-
-                                debugMode && console.log( "removing", $option.get(0) );
-                                $option.remove();
-
-                                if (textureDroplist.options.length == 0) {
-                                    var option = document.createElement("option");
-                                    option.value = "";  option.innerText = "Import textures:";
-                                    $(textureDroplist).append(option);
-                                }
-
-                                textureDroplistChanged.dispatch( textureDroplist.value );  // == $(textureDroplist).change();
-                            }
                         },
                     },
                 });

@@ -1182,7 +1182,10 @@
                 delete textures[name];
             }
 
-            files = {}; textures = {};
+        //  files = {}; textures = {};
+
+            debugMode && console.log("files:", files);
+        //  debugMode && console.log("textures:", textures);
 
         }, 250 );
 

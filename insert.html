@@ -1219,7 +1219,7 @@
         if ( !files[ textureDroplist.value ] ) return;
 
         var file = files[ textureDroplist.value ];
-        var option = textureDroplist.selectedOptions[0];
+        var $option = $( textureDroplist.selectedOptions[0] );
 
         new Promise(function(resolve, reject){
 
@@ -1283,7 +1283,7 @@
                                 delete files[ file.name ];
                             //  delete textures[ file.name ];
 
-                                $(option).remove();
+                                $option.remove();
 
                                 if (textureDroplist.options.length == 0) {
                                     var option = document.createElement("option");

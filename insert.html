@@ -1221,6 +1221,13 @@
         var file = files[ textureDroplist.value ];
         var $option = $( textureDroplist.selectedOptions[0] );
 
+        var dialog = bootbox.dialog({
+            message: `<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Uploading...</div>`,
+            buttons: false,
+            closeButton: false,
+            className: "middle",
+        });
+
         new Promise(function(resolve, reject){
 
             $(textureUploadButton).off(); // important!
@@ -1306,10 +1313,12 @@
         }).catch(function(err){
 
             console.error(err);
+            dialog.modal("hide"); // important!
             bootbox.dialog( errorDialogOptions(err) );
 
         }).then(function(){
 
+            dialog.modal("hide"); // important!
             $(textureUploadButton).on("click", uploadSelectedTexture ); // important!
             debugMode && console.log( "Upload button is enabled and ready to upload." );
 

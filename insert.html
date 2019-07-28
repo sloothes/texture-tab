@@ -1014,6 +1014,7 @@
         if ( this.files.length == 0 ) return;
 
         $(textureCheckboxSelector).attr({checked:false});
+        $(textureDroplist).find(`option[value=""]`).remove();
 
     //  Using window.URL.createObjectURL().
 
@@ -1268,6 +1269,7 @@
                 bootbox.dialog({
                     size: "small",
                     className: "middle",
+                    closeButton: false,
                     title: `<div class="alert-icon icon-success">`
                     + `</div><h2 style="margin:auto;">Success</h2>`,
                     message: `<div>${msg}</div>`,
@@ -1317,6 +1319,7 @@
             return {
                 size: "small",
                 className: "middle",
+                closeButton: false,
                 title: `<div class="alert-icon icon-warning">` 
                 + `</div><h2 style="margin:auto;">Error!</h2>`,
                 message: `<div>Sorry! An error occurred.</div><div>${err}</div>`,

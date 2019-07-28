@@ -1278,6 +1278,11 @@
                             className: "btn-success",
                             callback: function(){
                                 $(option).remove();
+                                if (textureDroplist.options.length == 0) {
+                                    var option = document.createElement("option");
+                                    option.value = "";  option.innerText = "Import textures:";
+                                    $(textureDroplist).append(option);
+                                }
                                 textureDroplistChanged.dispatch( textureDroplist.value );  // == $(textureDroplist).change();
                             }
                         },
@@ -1294,7 +1299,7 @@
         }).then(function(){
 
             $(textureUploadButton).on("click", uploadSelectedTexture ); // important!
-            debugMode && console.log( "Button upload is enabled again." );
+            debugMode && console.log( "Upload button is enabled and ready to upload." );
 
         });
 

@@ -309,9 +309,9 @@
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;
 
-        if ( !viewer.contentWindow[gender][slot] ) return; // important!
+        if ( !viewer.contentWindow[gender][slot] ) return;
+        if ( !window.THREE ) var THREE = viewer.contentWindow.THREE;
 
-        if ( !window.THREE ) var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;
     //  texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
 
@@ -394,8 +394,8 @@
 
     //  Null outfit NOT allowed.
         if ( !viewer.contentWindow[gender][slot] ) return;  
-
         if ( !window.THREE ) var THREE = viewer.contentWindow.THREE;
+
         var geometry = viewer.contentWindow[gender][slot].geometry;
     //  texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
 
@@ -1027,10 +1027,13 @@
 
             var slot = slotDroplist.value;
             var gender = viewer.contentWindow.localPlayer.outfit.getGender();
+
+            if ( !viewer.contentWindow[gender][slot] ) return;
+            if ( !window.THREE ) var THREE = viewer.contentWindow.THREE;
+
             var geometry = viewer.contentWindow[gender][slot].geometry;
 
         //  Using window.URL.createObjectURL().
-            if ( !window.THREE ) var THREE = viewer.contentWindow.THREE; // important!
             THREE.UVsDebug(geometry, 512).toBlob(function(blob){
                 texturePreview.src = window.URL.createObjectURL(blob);
             }, "image/jpeg");

@@ -88,7 +88,7 @@
 
 (function(){
 
-    const texturePreview = document.getElementById("texture-preview");
+    const texturePreview = $("img#texture-preview").get(0);
 
     $(texturePreview).on("load", function(){
         window.URL.revokeObjectURL(this.src); // important!
@@ -98,7 +98,6 @@
 })();
 
 </script>
-
 
 <div style="height:45px;margin-bottom:10px;">
     <select id="imported-textures" class="form-control material-texture-droplist" readonly>
@@ -310,17 +309,9 @@
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;
 
-        if ( !viewer.contentWindow[gender][slot] ) {
+        if ( !viewer.contentWindow[gender][slot] ) return; // important!
 
-        //  Reset texture preview.
-            // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
-        //  $(texturePreview).attr({src: "//:0"}); 
-
-            return;   //  Null values NOT allowed.
-
-        }
-
-        var THREE = viewer.contentWindow.THREE; // important!
+        if ( !window.THREE ) var THREE = viewer.contentWindow.THREE; // important!
         var geometry = viewer.contentWindow[gender][slot].geometry;
     //  texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
 
@@ -375,7 +366,6 @@
     //  if ( !this.value ) $(texturePreview).attr({src: "//:0"}); 
 
     //  Null value IS allowed!
-
         outfitSlotChanged.dispatch(this.value);
 
     });
@@ -405,7 +395,7 @@
     //  Null outfit NOT allowed.
         if ( !viewer.contentWindow[gender][slot] ) return;  
 
-        var THREE = viewer.contentWindow.THREE; // important!
+        if ( !window.THREE ) var THREE = viewer.contentWindow.THREE;
         var geometry = viewer.contentWindow[gender][slot].geometry;
     //  texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
 
@@ -1035,12 +1025,12 @@
 
         } else {
 
-            var THREE = viewer.contentWindow.THREE; // important!
             var slot = slotDroplist.value;
             var gender = viewer.contentWindow.localPlayer.outfit.getGender();
             var geometry = viewer.contentWindow[gender][slot].geometry;
 
         //  Using window.URL.createObjectURL().
+            if ( !window.THREE ) var THREE = viewer.contentWindow.THREE; // important!
             THREE.UVsDebug(geometry, 512).toBlob(function(blob){
                 texturePreview.src = window.URL.createObjectURL(blob);
             }, "image/jpeg");
@@ -1090,7 +1080,7 @@
 
         //  Optional.
 
-            delete files[ option.value ];
+            console.log( delete files[ option.value ] );
             delete textures[ option.value ];
             debugMode && console.log({"files":files, "textures": textures});
 

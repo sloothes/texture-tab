@@ -962,10 +962,9 @@
 
     });
 
-    const noscr = "//:0";
-// "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
 
-    files = {};  // debuging only: to become local!
+
+    var files = {};
     var uploads = [];
     var textures = {};
 
@@ -983,6 +982,7 @@
     const textureControlSelector = "#texture-map-controls";
     const textureCheckboxSelector = "input[type=checkbox].material-texture-checkbox";
     const texturePropertyControls = document.getElementById("texture-property-controls");
+    const noscr = "//:0";  // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
 
     var textureDroplistChanged = new Signal();
 
@@ -1076,7 +1076,7 @@
             if ( !gender || !slot || !viewer.contentWindow[gender][slot] ) {
             //  reset texture preview image src and return.
                 // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
-                texturePreview.src = "//:0";  return;  // nosrc  
+                texturePreview.src = "//:0";  return;  // nosrc.  
             }
 
         //  This is the "THREE" of scene window that has UVsDebug().
@@ -1103,6 +1103,7 @@
     });
 
     deleteButtonClicked.add( function(){
+    //  This signal function first. important!
     //  if (!textureDroplist.selectedOptions.length) return;
 
     //  Optional.
@@ -1113,11 +1114,12 @@
         delete textures[ name ];
 
         debugMode && console.log("files:", files);
-        debugMode && console.log("textures:", textures);
+    //  debugMode && console.log("textures:", textures);
 
     });
 
     deleteButtonClicked.add( function(){
+    //  This signal function last. important!
 
         var option = textureDroplist.selectedOptions[0];
 

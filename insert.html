@@ -1013,7 +1013,6 @@
     $(textureFileinput).on("change", function(){
         if ( this.files.length == 0 ) return;
 
-        $(textureDroplist).children().remove();
         $(textureCheckboxSelector).attr({checked:false});
 
     //  Using window.URL.createObjectURL().

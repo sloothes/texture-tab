@@ -962,6 +962,8 @@
 
     });
 
+    const noscr = "//:0";
+// "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
 
     files = {};  // debuging only: to become local!
     var uploads = [];
@@ -1041,7 +1043,20 @@
 //  SELECT TEXTURE DROPLIST.
 
     $(textureDroplist).on("change", function(){
+
+    //  Reset texture map checkboxes.
+        $(textureCheckboxSelector).attr({checked:false});
+    //  Overwrite gender droplist value.
+        genderDroplist.value = viewer.contentWindow.localPlayer.outfit.getGender();
+
+        if ( !value ) {
+            $(textureControlSelector).slideUp();
+        } else {
+            $(textureControlSelector).slideDown();
+        }
+
         textureDroplistChanged.dispatch(this.value);
+
     });
 
     textureDroplistChanged.add(function(value){
@@ -1050,15 +1065,22 @@
 
         //  Using window.URL.createObjectURL().
             texturePreview.src = window.URL.createObjectURL( files[ value ] );
-
-        } else {
+            return;
+        } 
+        
+        if ( !value ) {
 
             var slot = slotDroplist.value;
             var gender = viewer.contentWindow.localPlayer.outfit.getGender();
 
-            if ( !viewer.contentWindow[gender][slot] ) return;
-            if ( !window.THREE ) var THREE = viewer.contentWindow.THREE;
+            if ( !gender || !slot || !viewer.contentWindow[gender][slot] ) {
+            //  reset texture preview image src and return.
+                // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+                texturePreview.src = "//:0";  return;  // nosrc  
+            }
 
+        //  This is the "THREE" of scene window that has UVsDebug().
+            var THREE = viewer.contentWindow.THREE;  //  important!
             var geometry = viewer.contentWindow[gender][slot].geometry;
 
         //  Using window.URL.createObjectURL().
@@ -1070,54 +1092,41 @@
 
     });
 
-    textureDroplistChanged.add(function(value){
-
-    //  Overwrite gender droplist value.
-        genderDroplist.value = viewer.contentWindow.localPlayer.outfit.getGender();
-
-        $(textureCheckboxSelector).attr({checked:false});
-
-        if ( !value ) {
-            $(textureControlSelector).slideUp();
-        } else {
-            $(textureControlSelector).slideDown();
-        }
-
-    });
-
 //  BUTTON DELETE.
+    var deleteButtonClicked = new Signal();
 
     $(textureDeleteBtn).on("click", function(){
-
         clearTimeout(this.interval);
         this.interval = setTimeout( function(){
+            deleteButtonClicked.dispatch();
+        }, 200 );
+    });
 
-            var option = textureDroplist.selectedOptions[0];
+    deleteButtonClicked.add( function(){
 
-            if ( !option ) return;
-            if ( !option.value ) return;
+        var option = textureDroplist.selectedOptions[0];
 
-            $(option).remove();
+        if ( !option ) return;
+        if ( !option.value ) return;
 
-            if (textureDroplist.options.length == 0) {
-                var option = document.createElement("option");
-                option.value = "";  option.innerText = "Import textures:";
-                $(textureDroplist).append(option);
-            }
+        $(option).remove();
 
-            $(textureControlSelector).slideUp();
-            $(textureCheckboxSelector).attr({checked:false});
-            textureDroplistChanged.dispatch( textureDroplist.value );  // == $(textureDroplist).change();
+        if (textureDroplist.options.length == 0) {
+            var option = document.createElement("option");
+            option.value = "";  option.innerText = "Import textures:";
+            $(textureDroplist).append(option);
+        }
+
+        $(textureControlSelector).slideUp();
+        $(textureCheckboxSelector).attr({checked:false});
+        textureDroplistChanged.dispatch( textureDroplist.value );  // == $(textureDroplist).change();
 
         //  Optional.
 
-            var name = option.value;
-            console.log( delete files[ name ] );
-            console.log( delete textures[ name ] );
-            debugMode && console.log("files:", files);
-            debugMode && console.log("textures:", textures);
-
-        }, 200 );
+        delete files[ option.value.toString() ] );
+        delete textures[ option.value.toString() ] );
+        debugMode && console.log("files:", files);
+        debugMode && console.log("textures:", textures);
 
     });
 

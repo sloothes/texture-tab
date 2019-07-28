@@ -940,7 +940,7 @@
     });
 
 
-    var files = {};
+    files = {};  // debuging only: to become local!
     var uploads = [];
     var textures = {};
 
@@ -1104,7 +1104,7 @@
 
         clearTimeout(this.interval);
         this.interval = setTimeout( function(){
-            debugMode && console.log({"files":files, "textures": textures});
+        //  debugMode && console.log({"files":files, "textures": textures});
 
             $(textureDroplist).children().remove();
 

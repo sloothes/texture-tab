@@ -539,6 +539,29 @@
 
 (function(){
 
+/*
+//  const VERSION = 5;
+    const NAME = "USER";
+
+    var db = new zango.Db( NAME, {
+        current:    true,
+        settings:   true,
+        animations: true,
+        outfits:    true,
+        materials:  true,
+        textures:   true,
+        products:   true,
+    });
+
+    db.open(function(err, database){
+        if (err) console.error(err);
+    }).then( function(){
+        debugMode && console.log(`Database ${db.name} (v${db.version}) opened.`);
+    }).catch(function(err){
+        console.error(err);
+    });
+*/
+
     const viewer = document.getElementById("viewer");
     const propDroplist = $("select#texture-property").get(0);
     const propControls = $("#texture-property-controls").get(0);
@@ -1203,8 +1226,8 @@
 */
 
     var json;
-    var files = {};
-    var uploads = [];
+//  var files = {};
+//  var uploads = [];
     var textures = {};
 
     const viewer = document.getElementById("viewer");
@@ -1305,6 +1328,8 @@
 
         });
     });
+
+})();
 
 /*
 //  BUTTON IMPORT.
@@ -1561,6 +1586,7 @@
 
 */
 
+/*
 //  deepCopy.js
 
     function deepCopy(obj) {
@@ -1593,12 +1619,8 @@
         };
         return shift(Math.round(shift(number, precision, false)), precision, true);
     }
+*/
 
-})();
-
-</script>
-
-<script>
 
 /*
     function jsonTexture() {

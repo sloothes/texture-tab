@@ -260,7 +260,7 @@
     const importedTextures = $("select#imported-textures").get(0);
 
     var Signal = signals.Signal;
-    var genderChanged = new Signal();
+    var genderDroplistChanged = new Signal();
 
     $(genderDroplist).on("change", function(){
 
@@ -283,7 +283,7 @@
 
     });
 
-    genderChanged.add(function(value){
+    genderDroplistChanged.add(function(value){
 
     //  Reset texture preview.
         // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
@@ -300,7 +300,7 @@
 
     });
 
-    genderChanged.add(function(){
+    genderDroplistChanged.add(function(){
 
         if ( !slotDroplist.value ) return;
         if ( !genderDroplist.value ) return;
@@ -309,8 +309,11 @@
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;
 
+    //  Null outfit NOT allowed.
         if ( !viewer.contentWindow[gender][slot] ) return;
-        if ( !window.THREE ) var THREE = viewer.contentWindow.THREE;
+
+    //  This is the "THREE" of scene window that has UVsDebug().
+        var THREE = viewer.contentWindow.THREE;  //  important!
 
         var geometry = viewer.contentWindow[gender][slot].geometry;
     //  texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
@@ -393,8 +396,10 @@
         var gender = genderDroplist.value;
 
     //  Null outfit NOT allowed.
-        if ( !viewer.contentWindow[gender][slot] ) return;  
-        if ( !window.THREE ) var THREE = viewer.contentWindow.THREE;
+        if ( !viewer.contentWindow[gender][slot] ) return;
+
+    //  This is the "THREE" of scene window that has UVsDebug().
+        var THREE = viewer.contentWindow.THREE;  //  important!
 
         var geometry = viewer.contentWindow[gender][slot].geometry;
     //  texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
@@ -1083,9 +1088,11 @@
 
         //  Optional.
 
-            console.log( delete files[ option.value ] );
-            delete textures[ option.value ];
-            debugMode && console.log({"files":files, "textures": textures});
+            var name = option.value;
+            console.log( delete files[ name ] );
+            console.log( delete textures[ name ] );
+            debugMode && console.log("files:", files);
+            debugMode && console.log("textures:", textures);
 
         }, 200 );
 

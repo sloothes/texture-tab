@@ -1103,6 +1103,21 @@
     });
 
     deleteButtonClicked.add( function(){
+    //  if (!textureDroplist.selectedOptions.length) return;
+
+    //  Optional.
+        var name = textureDroplist.selectedOptions[0].value;
+        debugMode && console.log("delete from files:", name);
+
+        delete files[ name ];
+        delete textures[ name ];
+
+        debugMode && console.log("files:", files);
+        debugMode && console.log("textures:", textures);
+
+    });
+
+    deleteButtonClicked.add( function(){
 
         var option = textureDroplist.selectedOptions[0];
 
@@ -1120,13 +1135,6 @@
         $(textureControlSelector).slideUp();
         $(textureCheckboxSelector).attr({checked:false});
         textureDroplistChanged.dispatch( textureDroplist.value );  // == $(textureDroplist).change();
-
-        //  Optional.
-
-        delete files[ option.value.toString() ];
-        delete textures[ option.value.toString() ];
-        debugMode && console.log("files:", files);
-        debugMode && console.log("textures:", textures);
 
     });
 

@@ -138,20 +138,22 @@
             return bootbox.dialog( errorDialogOptions(err) );
         }
 
-        var option = importedTextures.selectedOptions[0];
-        debugMode && console.log("selected option:", option);
+    //  var name = importedTextures.selectedOptions[0].value;
+    //  var data = texturePreview.src.split(";base64,").pop(); // important!
+    //  var type = texturePreview.src.split(";base64,").shift().replace("data:", "");
 
-        var name = option.value;
-        var data = texturePreview.src.split(";base64,").pop(); // important!
-        var type = texturePreview.src.split(";base64,").shift().replace("data:", "");
+    //  Using files.
+
+        var file = files[ importedTextures.value ];
 
         new Promise(function(resolve, reject){
+            debugMode && console.log(`uploading ${name}...`);
 
             var formdata = new FormData();
-            formdata.append("type",  type);
-            formdata.append("image", data);
-            formdata.append("name",  name);
-            formdata.append("title", name);
+            formdata.append("image", file);
+            formdata.append("type",  file.type);
+            formdata.append("name",  file.name);
+        //  formdata.append("title", file.name);
 
             var xhttp = new XMLHttpRequest();
             var clientid = "60db267c697bb33";  // textures.
@@ -1049,7 +1051,7 @@
     //  Overwrite gender droplist value.
         genderDroplist.value = viewer.contentWindow.localPlayer.outfit.getGender();
 
-        if ( !value ) {
+        if ( !this.value ) {
             $(textureControlSelector).slideUp();
         } else {
             $(textureControlSelector).slideDown();
@@ -1065,6 +1067,7 @@
 
         //  Using window.URL.createObjectURL().
             texturePreview.src = window.URL.createObjectURL( files[ value ] );
+
             return;
         } 
         
@@ -1088,6 +1091,8 @@
                 texturePreview.src = window.URL.createObjectURL(blob);
             }, "image/jpeg");
 
+            return;
+
         }
 
     });
@@ -1104,10 +1109,20 @@
 
     deleteButtonClicked.add( function(){
     //  This signal function first. important!
-    //  if (!textureDroplist.selectedOptions.length) return;
+
+        if ( !textureDroplist.value ) {
+            debugMode && console.log("files:", files);
+            return;
+        }
+
+        if ( !textureDroplist.selectedOptions.length ) {
+            debugMode && console.log("files:", files);
+            return;
+        }
 
     //  Optional.
-        var name = textureDroplist.selectedOptions[0].value;
+
+        var name = textureDroplist.value;
         debugMode && console.log("delete from files:", name);
 
         delete files[ name ];

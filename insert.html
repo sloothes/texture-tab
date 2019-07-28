@@ -1283,8 +1283,10 @@
                                 delete files[ file.name ];
                             //  delete textures[ file.name ];
 
-                                debugMode && console.log("removing", $option.get(0) );
+                                debugMode && console.log( "removing", $option.get(0) );
                                 $option.remove();
+
+                                debugMode && console.log( data.link );
 
                                 if (textureDroplist.options.length == 0) {
                                     var option = document.createElement("option");

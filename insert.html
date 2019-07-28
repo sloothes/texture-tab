@@ -1270,6 +1270,7 @@
             caches.open("textures").then(function(cache){
 
                 cache.add(data.link);
+                debugMode && console.log( data.link );
 
             //  Success.
                 var msg = `Texture ${file.name} uploaded successfully!`;
@@ -1293,8 +1294,6 @@
 
                                 debugMode && console.log( "removing", $option.get(0) );
                                 $option.remove();
-
-                                debugMode && console.log( data.link );
 
                                 if (textureDroplist.options.length == 0) {
                                     var option = document.createElement("option");

@@ -521,7 +521,6 @@
     const viewer = document.getElementById("viewer");
     const propDroplist = $("select#texture-property").get(0);
     const propControls = $("#texture-property-controls").get(0);
-    const texturePreview = $("img#texture-preview").get(0);
     const importedTextures = $("select#imported-textures").get(0);
 
     function generateUUID(){
@@ -533,33 +532,36 @@
         }).toLocaleUpperCase();
     };
 
-    function jsonTexture() {
+    function jsonTexture(options) {
         return {
-            anisotropy: 1,
-            encoding: 3000,
-            flipY: true,
-            format: 1021,
-            generateMipmaps: true,
-            magFilter: 1006,
-            mapping: 300,
-            minFilter: 1008,
-            mipmaps: [],
-            name: "",
-            offset: [0, 0],
-            premultiplyAlpha: false,
-            repeat: [1, 1],
-            sourceFile: "",
-            type: 1009,
-            unpackAlignment: 4,
-            uuid: generateUUID(),
-            version: 0,
-            wrapS: 1001,
-            wrapT: 1001,
-            _id: ObjectId(),
+            _id       : ObjectId(),
+            uuid      : generateUUID(),
+            name      : options.name  || "",
+            type      : options.type  || 1009,
+            flipY     : options.flipY || true,
+            wrapS     : options.wrapS || 1001,
+            wrapT     : options.wrapT || 1001,
+            offset    : options.offset || [0, 0],
+            repeat    : options.repeat || [1, 1],
+            format    : options.format  || 1021,
+            version   : options.version || 0,
+            mapping   : options.mapping || 300,
+            mipmaps   : options.mipmaps || [],
+            minFilter : options.minFilter || 1008,
+            magFilter : options.magFilter || 1006,
+            encoding  : options.encoding  || 3000,
+            anisotropy: options.anisotropy || 1,
+            sourceFile: options.sourceFile || "",
+            unpackAlignment : options.unpackAlignment  || 4,
+            generateMipmaps : options.generateMipmaps  || true,
+            premultiplyAlpha: options.premultiplyAlpha || false,
         };
-    };
+    }
 
     var json = new jsonTexture();
+
+    var Signal = signals.Signal;
+    var propertiesDroplistChanged = new Signal();
 
     function propertyDroplistReset(){
 
@@ -587,9 +589,6 @@
         }
 
     }
-
-    var Signal = signals.Signal;
-    var propertiesDroplistChanged = new Signal();
 
     $(propDroplist).on("change", function(){
         propertiesDroplistChanged.dispatch(this.value);
@@ -915,8 +914,31 @@
 
     });
 
+
+    var files = {};
+    var uploads = [];
+    var textures = {};
+
+    const slotDroplist     = $("#texture-outfit-slot").get(0);
+    const genderDroplist   = $("#texture-gender-droplist").get(0);
+    const texturePreview   = $("img#texture-preview").get(0);
+    const textureDroplist  = $("select#imported-textures").get(0);
     const textureNewButton = $("#new-texture-button").get(0);
+    const textureImportBtn = $("#import-texture-button").get(0);
+    const textureFileinput = $("input#texture-fileinput").get(0);
     const textureUploadBtn = $("#upload-selected-texture").get(0);
+    const textureDeleteBtn = $("#delete-selected-texture").get(0);
+    const texturesClearBtn = $("#clear-imported-textures").get(0);
+
+    const textureControlSelector = "#texture-map-controls";
+    const textureCheckboxSelector = "input[type=checkbox].material-texture-checkbox";
+    const texturePropertyControls = document.getElementById("texture-property-controls");
+
+    var textureDroplistChanged = new Signal();
+
+    $(texturePreview).on("load", function(){
+        window.URL.revokeObjectURL(this.src); // important!
+    });
 
 //  BUTTON NEW.
 
@@ -927,6 +949,167 @@
             debugMode && console.log({"new":json});
         }, 200);
     });
+
+//  BUTTON IMPORT.
+
+    $(textureImportBtn).on("click", function(){
+        $(textureFileinput).val("");
+        $(textureFileinput).click();
+    });
+
+    $(textureFileinput).on("change", function(){
+        if ( this.files.length == 0 ) return;
+
+        $(textureDroplist).children().remove();
+        $(textureCheckboxSelector).attr({checked:false});
+
+    //  Using window.URL.createObjectURL().
+
+        for (var i = 0; i < this.files.length; i++ ) {
+
+            var file = textureFileinput.files[i];
+            var name = textureFileinput.files[i].name;
+
+            files[ name ] = file;
+
+        //  textures[ name ] = new jsonTexture();
+        //  textures[ name ].name = name;
+        //  textures[ name ].sourceFile = files[ name ]; // file;
+
+            var option = document.createElement("option");
+        //  option.id = textures[ name ]._id;
+            option.value = option.innerText = name;
+
+            $(textureDroplist).append(option);
+            textureDroplist.value = option.value;
+            textureDroplistChanged.dispatch(option.value);  //  $(textureDroplist).change();
+
+        }
+
+        debugMode && console.log({
+            "files": files, 
+            "textures": textures,
+        });
+
+    });
+
+//  SELECT TEXTURE DROPLIST.
+
+    $(textureDroplist).on("change", function(){
+        textureDroplistChanged.dispatch(this.value);
+    });
+
+    textureDroplistChanged.add(function(value){
+
+        if ( value ) {
+
+        //  Using window.URL.createObjectURL().
+            texturePreview.src = window.URL.createObjectURL( files[ value ] );
+
+        } else {
+
+            var THREE = viewer.contentWindow.THREE; // important!
+            var slot = slotDroplist.value;
+            var gender = viewer.contentWindow.localPlayer.outfit.getGender();
+            var geometry = viewer.contentWindow[gender][slot].geometry;
+
+        //  Using window.URL.createObjectURL().
+            THREE.UVsDebug(geometry, 512).toBlob(function(blob){
+                texturePreview.src = window.URL.createObjectURL(blob);
+            }, "image/jpeg");
+
+        }
+
+    });
+
+    textureDroplistChanged.add(function(value){
+
+    //  Overwrite gender droplist value.
+        genderDroplist.value = viewer.contentWindow.localPlayer.outfit.getGender();
+
+        $(textureCheckboxSelector).attr({checked:false});
+
+        if ( !value ) {
+            $(textureControlSelector).slideUp();
+        } else {
+            $(textureControlSelector).slideDown();
+        }
+
+    });
+
+//  BUTTON DELETE.
+
+    $(textureDeleteBtn).on("click", function(){
+
+        clearTimeout(this.interval);
+        this.interval = setTimeout( function(){
+
+            var option = textureDroplist.selectedOptions[0];
+
+            if ( !option ) return;
+            if ( !option.value ) return;
+
+            $(option).remove();
+
+            if (textureDroplist.options.length == 0) {
+                var option = document.createElement("option");
+                option.value = "";  option.innerText = "Import textures:";
+                $(textureDroplist).append(option);
+            }
+
+            $(textureControlSelector).slideUp();
+            $(textureCheckboxSelector).attr({checked:false});
+            textureDroplistChanged.dispatch( textureDroplist.value );  // == $(textureDroplist).change();
+
+        //  Optional.
+
+            delete files[ option.value ];
+            delete textures[ option.value ];
+            debugMode && console.log({"files":files, "textures": textures});
+
+        }, 200 );
+
+    });
+
+//  BUTTON CLEAR.
+
+    $(texturesClearBtn).on("click", function(){
+
+        clearTimeout(this.interval);
+        this.interval = setTimeout( function(){
+            debugMode && console.log({"files":files, "textures": textures});
+
+            $(textureDroplist).children().remove();
+
+            if (textureDroplist.options.length == 0) {
+                var option = document.createElement("option");
+                option.value = "";  option.innerText = "Import textures:";
+                $(textureDroplist).append(option);
+            }
+
+            $(textureControlSelector).slideUp();
+            $(textureCheckboxSelector).attr({checked:false});
+            textureDroplistChanged.dispatch( textureDroplist.value );  // == $(textureDroplist).change();
+
+        //  Optional.
+
+            for (var name in textures){
+                delete files[name];
+                delete textures[name];
+            }
+
+            files = {}; textures = {};
+
+        }, 250 );
+
+    });
+
+
+
+
+
+
+
 
 //  deepCopy.js
 
@@ -1028,29 +1211,29 @@
         }).toLocaleUpperCase();
     }
 
-    function jsonTexture() {
+    function jsonTexture(options) {
         return {
-            anisotropy: 1,
-            encoding: 3000,
-            flipY: true,
-            format: 1021,
-            generateMipmaps: true,
-            magFilter: 1006,
-            mapping: 300,
-            minFilter: 1008,
-            mipmaps: [],
-            name: "",
-            offset: [0, 0],
-            premultiplyAlpha: false,
-            repeat: [1, 1],
-            sourceFile: "",
-            type: 1009,
-            unpackAlignment: 4,
-            uuid: generateUUID(),
-            version: 0,
-            wrapS: 1001,
-            wrapT: 1001,
-            _id: ObjectId(),
+            _id       : ObjectId(),
+            uuid      : generateUUID(),
+            name      : options.name  || "",
+            type      : options.type  || 1009,
+            flipY     : options.flipY || true,
+            wrapS     : options.wrapS || 1001,
+            wrapT     : options.wrapT || 1001,
+            offset    : options.offset || [0, 0],
+            repeat    : options.repeat || [1, 1],
+            format    : options.format  || 1021,
+            version   : options.version || 0,
+            mapping   : options.mapping || 300,
+            mipmaps   : options.mipmaps || [],
+            minFilter : options.minFilter || 1008,
+            magFilter : options.magFilter || 1006,
+            encoding  : options.encoding  || 3000,
+            anisotropy: options.anisotropy || 1,
+            sourceFile: options.sourceFile || "",
+            unpackAlignment : options.unpackAlignment  || 4,
+            generateMipmaps : options.generateMipmaps  || true,
+            premultiplyAlpha: options.premultiplyAlpha || false,
         };
     }
 
@@ -1092,6 +1275,7 @@
         });
     });
 
+/*
 //  BUTTON IMPORT.
 
     $(textureImportBtn).on("click", function(){
@@ -1104,6 +1288,8 @@
 
         $(textureDroplist).children().remove();
         $(textureCheckboxSelector).attr({checked:false});
+
+    //  Using FileReader().
 
         for (var i = 0; i < this.files.length; i++ ) {
 
@@ -1130,7 +1316,7 @@
 
                         var option = document.createElement("option");
                         option.value = option.innerText = name;
-                        option.id = textures[ name ]._id;
+                        //  option.id = textures[ name ]._id;
 
                         $(textureDroplist).append(option);
                         textureDroplist.value = option.value;
@@ -1153,7 +1339,9 @@
 
     });
 
+*/
 
+/*
 //  SELECT TEXTURE DROPLIST.
 
     $(textureDroplist).on("change", function(){
@@ -1164,17 +1352,22 @@
 
         if ( value ) {
 
+        //  Using dataURL from FileReader.
             var src = textures[ value ].sourceFile;
             $(texturePreviewImg).attr({"src":src});
 
         } else {
 
             var slot = slotDroplist.value;
+
+        //  Overwrite gender droplist value.
             var gender = genderDroplist.value = viewer.contentWindow.localPlayer.outfit.getGender();
 
-            if ( !viewer.contentWindow[gender][slot] ) {
-                $(texturePreviewImg).attr({src: "//:0"});  return;
-            }
+        //  Reset texture preview.
+        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+        //  if ( !viewer.contentWindow[gender][slot] ) {
+        //      $(texturePreviewImg).attr({src: "//:0"});  return;
+        //  }
 
             var THREE = viewer.contentWindow.THREE; // important!
             var geometry = viewer.contentWindow[gender][slot].geometry;
@@ -1196,7 +1389,9 @@
 
     });
 
+*/
 
+/*
 //  BUTTON DELETE.
 
     $(textureDeleteBtn).on("click", function(){
@@ -1217,9 +1412,9 @@
                 $(textureDroplist).append(option);
             }
 
-            $(textureDroplist).change(); // or ...dispatch();
             $(textureControlSelector).slideUp();
             $(textureCheckboxSelector).attr({checked:false});
+            textureDroplistChanged.dispatch( textureDroplist.value );  // == $(textureDroplist).change();
 
         //  Optional.
 
@@ -1248,9 +1443,9 @@
                 $(textureDroplist).append(option);
             }
 
-            $(textureDroplist).change(); // or ...dispatch();
             $(textureControlSelector).slideUp();
             $(textureCheckboxSelector).attr({checked:false});
+            textureDroplistChanged.dispatch( textureDroplist.value );  // == $(textureDroplist).change();
 
         //  Optional.
 
@@ -1265,9 +1460,10 @@
 
     });
 
+*/
 
-//  BUTTON UPLOAD.
 /*
+//  BUTTON UPLOAD.
     $(textureUploadBtn).on("click", function(){
         debugMode && console.log({"uploads":uploads});
 
@@ -1368,5 +1564,37 @@
     }
 
 })();
+
+</script>
+
+<script>
+
+/*
+    function jsonTexture() {
+        return {
+            anisotropy: 1,
+            encoding: 3000,
+            flipY: true,
+            format: 1021,
+            generateMipmaps: true,
+            magFilter: 1006,
+            mapping: 300,
+            minFilter: 1008,
+            mipmaps: [],
+            name: "",
+            offset: [0, 0],
+            premultiplyAlpha: false,
+            repeat: [1, 1],
+            sourceFile: "",
+            type: 1009,
+            unpackAlignment: 4,
+            uuid: generateUUID(),
+            version: 0,
+            wrapS: 1001,
+            wrapT: 1001,
+            _id: ObjectId(),
+        };
+    };
+*/
 
 </script>

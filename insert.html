@@ -1216,7 +1216,10 @@
 
     //  Using files.
 
-        var file = files[ importedTextures.value ];
+        if ( !files[ textureDroplist.value ] ) return;
+
+        var file = files[ textureDroplist.value ];
+        var option = textureDroplist.selectedOptions[0];
 
         new Promise(function(resolve, reject){
 
@@ -1275,7 +1278,7 @@
                             className: "btn-success",
                             callback: function(){
                                 $(option).remove();
-                                $(importedTextures).change();
+                                textureDroplistChanged.dispatch( textureDroplist.value );  // == $(textureDroplist).change();
                             }
                         },
                     },

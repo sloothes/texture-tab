@@ -533,6 +533,7 @@
     };
 
     function jsonTexture(options) {
+        var options = options || {};
         return {
             _id       : ObjectId(),
             uuid      : generateUUID(),
@@ -1212,6 +1213,9 @@
     }
 
     function jsonTexture(options) {
+
+        var options = options || {};
+
         return {
             _id       : ObjectId(),
             uuid      : generateUUID(),
@@ -1235,6 +1239,7 @@
             generateMipmaps : options.generateMipmaps  || true,
             premultiplyAlpha: options.premultiplyAlpha || false,
         };
+
     }
 
     const maps = [

@@ -1096,10 +1096,35 @@ caches.open("textures").then(function(cache){
     </h4>
     <h4 class="texture-checkbox-helper">
         <span style="vertical-align:-0.7rem;">Transparent:</span>
-        <input type="checkbox" id="transparent" class="form-control pull-right material-checkbox material-texture-checkbox">
+        <input type="checkbox" id="texture-transparent" class="form-control pull-right material-checkbox transparent-checkbox">
     </h4>
 
 </div>
+
+<script>
+
+(function(){
+
+    const viewer = document.getElementById("viewer");
+    const outfitDroplist = $("#texture-outfit-slot").get(0);
+    const genderDroplist = $("#texture-gender-droplist").get(0);
+    const transparentCheckbox = document.getElementById("texture-transparent");
+
+    $(transparentCheckbox).on("click", function(){
+        clearTimeout(this.interval);
+        this.interval = setTimeout(function(){
+            viewer.contentWindow.localPlayerMaterialHandler({
+                key   : "transparent",
+                slot  : outfitDroplist.value,
+                gender: genderDroplist.value,
+                value : transparentCheckbox.value,
+            });
+        }, 200);
+    });
+
+})();
+
+</script>
 
 <script>
 

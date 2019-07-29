@@ -833,8 +833,7 @@ caches.open("textures").then(function(cache){
                 }).then( function(doc){
 
                     json.sourceFile = doc.url; // important!
-                    return doc.url;
-
+            /*
                 //  Optional.
                     var element = document.createElement("div");
                     element.title = doc.name;
@@ -849,6 +848,8 @@ caches.open("textures").then(function(cache){
                             textureSelected.dispatch(element.id);
                         }, delay );
                     });
+            */
+                    return doc.url;
 
                 }).then( async function(url){
                     return await cache.match(url)

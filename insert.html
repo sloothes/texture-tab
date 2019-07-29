@@ -1111,12 +1111,21 @@ caches.open("textures").then(function(cache){
     const transparentCheckbox = document.getElementById("texture-transparent");
 
     $(transparentCheckbox).on("click", function(){
+
+        if ( !outfitDroplist.value ) { 
+            this.value = !this.value; return;
+        }
+
+        if ( !viewer.contentWindow.localPlayer.outfit.getGender() ) {
+            this.value = !this.value; return;
+        }
+
         clearTimeout(this.interval);
         this.interval = setTimeout(function(){
             viewer.contentWindow.localPlayerMaterialHandler({
                 key   : "transparent",
                 slot  : outfitDroplist.value,
-                gender: genderDroplist.value,
+                gender: genderDroplist.value || viewer.contentWindow.localPlayer.outfit.getGender(),
                 value : transparentCheckbox.value,
             });
         }, 200);

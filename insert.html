@@ -690,7 +690,7 @@ caches.open("textures").then(function(cache){
         var k = skip;
         await collection.find(selectors)
         .skip(skip).forEach(function(){
-            ++k; debugMode && console.log("k:", k);
+            ++k;  //  debugMode && console.log("k:", k);
         });
         return k;
     }

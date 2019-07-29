@@ -468,6 +468,95 @@
 
 <div id="texture-property-controls" class="well"></div>
 
+<div id="texture-collection-panel">
+
+    <div id="texture-items" class="well">
+
+        <h4>Choose texture:
+            <div id="counter" class="pull-right small" style="margin-top:4px;color:#ddd;">
+                <span id="from">zero</span>
+                to <span id="upto">zero</span>
+                of <span id="count">none</span>
+            </div>
+        </h4>
+
+        <div id="texture-pager" class="pager">
+            <div style="margin:10px 0px 10px;height:35px;">
+                <li class="btn btn-primary get-prev-btn pull-left">&#9668;</li>
+                <div class="pager-buttons-holder" style="display:inline;">
+                    <a class="btn btn-default page-btn">1</a>
+                    <a class="btn btn-default page-btn">2</a>
+                    <a class="btn btn-default page-btn">3</a>
+                    <a class="btn btn-default page-btn">4</a>
+                </div>
+                <li class="btn btn-primary get-next-btn pull-right">&#9658;</li>
+            </div>
+
+            <div id="documents-display" class="well"></div>
+
+            <div style="margin:10px 0px 10px;height:35px;">
+                <li class="btn btn-primary btn-white-outline first-page-btn pull-left" style="margin-right:5px;">First</li>
+                <li class="btn btn-primary btn-white-outline get-prev-group-btn pull-left">&#9668;&#9668;</li>
+                <li class="btn btn-primary btn-white-outline last-page-btn pull-right" style="margin-left:5px;">Last</li>
+                <li class="btn btn-primary btn-white-outline get-next-group-btn pull-right">&#9658;&#9658;</li>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+(function(){
+
+//  Pager.
+
+    const collection = db.collection("materials");
+    debugMode && console.log({"collection":collection});
+
+    const viewer = document.getElementById("viewer");
+    const pager  = document.getElementById("texture-pager");
+    const textureItems = document.getElementById("texture-items");
+    const outfitGenderPanel = document.getElementById("outfit-gender-panel");
+    const outfitMaterialPanel = document.getElementById("outfit-texture-panel");
+
+    const materialDroplistSelector = ".costumize-outfit-droplist";
+
+    const counter        = $(textureItems).find("#counter").get(0);
+    const genderDroplist = $(outfitGenderPanel).find("#gender-droplist").get(0);
+    const outfitDroplist = $(outfitMaterialPanel).find("#outfit-slot-droplist").get(0);
+    const displayObjects = $(outfitMaterialPanel).find("#documents-display").get(0);
+
+    var timeout;
+    var interval;
+    var selectors;
+    var msec = 200;
+
+    const limit = 5;
+
+    var max = 0;
+    var skip = 0;
+    var lastpage = 0;
+    var currentpage = 0;
+    var currentindex = 0;
+
+    var pagebuttons = $(pager).find(".page-btn");
+    var pageslength = $(pager).find(".page-btn").length;
+
+//  Signals.
+
+    var Signal = signals.Signal;
+    var textureSelected = new Signal();
+
+
+
+
+})();
+
+</script>
+
+
 <div id="texture-map-controls" class="well" style="background:none;border-radius:8px;height:auto;display:none;">
 
     <h4 class="texture-checkbox-helper">

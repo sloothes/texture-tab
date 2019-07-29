@@ -547,22 +547,10 @@
 
 //  Pager.
 
-    const collection = db.collection("textures");
-    debugMode && console.log({"collection":collection});
-
-    const viewer = document.getElementById("viewer");
-    const pager  = document.getElementById("texture-pager");
-    const outfitDroplist = $("#texture-outfit-slot").get(0);
-    const genderDroplist = $("#texture-gender-droplist").get(0);
-
-    const textureItems   = $("#texture-items").get(0);
-    const counter        = $(textureItems).find("#counter").get(0);
-    const displayObjects = $(textureItems).find("#documents-display").get(0);
-
     var timeout;
     var interval;
-    var selectors;
     var msec = 200;
+    var selectors = {};
 
     const limit = 5;
 
@@ -572,8 +560,26 @@
     var currentpage = 0;
     var currentindex = 0;
 
-    var pagebuttons = $(pager).find(".page-btn");
-    var pageslength = $(pager).find(".page-btn").length;
+    const collection = db.collection("textures");
+    debugMode && console.log({"collection":collection});
+
+    const viewer = document.getElementById("viewer");
+    const outfitDroplist = $("#texture-outfit-slot").get(0);
+    const genderDroplist = $("#texture-gender-droplist").get(0);
+
+    const pager = document.getElementById("texture-pager");
+    const counter        = $(pager).find("#counter").get(0);
+    const textureItems   = $(pager).find("#texture-items").get(0);
+    const firstPageBtn   = $(pager).find(".first-page-btn").get(0);
+    const lastPageBtn    = $(pager).find(".last-page-btn").get(0);
+    const prevPageBtn    = $(pager).find(".get-prev-btn").get(0);
+    const nextPageBtn    = $(pager).find(".get-next-btn").get(0);
+    const prevGroupBtn   = $(pager).find(".get-prev-group-btn").get(0);
+    const nextGroupBtn   = $(pager).find(".get-next-group-btn").get(0);
+    const displayObjects = $(pager).find("#documents-display").get(0);
+    const pageSelector   = "#texture-pager .page-btn";
+    const pagebuttons    = $(pager).find(".page-btn");
+    const pageslength    = $(pager).find(".page-btn").length;
 
 //  Signals.
 
@@ -725,13 +731,6 @@
 
 //  Pager.
 
-    const pageSelector = "#material-pager .page-btn";
-    const firstPageBtn = $(pager).find(".first-page-btn").get(0);
-    const lastPageBtn  = $(pager).find(".last-page-btn").get(0);
-    const prevPageBtn  = $(pager).find(".get-prev-btn").get(0);
-    const nextPageBtn  = $(pager).find(".get-next-btn").get(0);
-    const prevGroupBtn = $(pager).find(".get-prev-group-btn").get(0);
-    const nextGroupBtn = $(pager).find(".get-next-group-btn").get(0);
 
 //  For performance we count items only when we ask last page 
 //  or we change droplist selectors. Not need to count on backward.

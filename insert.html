@@ -14,6 +14,75 @@
 
 </script>
 
+
+<script>
+
+    function getTextureData(id){
+    //  Returns a resolved promise with record data from imgur.com.
+        debugMode && console.log(`GET https://api.imgur.com/3/image/${id}`);
+        return new Promise(function( resolve, reject ){
+            var xhttp = new XMLHttpRequest();
+            var clientid = "60db267c697bb33";  // textures app.
+            var endpoint = "https://api.imgur.com/3/image/" + id;
+            xhttp.open("GET", endpoint, true);
+            xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
+            xhttp.onreadystatechange = function() {
+                if (this.readyState === 4) {
+                    var response = "";
+                    if (this.status >= 200 && this.status < 300) {
+                        response = JSON.parse(this.responseText);
+                        debugMode && console.log(response.data);
+                        resolve(response.data); // resolve promise.
+                    } else {
+                        var err = JSON.parse(this.responseText).data.error;
+                        console.error( err.type, err );
+                        throw err;
+                    }
+                }
+            };
+
+            xhttp.send();
+            xhttp = null;
+        });
+    }
+
+    function uploadTexture(file){
+    //  Returns a resolved promise with record data from imgur.com.
+        debugMode && console.log(`uploading ${file.name}...`);
+        return new Promise(function( resolve, reject ){
+
+            var formdata = new FormData();
+            formdata.append("image", file);
+            formdata.append("type",  file.type);
+            formdata.append("name",  file.name);
+
+            var xhttp = new XMLHttpRequest();
+            var clientid = "60db267c697bb33";  // textures app.
+            var endpoint = "https://api.imgur.com/3/image";
+            xhttp.open("POST", endpoint, true);
+            xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    var response = "";
+                    if (this.status >= 200 && this.status < 300) {
+                        response = JSON.parse(this.responseText);
+                        debugMode && console.log(response.data);
+                        resolve(response.data); // resolve promise.
+                    } else {
+                        var err = JSON.parse(this.responseText).data.error;
+                        console.error( err.type, err );
+                        throw err;
+                    }
+                }
+            };
+
+            xhttp.send(formdata);
+            xhttp = null;
+        });
+    }
+
+</script>
+
 <style>
 
     .helpers-header h2 { 
@@ -543,7 +612,7 @@
 
 <script>
 
-(function(){
+caches.open("textures").then(function(cache){
 
 //  Pager.
 
@@ -564,6 +633,7 @@
     debugMode && console.log({"collection":collection});
 
     const viewer = document.getElementById("viewer");
+    const texturePreview = $("img#texture-preview").get(0);
     const outfitDroplist = $("#texture-outfit-slot").get(0);
     const genderDroplist = $("#texture-gender-droplist").get(0);
 
@@ -646,7 +716,7 @@
                     this.interval = setTimeout( function(){
                         $(".texture-item").removeClass("selected");
                         $(element).addClass("selected");
-                        textureSelected.dispatch(json);
+                        textureSelected.dispatch(this.id);
                     }, msec );
                 });
 
@@ -712,26 +782,21 @@
 
     }
 
-    textureSelected.add(function(json){
+    textureSelected.add(function(id){
 
-        var data = {};
-    //  data.maps = []
-        data.slot = outfitDroplist.value;
-        data.gender = genderDroplist.value;
-    //  data.material = {};
-
-    //  if ( window.socket ) {
-    //      socket.publish(localPlayerMaterialChannel, data); // TODO.
-    //  } else {
-    //      viewer.contentWindow.localPlayerApplyMaterial(data);
-    //  }
-
-        debugMode && console.log({"textureSelected data":data});
+        collection.findOne({_id:id}, function(err){
+            if (err) throw err;
+        }).then(function(doc){
+            return cache.match(doc.url);
+        }).then(function(response){
+            return response.blob();
+        }).then(function(blob){
+            texturePreview.src = window.URL.createObjectURL(blob);
+        }).catch(function(err){
+            console.error(err);
+        });
 
     });
-
-//  Pager.
-
 
 //  For performance we count items only when we ask last page 
 //  or we change droplist selectors. Not need to count on backward.
@@ -888,7 +953,7 @@
         pagerClicked();
     });
 
-})();
+});
 
 </script>
 
@@ -978,74 +1043,6 @@
     <div id="apply-texture-button" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;">Apply</div>
     <div id="save-texture-button" class="form-control btn btn-success btn-white-outline gradient-btn pull-right" style="width:24%;">Save</div>
 </div>
-
-<script>
-
-    function getTextureData(id){
-    //  Returns a resolved promise with record data from imgur.com.
-        debugMode && console.log(`GET https://api.imgur.com/3/image/${id}`);
-        return new Promise(function( resolve, reject ){
-            var xhttp = new XMLHttpRequest();
-            var clientid = "60db267c697bb33";  // textures app.
-            var endpoint = "https://api.imgur.com/3/image/" + id;
-            xhttp.open("GET", endpoint, true);
-            xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
-            xhttp.onreadystatechange = function() {
-                if (this.readyState === 4) {
-                    var response = "";
-                    if (this.status >= 200 && this.status < 300) {
-                        response = JSON.parse(this.responseText);
-                        debugMode && console.log(response.data);
-                        resolve(response.data); // resolve promise.
-                    } else {
-                        var err = JSON.parse(this.responseText).data.error;
-                        console.error( err.type, err );
-                        throw err;
-                    }
-                }
-            };
-
-            xhttp.send();
-            xhttp = null;
-        });
-    }
-
-    function uploadTexture(file){
-    //  Returns a resolved promise with record data from imgur.com.
-        debugMode && console.log(`uploading ${file.name}...`);
-        return new Promise(function( resolve, reject ){
-
-            var formdata = new FormData();
-            formdata.append("image", file);
-            formdata.append("type",  file.type);
-            formdata.append("name",  file.name);
-
-            var xhttp = new XMLHttpRequest();
-            var clientid = "60db267c697bb33";  // textures app.
-            var endpoint = "https://api.imgur.com/3/image";
-            xhttp.open("POST", endpoint, true);
-            xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
-            xhttp.onreadystatechange = function () {
-                if (this.readyState === 4) {
-                    var response = "";
-                    if (this.status >= 200 && this.status < 300) {
-                        response = JSON.parse(this.responseText);
-                        debugMode && console.log(response.data);
-                        resolve(response.data); // resolve promise.
-                    } else {
-                        var err = JSON.parse(this.responseText).data.error;
-                        console.error( err.type, err );
-                        throw err;
-                    }
-                }
-            };
-
-            xhttp.send(formdata);
-            xhttp = null;
-        });
-    }
-
-</script>
 
 <script>
 

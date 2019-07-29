@@ -256,6 +256,10 @@
 
 <script>
 
+    const NoSrc = "//:0";
+// "source: https://stackoverflow.com/questions/5775469/
+//  whats-the-valid-way-to-include-an-image-with-no-src".
+
     function generateUUID(){
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
         .replace(/[xy]/g, function(c) {
@@ -514,7 +518,8 @@ $(viewer.contentWindow).on("load", function(){
 
     outfitSlotChanged.add(function(){
 
-//  https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src
+    // "source: https://stackoverflow.com/questions/5775469/
+    //  whats-the-valid-way-to-include-an-image-with-no-src"
 
         if ( !genderDroplist.value ) {
             texturePreview.src = "//:0"; return;
@@ -527,8 +532,6 @@ $(viewer.contentWindow).on("load", function(){
         if ( importedTextures.value ) {
             texturePreview.src = "//:0"; return;
         }
-
-//  https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src
 
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;
@@ -1667,12 +1670,20 @@ $(viewer.contentWindow).on("load", function(){
 
     });
 
-
-    const noscr = "//:0";  // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+//  const NoScr = "//:0";  
+// "source: https://stackoverflow.com/questions/5775469/
+//  whats-the-valid-way-to-include-an-image-with-no-src".
 
     var files = {};
     var uploads = [];
     var textures = {};
+
+    const maps = [
+        "map", "bumpMap", "emissiveMap", 
+        "metalnessMap", "roughnessMap", 
+        "displacementMap", "alphaMap", 
+        "normalMap", "lightMap", "aoMap", 
+    ];
 
     const slotDroplist     = $("#texture-outfit-slot").get(0);
     const genderDroplist   = $("#texture-gender-droplist").get(0);
@@ -1692,38 +1703,34 @@ $(viewer.contentWindow).on("load", function(){
     const texturePropertyControls = document.getElementById("texture-property-controls");
 
     var textureDroplistChanged = new Signal();
-
     textureDroplistChanged.add(function(value){
+
+        const contentWindow = viewer.contentWindow;
 
         if ( value ) {
 
-        //  Using window.URL.createObjectURL().
-            texturePreview.src = window.URL.createObjectURL( files[ value ] ); return;
-        } 
-        
-        if ( !value ) {
+            texturePreview.src = window.URL.createObjectURL( files[ value ] ); 
+
+        } else {
 
             var slot = slotDroplist.value;
-            var gender = viewer.contentWindow.localPlayer.outfit.getGender();
+            var gender = contentWindow.localPlayer.outfit.getGender();
 
-        //  reset texture preview image src and return.
         //  "source: http://stackoverflow.com/questions/5775469/
         //  whats-the-valid-way-to-include-an-image-with-no-src".
 
-            if ( !gender || !slot || !viewer.contentWindow[gender][slot] ) {
+            if ( !gender || !slot || !contentWindow[gender][slot] ) {
                 texturePreview.src = "//:0"; return;
             }
 
         //  This is the "THREE" of scene window that has UVsDebug().
-            var THREE = viewer.contentWindow.THREE;  //  important!
-            var geometry = viewer.contentWindow[gender][slot].geometry;
+            var THREE = contentWindow.THREE;  //  important!
+            var geometry = contentWindow[gender][slot].geometry;
 
         //  Using window.URL.createObjectURL().
             THREE.UVsDebug(geometry, 512).toBlob(function(blob){
                 texturePreview.src = window.URL.createObjectURL(blob);
             }, "image/jpeg");
-
-            return;
 
         }
 
@@ -1755,9 +1762,7 @@ $(viewer.contentWindow).on("load", function(){
         if ( this.files.length == 0 ) return;
 
         $(textureCheckboxSelector).attr({checked:false});
-        $(textureDroplist).find(`option[value=""]`).remove();
-
-    //  Using window.URL.createObjectURL().
+    //  $(textureDroplist).find(`option[value=""]`).remove();
 
         for (var i = 0; i < this.files.length; i++ ) {
 
@@ -1766,21 +1771,20 @@ $(viewer.contentWindow).on("load", function(){
 
             files[ name ] = file;
 
-        //  textures[ name ] = new jsonTexture();
+        //  textures[ name ] = {};         //  new jsonTexture();
         //  textures[ name ].name = name;
         //  textures[ name ].sourceFile = files[ name ]; // file;
 
             var option = document.createElement("option");
-        //  option.id = textures[ name ]._id;
-            option.value = option.innerText = name;
+            option.name = option.value = option.innerText = name;
 
             $(textureDroplist).append(option);
             textureDroplist.value = option.value;
-            textureDroplistChanged.dispatch(option.value);  // == $(textureDroplist).change();
+            textureDroplistChanged.dispatch(option.value);
 
         }
 
-        debugMode && console.log({"files": files, "textures": textures});
+        debugMode && console.log({"files": files});
 
     });
 
@@ -1792,7 +1796,8 @@ $(viewer.contentWindow).on("load", function(){
         $(textureCheckboxSelector).attr({checked:false});
 
     //  Overwrite gender droplist value.
-        genderDroplist.value = viewer.contentWindow.localPlayer.outfit.getGender();
+        const contentWindow = viewer.contentWindow;
+        genderDroplist.value = contentWindow.localPlayer.outfit.getGender();
 
         if ( !this.value ) {
             $(textureControlSelector).slideUp();
@@ -1806,6 +1811,7 @@ $(viewer.contentWindow).on("load", function(){
 
 
 //  BUTTON DELETE.
+
     var deleteButtonClicked = new Signal();
 
     $(textureDeleteBtn).on("click", function(){
@@ -1923,6 +1929,8 @@ $(viewer.contentWindow).on("load", function(){
 
     function uploadSelectedTexture(){
 
+    //  Using files.
+
         if ( !navigator.onLine ) {
             var err = "Your connection to the internet is down.";
             debugMode && console.error(err);
@@ -1934,8 +1942,6 @@ $(viewer.contentWindow).on("load", function(){
             debugMode && console.error(err);
             return bootbox.dialog( errorDialogOptions(err) );
         }
-
-    //  Using files.
 
         if ( !files[ textureDroplist.value ] ) return;
 
@@ -2082,22 +2088,6 @@ $(viewer.contentWindow).on("load", function(){
 
     }
 
-    const maps = [
-        "map", 
-        "bumpMap", 
-        "emissiveMap", 
-        "metalnessMap", 
-        "roughnessMap", 
-        "displacementMap", 
-        "alphaMap", 
-        "normalMap", 
-        "lightMap", 
-    //  "envMap",
-        "aoMap", 
-    ];
-
-//  const textureControls  = $("#texture-map-controls").get(0);
-
     var propertyValueChanged = new Signal();
     propertyValueChanged.add(function(key, value){
         debugMode && console.log({"json":json});
@@ -2127,11 +2117,7 @@ $(viewer.contentWindow).on("load", function(){
         });
     });
 
-
-
-
-
-
+/*
 //  deepCopy.js
 
     function deepCopy(obj) {
@@ -2164,6 +2150,7 @@ $(viewer.contentWindow).on("load", function(){
         };
         return shift(Math.round(shift(number, precision, false)), precision, true);
     }
+*/
 
 })();
 

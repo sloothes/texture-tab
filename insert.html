@@ -381,20 +381,12 @@
 
     $(slotDroplist).on("change", function(){
 
-    //  Reset texture preview.
-        //  https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src
-    //  if ( !this.value ) $(texturePreview).attr({src: "//:0"}); 
-
     //  Null value IS allowed!
         outfitSlotChanged.dispatch(this.value);
 
     });
 
     outfitSlotChanged.add(function(value){
-
-    //  Reset texture preview.
-        // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
-    //  if ( !value ) $(texturePreview).attr({src: "//:0"}); 
 
     //  Null value IS allowed!
 
@@ -416,6 +408,8 @@
         if ( importedTextures.value ) {
             texturePreview.src = "//:0"; return;
         }
+
+//  https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src
 
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;

@@ -1142,47 +1142,45 @@ caches.open("textures").then(function(cache){
 
 <script>
 
-(function(){
+$(viewer.contentWindow).on("load", function(){
 
-    const viewer = document.getElementById("viewer");
+    const contentWindow = this;
+
+//  const viewer = document.getElementById("viewer");
+    const checkbox = $("#texture-transparent-checkbox").get(0);
     const outfitDroplist = $("#texture-outfit-slot").get(0);
     const genderDroplist = $("#texture-gender-droplist").get(0);
-    const transparentControl = $("#texture-transparent-checkbox").get(0);
 
     var Signal = signals.Signal;
     var transparentClicked = new Signal();
 
-    $(transparentControl).on("click", function(){
-        clearTimeout(this.interval);
-        this.interval = setTimeout(() => {
-            transparentClicked.dispatch( this.value );
+    transparentClicked.add(function(){
+        genderDroplist.value = contentWindow.localPlayer.outfit.getGender();
+    });
+
+    transparentClicked.add(function(checked){
+
+        if ( !genderDroplist.value || !outfitDroplist.value ) {
+            checkbox.checked = !checked; return;
+        }
+
+        contentWindow.localPlayerMaterialHandler({
+            value : checked,
+            key: "transparent",
+            slot: outfitDroplist.value,
+            gender: genderDroplist.value,
+        });
+
+    });
+
+    $(checkbox).on("click", function(){
+        clearTimeout(checkbox.interval);
+        checkbox.interval = setTimeout(function(){
+            transparentClicked.dispatch( checkbox.checked );
         }, 200);
     });
 
-    $(viewer.contentWindow).on("load", function(){
-
-        transparentClicked.add(() => {
-            genderDroplist.value = this.localPlayer.outfit.getGender();
-        });
-
-        transparentClicked.add((value) => {
-
-            if ( !genderDroplist.value || !outfitDroplist.value ) {
-                transparentControl.value = !value; return;
-            }
-
-            this.localPlayerMaterialHandler({
-                value : value,
-                key   : "transparent",
-                slot  : outfitDroplist.value,
-                gender: genderDroplist.value,
-            });
-
-        });
-
-    });
-
-})();
+});
 
 </script>
 

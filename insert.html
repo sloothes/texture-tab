@@ -651,13 +651,13 @@ caches.open("textures").then(function(cache){
     const texturePreview = $("img#texture-preview").get(0);
     const outfitDroplist = $("#texture-outfit-slot").get(0);
     const genderDroplist = $("#texture-gender-droplist").get(0);
+    const textureItemsPanel  = $("#texture-items").get(0);
     const textureMapControls = $("#texture-map-controls").get(0);
 
-    const texturesPanel  = document.getElementById("texture-items");
-    const counter        = $(texturesPanel).find("#counter").get(0);
+    const pageSelector = "#texture-pager .page-btn";
 
     const pager = document.getElementById("texture-pager");
-    const pageSelector   = "#texture-pager .page-btn";
+    const counter        = $("#texture-items").find("#counter").get(0);
     const firstPageBtn   = $(pager).find(".first-page-btn").get(0);
     const lastPageBtn    = $(pager).find(".last-page-btn").get(0);
     const prevPageBtn    = $(pager).find(".get-prev-btn").get(0);

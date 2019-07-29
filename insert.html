@@ -445,6 +445,10 @@
 
     });
 
+    viewer.contentWindow.localPlayer.outfit.changed.add(function(){
+        genderDroplist.value = viewer.contentWindow.localPlayer.outfit.getGender();
+    });
+
 })();
 
 </script>
@@ -1095,7 +1099,7 @@ caches.open("textures").then(function(cache){
     </h4>
     <h4 class="texture-checkbox-helper">
         <span style="vertical-align:-0.7rem;">Transparent:</span>
-        <input type="checkbox" id="texture-transparent" class="form-control pull-right material-checkbox transparent-checkbox">
+        <input type="checkbox" id="texture-transparent-checkbox" class="form-control pull-right texture-checkbox transparent-checkbox-control">
     </h4>
 
 </div>
@@ -1139,27 +1143,34 @@ caches.open("textures").then(function(cache){
     const viewer = document.getElementById("viewer");
     const outfitDroplist = $("#texture-outfit-slot").get(0);
     const genderDroplist = $("#texture-gender-droplist").get(0);
-    const transparentCheckbox = document.getElementById("texture-transparent");
+    const transparentControl = $("#texture-transparent-checkbox").get(0);
 
-    $(transparentCheckbox).on("click", function(){
+    var Signal = signals.Signal;
+    var transparentClicked = new Signal();
 
-        if ( !outfitDroplist.value ) { 
-            this.value = !this.value; return;
-        }
-
-        if ( !viewer.contentWindow.localPlayer.outfit.getGender() ) {
-            this.value = !this.value; return;
-        }
-
+    $(transparentControl).on("click", function(){
         clearTimeout(this.interval);
         this.interval = setTimeout(function(){
-            viewer.contentWindow.localPlayerMaterialHandler({
-                key   : "transparent",
-                slot  : outfitDroplist.value,
-                gender: genderDroplist.value || viewer.contentWindow.localPlayer.outfit.getGender(),
-                value : transparentCheckbox.value,
-            });
+            transparentClicked.dispatch( transparentControl.value );
         }, 200);
+    });
+
+    transparentClicked.add(function(){
+        genderDroplist.value = viewer.contentWindow.localPlayer.outfit.getGender();
+    });
+
+    transparentClicked.add(function(value){
+
+        if ( !genderDroplist.value || !outfitDroplist.value ) {
+            transparentCheckbox.value = !value; return;
+        }
+
+        viewer.contentWindow.localPlayerMaterialHandler({
+            value : value,
+            key   : "transparent",
+            slot  : outfitDroplist.value,
+            gender: genderDroplist.value,
+        });
 
     });
 

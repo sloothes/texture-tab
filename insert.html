@@ -445,8 +445,10 @@
 
     });
 
-    viewer.contentWindow.localPlayer.outfit.changed.add(function(){
-        genderDroplist.value = viewer.contentWindow.localPlayer.outfit.getGender();
+    $(viewer.contentWindow).on("load", function(){
+        this.localPlayer.outfit.changed.add(() => {
+            genderDroplist.value = this.localPlayer.outfit.getGender();
+        });
     });
 
 })();
@@ -1159,17 +1161,17 @@ caches.open("textures").then(function(cache){
 
     $(viewer.contentWindow).on("load", function(){
 
-        transparentClicked.add(function(){
-            genderDroplist.value = viewer.contentWindow.localPlayer.outfit.getGender();
+        transparentClicked.add(() => {
+            genderDroplist.value = this.localPlayer.outfit.getGender();
         });
 
-        transparentClicked.add(function(value){
+        transparentClicked.add((value) => {
 
             if ( !genderDroplist.value || !outfitDroplist.value ) {
                 transparentControl.value = !value; return;
             }
 
-            viewer.contentWindow.localPlayerMaterialHandler({
+            this.localPlayerMaterialHandler({
                 value : value,
                 key   : "transparent",
                 slot  : outfitDroplist.value,

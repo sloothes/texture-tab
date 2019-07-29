@@ -1329,7 +1329,7 @@ $(viewer.contentWindow).on("load", function(){
         option.value = ""; option.innerText = "Select key:";
         $(propDroplist).append(option);
 
-        json = new jsonTexture();
+        json = {}; // new jsonTexture();
 
     //  Sort json keys.
         var sortedKeys = Object.keys(json).sort();

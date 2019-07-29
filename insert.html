@@ -969,8 +969,8 @@ caches.open("textures").then(function(cache){
                     } else {
                         skip = limit * ( lastpage - 1 );
                     }
-                } else skip = 0;
-            }).then(pagerClicked);
+                }
+            });
         }, delay);
 
     });

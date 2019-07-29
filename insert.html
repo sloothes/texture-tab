@@ -1279,6 +1279,23 @@
 
     $(textureUploadButton).on("click", uploadSelectedTexture );
 
+    function errorDialogOptions(err){
+        return {
+            size: "small",
+            className: "middle",
+            closeButton: false,
+            title: `<div class="alert-icon icon-warning">` 
+            + `</div><h2 style="margin:auto;">Error!</h2>`,
+            message: `<div>Sorry! An error occurred.</div><div>${err}</div>`,
+            buttons: {
+                cancel: {
+                    label: "Close",
+                    className: "btn-default",
+                },
+            },
+        };
+    }
+
     function uploadSelectedTexture(){
 
         if ( !navigator.onLine ) {
@@ -1386,6 +1403,7 @@
 
         //  Success.
 
+            $(textureCheckboxSelector).attr({checked:false});
             debugMode && console.log(`deleting "${file.name}" from files.`);
 
             delete files[ file.name ];
@@ -1436,23 +1454,6 @@
             debugMode && console.log( "Upload button is enabled and ready to upload." );
 
         });
-
-        function errorDialogOptions(err){
-            return {
-                size: "small",
-                className: "middle",
-                closeButton: false,
-                title: `<div class="alert-icon icon-warning">` 
-                + `</div><h2 style="margin:auto;">Error!</h2>`,
-                message: `<div>Sorry! An error occurred.</div><div>${err}</div>`,
-                buttons: {
-                    cancel: {
-                        label: "Close",
-                        className: "btn-default",
-                    },
-                },
-            };
-        }
 
     }
 

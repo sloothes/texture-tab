@@ -14,113 +14,6 @@
 
 </script>
 
-
-<script>
-
-    function generateUUID(){
-        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
-        .replace(/[xy]/g, function(c) {
-            var r = Math.random()*16|0;
-            var v = c == 'x'?r:r&0x3|0x8;
-            return v.toString(16);
-        }).toLocaleUpperCase();
-    };
-
-    function jsonTexture(options) {
-
-        var options = options || {}; // important!
-
-        return {
-            _id       : ObjectId(),
-            uuid      : generateUUID(),
-            name      : options.name  || "",
-            type      : options.type  || 1009,
-            flipY     : options.flipY || true,
-            wrapS     : options.wrapS || 1001,
-            wrapT     : options.wrapT || 1001,
-            offset    : options.offset || [0, 0],
-            repeat    : options.repeat || [1, 1],
-            format    : options.format  || 1021,
-            version   : options.version || 0,
-            mapping   : options.mapping || 300,
-            mipmaps   : options.mipmaps || [],
-            minFilter : options.minFilter || 1008,
-            magFilter : options.magFilter || 1006,
-            encoding  : options.encoding  || 3000,
-            anisotropy: options.anisotropy || 1,
-            sourceFile: options.sourceFile || "",
-            unpackAlignment : options.unpackAlignment  || 4,
-            generateMipmaps : options.generateMipmaps  || true,
-            premultiplyAlpha: options.premultiplyAlpha || false,
-        };
-    }
-
-    function getTextureData(id){
-    //  Returns a resolved promise with record data from imgur.com.
-        debugMode && console.log(`GET https://api.imgur.com/3/image/${id}`);
-        return new Promise(function( resolve, reject ){
-            var xhttp = new XMLHttpRequest();
-            var clientid = "60db267c697bb33";  // textures app.
-            var endpoint = "https://api.imgur.com/3/image/" + id;
-            xhttp.open("GET", endpoint, true);
-            xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
-            xhttp.onreadystatechange = function() {
-                if (this.readyState === 4) {
-                    var response = "";
-                    if (this.status >= 200 && this.status < 300) {
-                        response = JSON.parse(this.responseText);
-                        debugMode && console.log(response.data);
-                        resolve(response.data); // resolve promise.
-                    } else {
-                        var err = JSON.parse(this.responseText).data.error;
-                        console.error( err.type, err );
-                        throw err;
-                    }
-                }
-            };
-
-            xhttp.send();
-            xhttp = null;
-        });
-    }
-
-    function uploadTexture(file){
-    //  Returns a resolved promise with record data from imgur.com.
-        debugMode && console.log(`uploading ${file.name}...`);
-        return new Promise(function( resolve, reject ){
-
-            var formdata = new FormData();
-            formdata.append("image", file);
-            formdata.append("type",  file.type);
-            formdata.append("name",  file.name);
-
-            var xhttp = new XMLHttpRequest();
-            var clientid = "60db267c697bb33";  // textures app.
-            var endpoint = "https://api.imgur.com/3/image";
-            xhttp.open("POST", endpoint, true);
-            xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
-            xhttp.onreadystatechange = function () {
-                if (this.readyState === 4) {
-                    var response = "";
-                    if (this.status >= 200 && this.status < 300) {
-                        response = JSON.parse(this.responseText);
-                        debugMode && console.log(response.data);
-                        resolve(response.data); // resolve promise.
-                    } else {
-                        var err = JSON.parse(this.responseText).data.error;
-                        console.error( err.type, err );
-                        throw err;
-                    }
-                }
-            };
-
-            xhttp.send(formdata);
-            xhttp = null;
-        });
-    }
-
-</script>
-
 <style>
 
     .helpers-header h2 { 
@@ -360,6 +253,113 @@
 
 </style>
 
+
+<script>
+
+    function generateUUID(){
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+        .replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0;
+            var v = c == 'x'?r:r&0x3|0x8;
+            return v.toString(16);
+        }).toLocaleUpperCase();
+    };
+
+    function jsonTexture(options) {
+
+        var options = options || {}; // important!
+
+        return {
+            _id       : ObjectId(),
+            uuid      : generateUUID(),
+            name      : options.name  || "",
+            type      : options.type  || 1009,
+            flipY     : options.flipY || true,
+            wrapS     : options.wrapS || 1001,
+            wrapT     : options.wrapT || 1001,
+            offset    : options.offset || [0, 0],
+            repeat    : options.repeat || [1, 1],
+            format    : options.format  || 1021,
+            version   : options.version || 0,
+            mapping   : options.mapping || 300,
+            mipmaps   : options.mipmaps || [],
+            minFilter : options.minFilter || 1008,
+            magFilter : options.magFilter || 1006,
+            encoding  : options.encoding  || 3000,
+            anisotropy: options.anisotropy || 1,
+            sourceFile: options.sourceFile || "",
+            unpackAlignment : options.unpackAlignment  || 4,
+            generateMipmaps : options.generateMipmaps  || true,
+            premultiplyAlpha: options.premultiplyAlpha || false,
+        };
+    }
+
+    function getTextureData(id){
+    //  Returns a resolved promise with record data from imgur.com.
+        debugMode && console.log(`GET https://api.imgur.com/3/image/${id}`);
+        return new Promise(function( resolve, reject ){
+            var xhttp = new XMLHttpRequest();
+            var clientid = "60db267c697bb33";  // textures app.
+            var endpoint = "https://api.imgur.com/3/image/" + id;
+            xhttp.open("GET", endpoint, true);
+            xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
+            xhttp.onreadystatechange = function() {
+                if (this.readyState === 4) {
+                    var response = "";
+                    if (this.status >= 200 && this.status < 300) {
+                        response = JSON.parse(this.responseText);
+                        debugMode && console.log(response.data);
+                        resolve(response.data); // resolve promise.
+                    } else {
+                        var err = JSON.parse(this.responseText).data.error;
+                        console.error( err.type, err );
+                        throw err;
+                    }
+                }
+            };
+
+            xhttp.send();
+            xhttp = null;
+        });
+    }
+
+    function uploadTexture(file){
+    //  Returns a resolved promise with record data from imgur.com.
+        debugMode && console.log(`uploading ${file.name}...`);
+        return new Promise(function( resolve, reject ){
+
+            var formdata = new FormData();
+            formdata.append("image", file);
+            formdata.append("type",  file.type);
+            formdata.append("name",  file.name);
+
+            var xhttp = new XMLHttpRequest();
+            var clientid = "60db267c697bb33";  // textures app.
+            var endpoint = "https://api.imgur.com/3/image";
+            xhttp.open("POST", endpoint, true);
+            xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    var response = "";
+                    if (this.status >= 200 && this.status < 300) {
+                        response = JSON.parse(this.responseText);
+                        debugMode && console.log(response.data);
+                        resolve(response.data); // resolve promise.
+                    } else {
+                        var err = JSON.parse(this.responseText).data.error;
+                        console.error( err.type, err );
+                        throw err;
+                    }
+                }
+            };
+
+            xhttp.send(formdata);
+            xhttp = null;
+        });
+    }
+
+</script>
+
 <div class="helpers-header texture-header">
     <h2 style="margin-bottom:20px;">Texture:</h2>
 </div>
@@ -382,20 +382,6 @@
 })();
 
 </script>
-
-<div style="height:45px;margin-bottom:10px;">
-    <select id="imported-textures" class="form-control material-texture-droplist" readonly>
-        <option value="">Import textures:</option>
-    </select>
-</div>
-
-<div style="margin-bottom:20px;">
-    <input id="texture-fileinput" type="file" class="hidden" multiple>
-    <div id="clear-imported-textures" class="form-control btn btn-danger btn-white-outline gradient-btn pull-left" style="width:24%;">Clear</div>
-    <div id="import-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn" style="width:24%;margin:0 1%;">Import</div>
-    <div id="upload-selected-texture" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;">Upload</div>
-    <div id="delete-selected-texture" class="form-control btn btn-danger btn-white-outline gradient-btn pull-right" style="width:24%;">Delete</div>
-</div>
 
 <div style="height:35px;margin-bottom:10px;">
     <h4><span style="vertical-align:-0.5rem;">Select gender:</span>
@@ -578,41 +564,6 @@
 
 </script>
 
-<div style="height:35px;margin-bottom:10px;">
-    <h4><span style="vertical-align:-0.5rem;">Select property:</span>
-        <div style="width:40%;display:inline-block;float:right;">
-            <select id="texture-property" class="form-control texture-property-droplist" readonly>
-                <option value="">Select key:</option>
-                <option value="_id">_id</option>
-                <option value="uuid">uuid</option>
-                <option value="name">name</option>
-                <option value="flipY">flipY</option>
-                <option value="offset">offset</option>
-                <option value="repeat">repeat</option>
-                <option value="version">version</option>
-                <option value="generateMipmaps">generate</option>
-                <option value="premultiplyAlpha">premultiply</option>
-                <!-- ----------------------------------------------- -->
-                <option value="type" style="display:none;">type</option>
-                <option value="wrapS" style="display:none;">wrapS</option>
-                <option value="wrapT" style="display:none;">wrapT</option>
-                <option value="unpackAlignment" style="display:none;">unpack</option>
-                <option value="anisotropy" style="display:none;">anisotropy</option>
-                <option value="encoding" style="display:none;">encoding</option>
-                <option value="format" style="display:none;">format</option>
-                <option value="magFilter" style="display:none;">magFilter</option>
-                <option value="mapping" style="display:none;">mapping</option>
-                <option value="minFilter" style="display:none;">minFilter</option>
-                <option value="mipmaps" style="display:none;">mipmaps</option>
-                <option value="sourceFile" style="display:none;">sourceFile</option>
-            </select>
-        </div>
-    </h4>
-</div>
-
-<div id="texture-property-controls" class="well"></div>
-
-
 <div id="texture-items" class="well">
 
     <h4>Choose texture:
@@ -624,6 +575,7 @@
     </h4>
 
     <div id="texture-pager" class="pager">
+
         <div style="margin:10px 0px 10px;height:35px;">
             <li class="btn btn-primary get-prev-btn pull-left">&#9668;</li>
             <div class="pager-buttons-holder" style="display:inline;">
@@ -635,6 +587,20 @@
             <li class="btn btn-primary get-next-btn pull-right">&#9658;</li>
         </div>
 
+        <div style="height:45px;margin-bottom:10px;">
+            <select id="imported-textures" class="form-control material-texture-droplist" readonly>
+                <option value="">Import textures:</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <input id="texture-fileinput" type="file" class="hidden" multiple>
+            <div id="clear-imported-textures" class="form-control btn btn-danger btn-white-outline gradient-btn pull-left" style="width:24%;">Clear</div>
+            <div id="import-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn" style="width:24%;margin:0 1%;">Import</div>
+            <div id="upload-selected-texture" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;">Upload</div>
+            <div id="delete-selected-texture" class="form-control btn btn-danger btn-white-outline gradient-btn pull-right" style="width:24%;">Delete</div>
+        </div>
+
         <div id="documents-display" class="well"></div>
 
         <div style="margin:10px 0px 10px;height:35px;">
@@ -643,10 +609,10 @@
             <li class="btn btn-primary btn-white-outline last-page-btn pull-right" style="margin-left:5px;">Last</li>
             <li class="btn btn-primary btn-white-outline get-next-group-btn pull-right">&#9658;&#9658;</li>
         </div>
+
     </div>
 
 </div>
-
 
 <script>
 
@@ -1120,8 +1086,6 @@ caches.open("textures").then(function(cache){
 
 </div>
 
-<hr/>
-
 <script>
 
 (function(){
@@ -1153,6 +1117,42 @@ caches.open("textures").then(function(cache){
 })();
 
 </script>
+
+<div style="height:35px;margin-bottom:10px;">
+    <h4><span style="vertical-align:-0.5rem;">Select property:</span>
+        <div style="width:40%;display:inline-block;float:right;">
+            <select id="texture-property" class="form-control texture-property-droplist" readonly>
+                <option value="">Select key:</option>
+                <option value="_id">_id</option>
+                <option value="uuid">uuid</option>
+                <option value="name">name</option>
+                <option value="flipY">flipY</option>
+                <option value="offset">offset</option>
+                <option value="repeat">repeat</option>
+                <option value="version">version</option>
+                <option value="generateMipmaps">generate</option>
+                <option value="premultiplyAlpha">premultiply</option>
+                <!-- ----------------------------------------------- -->
+                <option value="type" style="display:none;">type</option>
+                <option value="wrapS" style="display:none;">wrapS</option>
+                <option value="wrapT" style="display:none;">wrapT</option>
+                <option value="unpackAlignment" style="display:none;">unpack</option>
+                <option value="anisotropy" style="display:none;">anisotropy</option>
+                <option value="encoding" style="display:none;">encoding</option>
+                <option value="format" style="display:none;">format</option>
+                <option value="magFilter" style="display:none;">magFilter</option>
+                <option value="mapping" style="display:none;">mapping</option>
+                <option value="minFilter" style="display:none;">minFilter</option>
+                <option value="mipmaps" style="display:none;">mipmaps</option>
+                <option value="sourceFile" style="display:none;">sourceFile</option>
+            </select>
+        </div>
+    </h4>
+</div>
+
+<div id="texture-property-controls" class="well"></div>
+
+<hr/>
 
 <div style="margin-bottom:10px;">
     <div id="new-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn pull-left" style="width:24%;">New</div>

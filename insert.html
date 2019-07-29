@@ -779,8 +779,7 @@ caches.open("textures").then(function(cache){
                 $(displayObjects).children().remove();
                 collection.find(selectors).skip(skip)
                 .limit(limit).forEach( function(json){
-
-                    debugMode && console.log({"json":json});
+                //  debugMode && console.log({"json":json});
 
                     var element = document.createElement("div");
                     element.title = json.name;

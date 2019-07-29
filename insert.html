@@ -1269,11 +1269,7 @@ $(viewer.contentWindow).on("load", function(){
     });
 */
 
-    const viewer = document.getElementById("viewer");
-    const propDroplist = $("select#texture-property").get(0);
-    const propControls = $("#texture-property-controls").get(0);
-    const importedTextures = $("select#imported-textures").get(0);
-
+/*
     function generateUUID(){
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
         .replace(/[xy]/g, function(c) {
@@ -1312,9 +1308,14 @@ $(viewer.contentWindow).on("load", function(){
         };
     }
 
-    var json = {}; // new jsonTexture();
+*/
 
-    debugMode && console.log({"json texture":json});
+    const viewer = document.getElementById("viewer");
+    const propDroplist = $("select#texture-property").get(0);
+    const propControls = $("#texture-property-controls").get(0);
+    const importedTextures = $("select#imported-textures").get(0);
+
+    var json = {}; // new jsonTexture();
 
     var Signal = signals.Signal;
     var propertiesDroplistChanged = new Signal();
@@ -2029,8 +2030,10 @@ $(viewer.contentWindow).on("load", function(){
             }).catch(function(err){
                 console.error(err);
             });
+            
+            return data.link;
 
-        }).then( function(){
+        }).then( function(url){
 
         //  Success.
 
@@ -2050,7 +2053,18 @@ $(viewer.contentWindow).on("load", function(){
                 $(textureDroplist).append(option);
             }
 
-            textureDroplistChanged.dispatch( textureDroplist.value );
+            textureDroplistChanged.dispatch(""); //  textureDroplistChanged.dispatch( textureDroplist.value );
+
+            caches.open("textures").then(function(cache){
+                cache.match(url).then(function(response){
+                    return response.blob();
+                }).then(function(blob){
+                    texturePreview.src = window.URL.createObjectURL(blob);
+                });
+
+            }).then(function(){
+                json.sourceFile = url; // important!
+            });
 
             var msg = `Texture ${file.name} uploaded successfully!`;
             bootbox.dialog({

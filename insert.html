@@ -654,7 +654,7 @@ caches.open("textures").then(function(cache){
 
 //  Pager.
 
-    var json;
+    var json = {};
 
     var timeout;
     var interval;
@@ -860,11 +860,9 @@ caches.open("textures").then(function(cache){
             cache.match(url).then(function(response){
                 return response.blob();
             }).then(function(blob){
-                texturePreview.src = window.URL.createObjectURL(blob);
 
-                json = new jsonTexture({
-                    sourceFile: url,
-                });
+                json.sourceFile = url; // important!
+                texturePreview.src = window.URL.createObjectURL(blob);
 
             }).catch(function(err){
                 console.error(err);
@@ -890,18 +888,26 @@ caches.open("textures").then(function(cache){
         "aoMap", 
     ];
 
+    var textureApplyBtnClicked = new Signal();
 
     $(textureApplyBtn).on("click", function(){
+        textureApplyBtnClicked.dispatch();
+    });
+
+    textureApplyBtnClicked.add(function(){
 
         var data = {};
+        data.maps    = [];
         data.slot    = outfitDroplist.value;
         data.gender  = genderDroplist.value;
-        data.maps    = [];
         data.texture = json;
 
         $(textureMapControls).find("input[type=checkbox]")
         .toArray().forEach(function(item){
-            item.checked && data.maps.push(item.id);
+            if (item.checked) {
+                data.maps.push(item.id);
+                item.checked = false;
+            }
         });
 
         debugMode && console.log({"data":data});
@@ -1648,6 +1654,10 @@ caches.open("textures").then(function(cache){
 //  BUTTON NEW.
 
     $(textureNewButton).on("click", function(){
+
+    //  Reset texture map checkboxes.
+        $(textureCheckboxSelector).attr({checked:false});
+
         clearTimeout(this.interval);
         this.interval = setTimeout(function(){
             json = {}; // new jsonTexture();
@@ -1663,6 +1673,7 @@ caches.open("textures").then(function(cache){
     });
 
     $(textureFileinput).on("change", function(){
+
         if ( this.files.length == 0 ) return;
 
         $(textureCheckboxSelector).attr({checked:false});
@@ -1701,6 +1712,7 @@ caches.open("textures").then(function(cache){
 
     //  Reset texture map checkboxes.
         $(textureCheckboxSelector).attr({checked:false});
+
     //  Overwrite gender droplist value.
         genderDroplist.value = viewer.contentWindow.localPlayer.outfit.getGender();
 

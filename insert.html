@@ -880,8 +880,10 @@
 
     });
 
-    count();
-    get_items();
+    count().then(function(k){
+        max = k;
+        pagerClicked();
+    });
 
 })();
 

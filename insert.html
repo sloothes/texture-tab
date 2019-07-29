@@ -827,13 +827,15 @@ caches.open("textures").then(function(cache){
 
                 $(displayObjects).children().remove();
                 collection.find().skip(skip).limit(1)
-                .toArray(function(err, docs){
+                .toArray(function(err){
                     if (err) throw err;
+                }).then( function(docs){
                     return docs[0];
                 }).then( function(doc){
-                    debugMode && console.log({"doc":doc});
 
                     json.sourceFile = doc.url; // important!
+                //  debugMode && console.log({"doc":doc});
+
             /*
                 //  Optional.
                     var element = document.createElement("div");

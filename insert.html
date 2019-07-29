@@ -778,19 +778,18 @@ caches.open("textures").then(function(cache){
 
         if ( max && skip < max ) {
             clearTimeout(interval);
-            interval = setTimeout( get_items, 200 );
+            interval = setTimeout( get_items, 1000 );
         }
 
     }
 
     textureSelected.add(function(id){
 
-        collection.findOne({_id:id}, function(err){
+        collection.findOne({"_id":id}, function(err){
             if (err) throw err;
         }).then(function(doc){
             return doc.url;
         }).then(function(url){
-            debugMode && console.log(url);
             cache.match(url).then(function(response){
                 return response.blob();
             }).then(function(blob){

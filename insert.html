@@ -364,25 +364,6 @@
     <h2 style="margin-bottom:20px;">Texture:</h2>
 </div>
 
-<div id="texture-viewer" style="text-align:center;margin-bottom:10px;border:1px solid;">
-    <img id="texture-preview" style="max-width:100%;max-height:300px;margin:auto;">
-</div>
-
-<script>
-
-(function(){
-
-    const texturePreview = $("img#texture-preview").get(0);
-
-    $(texturePreview).on("load", function(){
-        window.URL.revokeObjectURL(this.src); // important!
-        debugMode && console.log("revoked", this.src);
-    });
-
-})();
-
-</script>
-
 <div style="height:35px;margin-bottom:10px;">
     <h4><span style="vertical-align:-0.5rem;">Select gender:</span>
         <div style="width:40%;display:inline-block;float:right;">
@@ -589,6 +570,10 @@
             <li class="btn btn-primary get-next-btn pull-right">&#9658;</li>
         </div>
 
+        <div id="texture-viewer" style="text-align:center;margin-bottom:10px;border:1px solid;">
+            <img id="texture-preview" style="max-width:100%;max-height:300px;margin:auto;">
+        </div>
+
         <div style="height:45px;margin-bottom:10px;">
             <select id="imported-textures" class="form-control material-texture-droplist" readonly>
                 <option value="">Import textures:</option>
@@ -615,6 +600,20 @@
     </div>
 
 </div>
+
+<script>
+
+(function(){
+
+    const texturePreview = $("img#texture-preview").get(0);
+    $(texturePreview).on("load", function(){
+        window.URL.revokeObjectURL(this.src); // important!
+        debugMode && console.log("revoked", this.src);
+    });
+
+})();
+
+</script>
 
 <script>
 

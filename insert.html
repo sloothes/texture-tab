@@ -637,8 +637,9 @@
             docs.forEach(function(json){
 
                 var element = document.createElement("div");
-                element.innerText = element.title = json.name;
-                element.id = json._id; element.classList.add("texture-item");
+                element.title = json.name;
+                element.classList.add("texture-item");
+                element.innerText = element.id = json._id; 
 
                 $(element).on("click", function(){
                     clearTimeout(this.interval);

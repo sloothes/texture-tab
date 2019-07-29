@@ -1997,10 +1997,18 @@ $(viewer.contentWindow).on("load", function(){
             debugMode && console.log({"data": data});
 
         //  Add to cache.
-            caches.open("textures").then(function(cache){
+            caches.open("textures").then(async function(cache){
 
-                cache.add(data.link);
+                await cache.add(data.link);
+
+                json.sourceFile = data.link; // important!
                 debugMode && console.log( data.link );
+
+                cache.match(data.link).then(function(response){
+                    return response.blob();
+                }).then(function(blob){
+                    texturePreview.src = window.URL.createObjectURL(blob);
+                });
 
             });
 
@@ -2054,17 +2062,6 @@ $(viewer.contentWindow).on("load", function(){
             }
 
             textureDroplistChanged.dispatch(""); //  textureDroplistChanged.dispatch( textureDroplist.value );
-
-            caches.open("textures").then(function(cache){
-                cache.match(url).then(function(response){
-                    return response.blob();
-                }).then(function(blob){
-                    texturePreview.src = window.URL.createObjectURL(blob);
-                });
-
-            }).then(function(){
-                json.sourceFile = url; // important!
-            });
 
             var msg = `Texture ${file.name} uploaded successfully!`;
             bootbox.dialog({

@@ -879,7 +879,7 @@ caches.open("textures").then(function(cache){
         data.gender  = genderDroplist.value;
         data.texture = json;
 
-        $(textureMapControls).find("input[type=checkbox]")
+        $(textureMapControls).find("input[type=checkbox].texture-checkbox-control")
         .toArray().forEach(function(item){
             if (item.checked) {
                 data.maps.push(item.id);
@@ -1659,7 +1659,7 @@ caches.open("textures").then(function(cache){
     const textureUploadButton = $("#upload-selected-texture").get(0);
 
     const textureControlSelector = "#texture-map-controls";
-    const textureCheckboxSelector = "input[type=checkbox].material-texture-checkbox";
+    const textureCheckboxSelector = "input[type=checkbox].texture-checkbox-control";
     const texturePropertyControls = document.getElementById("texture-property-controls");
 
     var textureDroplistChanged = new Signal();
@@ -1669,9 +1669,7 @@ caches.open("textures").then(function(cache){
         if ( value ) {
 
         //  Using window.URL.createObjectURL().
-            texturePreview.src = window.URL.createObjectURL( files[ value ] );
-
-            return;
+            texturePreview.src = window.URL.createObjectURL( files[ value ] ); return;
         } 
         
         if ( !value ) {
@@ -1679,10 +1677,12 @@ caches.open("textures").then(function(cache){
             var slot = slotDroplist.value;
             var gender = viewer.contentWindow.localPlayer.outfit.getGender();
 
+        //  reset texture preview image src and return.
+        //  "source: http://stackoverflow.com/questions/5775469/
+        //  whats-the-valid-way-to-include-an-image-with-no-src".
+
             if ( !gender || !slot || !viewer.contentWindow[gender][slot] ) {
-            //  reset texture preview image src and return.
-                // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
-                texturePreview.src = "//:0";  return;  // nosrc.  
+                texturePreview.src = "//:0"; return;
             }
 
         //  This is the "THREE" of scene window that has UVsDebug().

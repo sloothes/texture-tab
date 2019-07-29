@@ -1157,21 +1157,25 @@ caches.open("textures").then(function(cache){
         }, 200);
     });
 
-    transparentClicked.add(function(){
-        genderDroplist.value = viewer.contentWindow.localPlayer.outfit.getGender();
-    });
+    $(viewer.contentWindow).on("load", function(){
 
-    transparentClicked.add(function(value){
+        transparentClicked.add(function(){
+            genderDroplist.value = viewer.contentWindow.localPlayer.outfit.getGender();
+        });
 
-        if ( !genderDroplist.value || !outfitDroplist.value ) {
-            transparentControl.value = !value; return;
-        }
+        transparentClicked.add(function(value){
 
-        viewer.contentWindow.localPlayerMaterialHandler({
-            value : value,
-            key   : "transparent",
-            slot  : outfitDroplist.value,
-            gender: genderDroplist.value,
+            if ( !genderDroplist.value || !outfitDroplist.value ) {
+                transparentControl.value = !value; return;
+            }
+
+            viewer.contentWindow.localPlayerMaterialHandler({
+                value : value,
+                key   : "transparent",
+                slot  : outfitDroplist.value,
+                gender: genderDroplist.value,
+            });
+
         });
 
     });

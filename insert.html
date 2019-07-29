@@ -1105,6 +1105,38 @@ caches.open("textures").then(function(cache){
 
 (function(){
 
+    const textureHeaderSelector = ".texture-header";
+    const helpersHeaderSelector = ".helpers-header";
+    const textureControlSelector = "#texture-map-controls";
+
+    var Signal = signals.Signal;
+    var dblclicked = new Signal();
+
+//  Event handlers.
+    function onDoubleClickEventHandler( element ){
+        if ( $(element).css("display") == "none" ) {
+            $(element).slideDown();
+        } else {
+            $(element).slideUp();
+        }
+    }
+
+//  Event listeners.
+    dblclicked.add(onDoubleClickEventHandler);
+
+//  Dispatch events.
+    $(textureHeaderSelector).on("dblclick", function(){
+        dblclicked.dispatch( $(textureControlSelector).get(0) );
+    });
+
+})();
+
+</script>
+
+<script>
+
+(function(){
+
     const viewer = document.getElementById("viewer");
     const outfitDroplist = $("#texture-outfit-slot").get(0);
     const genderDroplist = $("#texture-gender-droplist").get(0);
@@ -1129,38 +1161,7 @@ caches.open("textures").then(function(cache){
                 value : transparentCheckbox.value,
             });
         }, 200);
-    });
 
-})();
-
-</script>
-
-<script>
-
-(function(){
-
-    const textureHeaderSelector = ".texture-header";
-    const helpersHeaderSelector = ".helpers-header";
-    const textureControlSelector = "#texture-map-controls";
-
-    var Signal = signals.Signal;
-    var dblclicked = new Signal();
-
-//  Event handlers.
-    function onDoubleClickEventHandler( element ){
-        if ( $(element).css("display") == "none" ) {
-            $(element).slideDown();
-        } else {
-            $(element).slideUp();
-        }
-    }
-
-//  Event listeners.
-    dblclicked.add(onDoubleClickEventHandler);
-
-//  Dispatch events.
-    $(textureHeaderSelector).on("dblclick", function(){
-        dblclicked.dispatch( $(textureControlSelector).get(0) );
     });
 
 })();

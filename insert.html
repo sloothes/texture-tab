@@ -17,6 +17,44 @@
 
 <script>
 
+    function generateUUID(){
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+        .replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0;
+            var v = c == 'x'?r:r&0x3|0x8;
+            return v.toString(16);
+        }).toLocaleUpperCase();
+    };
+
+    function jsonTexture(options) {
+
+        var options = options || {}; // important!
+
+        return {
+            _id       : ObjectId(),
+            uuid      : generateUUID(),
+            name      : options.name  || "",
+            type      : options.type  || 1009,
+            flipY     : options.flipY || true,
+            wrapS     : options.wrapS || 1001,
+            wrapT     : options.wrapT || 1001,
+            offset    : options.offset || [0, 0],
+            repeat    : options.repeat || [1, 1],
+            format    : options.format  || 1021,
+            version   : options.version || 0,
+            mapping   : options.mapping || 300,
+            mipmaps   : options.mipmaps || [],
+            minFilter : options.minFilter || 1008,
+            magFilter : options.magFilter || 1006,
+            encoding  : options.encoding  || 3000,
+            anisotropy: options.anisotropy || 1,
+            sourceFile: options.sourceFile || "",
+            unpackAlignment : options.unpackAlignment  || 4,
+            generateMipmaps : options.generateMipmaps  || true,
+            premultiplyAlpha: options.premultiplyAlpha || false,
+        };
+    }
+
     function getTextureData(id){
     //  Returns a resolved promise with record data from imgur.com.
         debugMode && console.log(`GET https://api.imgur.com/3/image/${id}`);
@@ -616,6 +654,8 @@ caches.open("textures").then(function(cache){
 
 //  Pager.
 
+    var json;
+
     var timeout;
     var interval;
     var msec = 200;
@@ -636,6 +676,7 @@ caches.open("textures").then(function(cache){
     const texturePreview = $("img#texture-preview").get(0);
     const outfitDroplist = $("#texture-outfit-slot").get(0);
     const genderDroplist = $("#texture-gender-droplist").get(0);
+    const textureMapControls = $("#texture-map-controls").get(0);
 
     const texturesPanel  = document.getElementById("texture-items");
     const counter        = $(texturesPanel).find("#counter").get(0);
@@ -651,6 +692,8 @@ caches.open("textures").then(function(cache){
     const pagebuttons    = $(pager).find(".page-btn");
     const pageslength    = $(pager).find(".page-btn").length;
     const displayObjects = $(pager).find("#documents-display").get(0);
+
+    const textureApplyBtn = $("#apply-texture-button").get(0);
 
 //  Signals.
 
@@ -697,6 +740,7 @@ caches.open("textures").then(function(cache){
 
     function get_items(){
 
+        $(displayObjects).children().remove();
         collection.find(selectors).skip(skip)
         .limit(limit).toArray(function(err){
             if (err) throw err;
@@ -774,12 +818,11 @@ caches.open("textures").then(function(cache){
 
         if ( max && skip < max ) {
             clearTimeout(interval);
-            interval = setTimeout( function(){
+            interval = setTimeout( function get_items(){
 
                 $(displayObjects).children().remove();
                 collection.find(selectors).skip(skip)
                 .limit(limit).forEach( function(json){
-                //  debugMode && console.log({"json":json});
 
                     var element = document.createElement("div");
                     element.title = json.name;
@@ -818,12 +861,51 @@ caches.open("textures").then(function(cache){
                 return response.blob();
             }).then(function(blob){
                 texturePreview.src = window.URL.createObjectURL(blob);
+
+                json = new jsonTexture({
+                    sourceFile: url,
+                });
+
             }).catch(function(err){
                 console.error(err);
             });
         }).catch(function(err){
             console.error(err);
         });
+
+    });
+
+
+    const maps = [
+        "map", 
+        "bumpMap", 
+        "emissiveMap", 
+        "metalnessMap", 
+        "roughnessMap", 
+        "displacementMap", 
+        "alphaMap", 
+        "normalMap", 
+        "lightMap", 
+    //  "envMap",
+        "aoMap", 
+    ];
+
+
+    $(textureApplyBtn).on("click", function(){
+
+        var data = {};
+        data.slot    = outfitDroplist.value;
+        data.gender  = genderDroplist.value;
+        data.maps    = [];
+        data.texture = json;
+
+        $(textureMapControls).find("input[type=checkbox]")
+        .toArray().forEach(function(item){
+            item.checked && data.maps.push(item.id);
+        });
+
+        debugMode && console.log({"data":data});
+        viewer.contentWindow.localPlayerTextureHandler(data);
 
     });
 
@@ -1511,6 +1593,7 @@ caches.open("textures").then(function(cache){
     const slotDroplist     = $("#texture-outfit-slot").get(0);
     const genderDroplist   = $("#texture-gender-droplist").get(0);
     const texturePreview   = $("img#texture-preview").get(0);
+    const textureControls  = $("#texture-map-controls").get(0);
     const textureDroplist  = $("select#imported-textures").get(0);
     const textureNewButton = $("#new-texture-button").get(0);
     const textureImportBtn = $("#import-texture-button").get(0);
@@ -1518,7 +1601,6 @@ caches.open("textures").then(function(cache){
     const textureUploadBtn = $("#upload-selected-texture").get(0);
     const textureDeleteBtn = $("#delete-selected-texture").get(0);
     const texturesClearBtn = $("#clear-imported-textures").get(0);
-
     const textureUploadButton = $("#upload-selected-texture").get(0);
 
     const textureControlSelector = "#texture-map-controls";
@@ -1924,7 +2006,7 @@ caches.open("textures").then(function(cache){
         "aoMap", 
     ];
 
-    const textureControls  = $("#texture-map-controls").get(0);
+//  const textureControls  = $("#texture-map-controls").get(0);
 
     var propertyValueChanged = new Signal();
     propertyValueChanged.add(function(key, value){

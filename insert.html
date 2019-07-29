@@ -405,9 +405,17 @@
 
     outfitSlotChanged.add(function(){
 
-        if ( !slotDroplist.value ) return;
-        if ( !genderDroplist.value ) return;
-        if ( importedTextures.value ) return;
+        if ( !genderDroplist.value ) {
+            texturePreview.src = "//:0"; return;
+        }
+
+        if ( !slotDroplist.value ) {
+            texturePreview.src = "//:0"; return;
+        }
+
+        if ( importedTextures.value ) {
+            texturePreview.src = "//:0"; return;
+        }
 
         var slot = slotDroplist.value;
         var gender = genderDroplist.value;

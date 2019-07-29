@@ -957,20 +957,10 @@ caches.open("textures").then(function(cache){
 
         pagerClicked();
 
+    //  Count for next time.
         clearTimeout(this.interval);
         this.interval = setTimeout(function(){
-            count().then(function(k){
-                return max = k; 
-            }).then(function(max){
-                if ( max && max > 0 ) {
-                    lastpage = parseInt(max / limit);
-                    if ( limit * lastpage < max ) {
-                        skip = limit * lastpage;
-                    } else {
-                        skip = limit * ( lastpage - 1 );
-                    }
-                }
-            });
+            count().then(function(k){ max = k; });
         }, delay);
 
     });

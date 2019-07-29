@@ -935,27 +935,33 @@ caches.open("textures").then(function(cache){
 
     $(lastPageBtn).on("click", function(){
 
-        if ( max && max > 0 ) {
+        count().then(function(k){
+            return max = k; 
+        }).then(function(max){
 
-            var lastpage = parseInt(max / limit);
+            if ( max && max > 0 ) {
 
-            if ( limit * lastpage < max ) {
+                var lastpage = parseInt(max / limit);
 
-                skip = limit * lastpage;          //  limit * parseInt(max / limit);
+                if ( limit * lastpage < max ) {
+
+                    skip = limit * lastpage;          //  limit * parseInt(max / limit);
+
+                } else {
+
+                    skip = limit * ( lastpage - 1 );  //  limit * ( parseInt(max / limit) - 1 );
+
+                }
 
             } else {
 
-                skip = limit * ( lastpage - 1 );  //  limit * ( parseInt(max / limit) - 1 );
+                skip = 0;
 
             }
 
-        } else {
+            pagerClicked();
 
-            skip = 0;
-
-        }
-
-        pagerClicked();
+        });
 
     });
 

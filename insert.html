@@ -851,14 +851,13 @@ caches.open("textures").then(function(cache){
             */
                     return doc.url;
 
-                }).then( async function(url){
-                    return await cache.match(url)
-                    .then(function(response){
-                        return response.blob();
-                    });
+                }).then( function(url){
 
-                }).then(function(blob){
-                    texturePreview.src = window.URL.createObjectURL(blob);
+                    cache.match(url).then(function(response){
+                        return response.blob();
+                    }).then(function(blob){
+                        texturePreview.src = window.URL.createObjectURL(blob);
+                    });
 
                 }).catch(function(err){
                     console.error(err);

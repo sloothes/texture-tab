@@ -4,7 +4,7 @@
         var component_ID = {
             type: "tab",
             beta: true,
-            version: 2.2,
+            version: 2.3,
             kind: "component",
             name: "insert.html",
             path: "/texture-tab/insert.html",
@@ -588,7 +588,7 @@
             <div id="delete-selected-texture" class="form-control btn btn-danger btn-white-outline gradient-btn pull-right" style="width:24%;">Delete</div>
         </div>
 
-        <div id="documents-display" class="well"></div>
+        <div id="documents-display" class="well" style="display:none;"></div>
 
         <div style="margin:10px 0px 10px;height:35px;">
             <li class="btn btn-primary btn-white-outline first-page-btn pull-left" style="margin-right:5px;">First</li>
@@ -621,14 +621,28 @@ caches.open("textures").then(function(cache){
 
 //  Pager.
 
+    const maps = [
+        "map", 
+        "bumpMap", 
+        "emissiveMap", 
+        "metalnessMap", 
+        "roughnessMap", 
+        "displacementMap", 
+        "alphaMap", 
+        "normalMap", 
+        "lightMap", 
+    //  "envMap",
+        "aoMap", 
+    ];
+
     var json = {};
 
     var timeout;
     var interval;
-    var msec = 200;
+    var delay = 200;
     var selectors = {};
 
-    const limit = 5;
+    const limit = 1;
 
     var max = 0;
     var skip = 0;
@@ -666,6 +680,30 @@ caches.open("textures").then(function(cache){
 
     var Signal = signals.Signal;
     var textureSelected = new Signal();
+    var textureApplyBtnClicked = new Signal();
+
+    textureSelected.add(function(id){
+
+        collection.findOne({"_id":id}, function(err){
+            if (err) throw err;
+        }).then(function(doc){
+            return doc.url;
+        }).then(function(url){
+            cache.match(url).then(function(response){
+                return response.blob();
+            }).then(function(blob){
+
+                json.sourceFile = url; // important!
+                texturePreview.src = window.URL.createObjectURL(blob);
+
+            }).catch(function(err){
+                console.error(err);
+            });
+        }).catch(function(err){
+            console.error(err);
+        });
+
+    });
 
     function reset(){
 
@@ -696,7 +734,7 @@ caches.open("textures").then(function(cache){
     }
 
     async function count(){
-    //  too slow!
+    //  too slow?
         var k = skip;
         await collection.find(selectors)
         .skip(skip).forEach(function(){
@@ -727,7 +765,7 @@ caches.open("textures").then(function(cache){
                         $(".texture-item").removeClass("selected");
                         $(element).addClass("selected");
                         textureSelected.dispatch(element.id);
-                    }, msec );
+                    }, delay );
                 });
                 $(displayObjects).append( element );
             });
@@ -785,77 +823,51 @@ caches.open("textures").then(function(cache){
 
         if ( max && skip < max ) {
             clearTimeout(interval);
-            interval = setTimeout( function get_items(){
+            interval = setTimeout( function getItem(){
 
                 $(displayObjects).children().remove();
-                collection.find(selectors).skip(skip)
-                .limit(limit).forEach( function(json){
+                collection.find().skip(skip).limit(1)
+                .toArray(function(err, docs){
+                    if (err) throw err;
+                    return docs[0];
+                }).then( function(doc){
 
+                    json.sourceFile = doc.url; // important!
+                    return doc.url;
+
+                //  Optional.
                     var element = document.createElement("div");
-                    element.title = json.name;
+                    element.title = doc.name;
                     element.classList.add("texture-item");
-                    element.innerText = element.id = json._id; 
+                    element.innerText = element.id = doc._id;
+                    $(displayObjects).append( element );
                     $(element).on("click", function(){
                         clearTimeout(this.interval);
                         this.interval = setTimeout( function(){
                             $(".texture-item").removeClass("selected");
                             $(element).addClass("selected");
                             textureSelected.dispatch(element.id);
-                        }, msec );
+                        }, delay );
                     });
 
-                    $(displayObjects).append( element );
+                }).then( async function(url){
+                    return await cache.match(url)
+                    .then(function(response){
+                        return response.blob();
+                    });
 
-                }, function(err){
-                    if (err) throw err;
+                }).then(function(blob){
+                    texturePreview.src = window.URL.createObjectURL(blob);
+
                 }).catch(function(err){
                     console.error(err);
                 });
 
-            }, 1000 );
+            }, 500 );
+
         }
 
     }
-
-    textureSelected.add(function(id){
-
-        collection.findOne({"_id":id}, function(err){
-            if (err) throw err;
-        }).then(function(doc){
-            return doc.url;
-        }).then(function(url){
-            cache.match(url).then(function(response){
-                return response.blob();
-            }).then(function(blob){
-
-                json.sourceFile = url; // important!
-                texturePreview.src = window.URL.createObjectURL(blob);
-
-            }).catch(function(err){
-                console.error(err);
-            });
-        }).catch(function(err){
-            console.error(err);
-        });
-
-    });
-
-
-    const maps = [
-        "map", 
-        "bumpMap", 
-        "emissiveMap", 
-        "metalnessMap", 
-        "roughnessMap", 
-        "displacementMap", 
-        "alphaMap", 
-        "normalMap", 
-        "lightMap", 
-    //  "envMap",
-        "aoMap", 
-    ];
-
-    var textureApplyBtnClicked = new Signal();
 
     $(textureApplyBtn).on("click", function(){
         textureApplyBtnClicked.dispatch();

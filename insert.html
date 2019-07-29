@@ -378,9 +378,11 @@
 
 <script>
 
-(function(){
+$(viewer.contentWindow).on("load", function(){
 
-    const viewer = document.getElementById("viewer");
+    var contentWindow = this;
+
+//  const viewer = document.getElementById("viewer");
     const titleTextfield = $("input#material-title").get(0);
     const slotDroplist   = $("#texture-outfit-slot").get(0);
     const genderDroplist = $("#texture-gender-droplist").get(0);
@@ -395,7 +397,7 @@
         if ( !this.value ) {
 
         //  Overwrite gender value.
-            this.value = viewer.contentWindow.localPlayer.outfit.getGender();
+            this.value = contentWindow.localPlayer.outfit.getGender();
 
         }
 
@@ -414,7 +416,7 @@
         if ( !value ) return;
 
         var data = "/gender/" + value;
-        viewer.contentWindow.localPlayerHandler(data);
+        contentWindow.localPlayerHandler(data);
 
         store( "Sex", data );
 
@@ -430,12 +432,12 @@
         var gender = genderDroplist.value;
 
     //  Null outfit NOT allowed.
-        if ( !viewer.contentWindow[gender][slot] ) return;
+        if ( !contentWindow[ gender ][ slot ] ) return;
 
     //  This is the "THREE" of scene window that has UVsDebug().
-        var THREE = viewer.contentWindow.THREE;  //  important!
+        var THREE = contentWindow.THREE;  //  important!
 
-        var geometry = viewer.contentWindow[gender][slot].geometry;
+        var geometry = contentWindow[ gender ][ slot ].geometry;
     //  texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
 
     //  Using window.URL.createObjectURL().
@@ -445,11 +447,19 @@
 
     });
 
-    $(viewer.contentWindow).on("load", function(){
-        this.localPlayer.outfit.changed.add(() => {
-            genderDroplist.value = this.localPlayer.outfit.getGender();
-        });
+    contentWindow.localPlayer.outfit.changed.add(function(){
+
+        var gender = contentWindow.localPlayer.outfit.getGender();
+
+        if ( !gender ) {
+            genderDroplist.value = "";
+        } else {
+            genderDroplist.value = gender;
+        }
+
     });
+
+});
 
 })();
 

@@ -695,23 +695,22 @@ caches.open("textures").then(function(cache){
         return k;
     }
 
-    function get_items(){
+    async function get_items(){
 
-        collection.find(selectors).skip(skip)
+        $(displayObjects).children().remove();
+
+        await collection.find(selectors).skip(skip)
         .limit(limit).toArray(function(err){
             if (err) throw err;
         }).then(function(docs){
 
-            $(displayObjects).children().remove();
             debugMode && console.log({"docs":docs});
 
             docs.forEach(function(json){
-
                 var element = document.createElement("div");
                 element.title = json.name;
                 element.classList.add("texture-item");
                 element.innerText = element.id = json._id; 
-
                 $(element).on("click", function(){
                     clearTimeout(this.interval);
                     this.interval = setTimeout( function(){
@@ -720,9 +719,7 @@ caches.open("textures").then(function(cache){
                         textureSelected.dispatch(element.id);
                     }, msec );
                 });
-
                 $(displayObjects).append( element );
-
             });
 
         }).catch(function(err){

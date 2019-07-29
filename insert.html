@@ -637,19 +637,20 @@ caches.open("textures").then(function(cache){
     const outfitDroplist = $("#texture-outfit-slot").get(0);
     const genderDroplist = $("#texture-gender-droplist").get(0);
 
+    const texturesPanel  = document.getElementById("texture-items");
+    const counter        = $(texturesPanel).find("#counter").get(0);
+
     const pager = document.getElementById("texture-pager");
-    const counter        = $(pager).find("#counter").get(0);
-    const textureItems   = $(pager).find("#texture-items").get(0);
+    const pageSelector   = "#texture-pager .page-btn";
     const firstPageBtn   = $(pager).find(".first-page-btn").get(0);
     const lastPageBtn    = $(pager).find(".last-page-btn").get(0);
     const prevPageBtn    = $(pager).find(".get-prev-btn").get(0);
     const nextPageBtn    = $(pager).find(".get-next-btn").get(0);
     const prevGroupBtn   = $(pager).find(".get-prev-group-btn").get(0);
     const nextGroupBtn   = $(pager).find(".get-next-group-btn").get(0);
-    const displayObjects = $(pager).find("#documents-display").get(0);
-    const pageSelector   = "#texture-pager .page-btn";
     const pagebuttons    = $(pager).find(".page-btn");
     const pageslength    = $(pager).find(".page-btn").length;
+    const displayObjects = $(pager).find("#documents-display").get(0);
 
 //  Signals.
 
@@ -716,7 +717,7 @@ caches.open("textures").then(function(cache){
                     this.interval = setTimeout( function(){
                         $(".texture-item").removeClass("selected");
                         $(element).addClass("selected");
-                        textureSelected.dispatch(this.id);
+                        textureSelected.dispatch(element.id);
                     }, msec );
                 });
 
@@ -787,11 +788,16 @@ caches.open("textures").then(function(cache){
         collection.findOne({_id:id}, function(err){
             if (err) throw err;
         }).then(function(doc){
-            return cache.match(doc.url);
-        }).then(function(response){
-            return response.blob();
-        }).then(function(blob){
-            texturePreview.src = window.URL.createObjectURL(blob);
+            return doc.url;
+        }).then(function(url){
+            debugMode && console.log(url);
+            cache.match(url).then(function(response){
+                return response.blob();
+            }).then(function(blob){
+                texturePreview.src = window.URL.createObjectURL(blob);
+            }).catch(function(err){
+                console.error(err);
+            });
         }).catch(function(err){
             console.error(err);
         });

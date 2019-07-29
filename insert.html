@@ -831,6 +831,7 @@ caches.open("textures").then(function(cache){
                     if (err) throw err;
                     return docs[0];
                 }).then( function(doc){
+                    debugMode && console.log({"doc":doc});
 
                     json.sourceFile = doc.url; // important!
             /*
@@ -852,6 +853,7 @@ caches.open("textures").then(function(cache){
                     return doc.url;
 
                 }).then( function(url){
+                    debugMode && console.log({"url":url});
 
                     cache.match(url).then(function(response){
                         return response.blob();

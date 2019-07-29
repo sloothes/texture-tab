@@ -882,7 +882,9 @@
     });
 
     count().then(function(k){
-        max = k;
+        max = k; 
+        return max;
+    }).then(function(max){
         pagerClicked();
     });
 

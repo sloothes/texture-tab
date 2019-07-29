@@ -697,13 +697,12 @@ caches.open("textures").then(function(cache){
 
     function get_items(){
 
-        $(displayObjects).children().remove();
-
-        return collection.find(selectors).skip(skip)
+        collection.find(selectors).skip(skip)
         .limit(limit).toArray(function(err){
             if (err) throw err;
         }).then(function(docs){
 
+            $(displayObjects).children().remove();
             debugMode && console.log({"docs":docs});
 
             docs.forEach(function(json){
@@ -775,7 +774,35 @@ caches.open("textures").then(function(cache){
 
         if ( max && skip < max ) {
             clearTimeout(interval);
-            interval = setTimeout( get_items, 1000 );
+            interval = setTimeout( 
+                collection.find(selectors).skip(skip)
+                .limit(limit).toArray(function(err){
+                    if (err) throw err;
+                }).then(function(docs){
+
+                    $(displayObjects).children().remove();
+                    debugMode && console.log({"docs":docs});
+
+                    docs.forEach(function(json){
+                        var element = document.createElement("div");
+                        element.title = json.name;
+                        element.classList.add("texture-item");
+                        element.innerText = element.id = json._id; 
+                        $(element).on("click", function(){
+                            clearTimeout(this.interval);
+                            this.interval = setTimeout( function(){
+                                $(".texture-item").removeClass("selected");
+                                $(element).addClass("selected");
+                                textureSelected.dispatch(element.id);
+                            }, msec );
+                        });
+                        $(displayObjects).append( element );
+                    });
+
+                }).catch(function(err){
+                    console.error(err);
+                }), 
+            1000 );
         }
 
     }

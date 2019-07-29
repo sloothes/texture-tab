@@ -554,6 +554,74 @@
 
 <script>
 
+    function getTextureData(id){
+    //  Returns a resolved promise with record data from imgur.com.
+        debugMode && console.log(`GET https://api.imgur.com/3/image/${id}`);
+        return new Promise(function( resolve, reject ){
+            var xhttp = new XMLHttpRequest();
+            var clientid = "60db267c697bb33";  // textures app.
+            var endpoint = "https://api.imgur.com/3/image/" + id;
+            xhttp.open("GET", endpoint, true);
+            xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
+            xhttp.onreadystatechange = function() {
+                if (this.readyState === 4) {
+                    var response = "";
+                    if (this.status >= 200 && this.status < 300) {
+                        response = JSON.parse(this.responseText);
+                        debugMode && console.log(response.data);
+                        resolve(response.data); // resolve promise.
+                    } else {
+                        var err = JSON.parse(this.responseText).data.error;
+                        console.error( err.type, err );
+                        throw err;
+                    }
+                }
+            };
+
+            xhttp.send();
+            xhttp = null;
+        });
+    }
+
+    function uploadTexture(file){
+    //  Returns a resolved promise with record data from imgur.com.
+        debugMode && console.log(`uploading ${file.name}...`);
+        return new Promise(function( resolve, reject ){
+
+            var formdata = new FormData();
+            formdata.append("image", file);
+            formdata.append("type",  file.type);
+            formdata.append("name",  file.name);
+
+            var xhttp = new XMLHttpRequest();
+            var clientid = "60db267c697bb33";  // textures app.
+            var endpoint = "https://api.imgur.com/3/image";
+            xhttp.open("POST", endpoint, true);
+            xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    var response = "";
+                    if (this.status >= 200 && this.status < 300) {
+                        response = JSON.parse(this.responseText);
+                        debugMode && console.log(response.data);
+                        resolve(response.data); // resolve promise.
+                    } else {
+                        var err = JSON.parse(this.responseText).data.error;
+                        console.error( err.type, err );
+                        throw err;
+                    }
+                }
+            };
+
+            xhttp.send(formdata);
+            xhttp = null;
+        });
+    }
+
+</script>
+
+<script>
+
 (function(){
 
 /*
@@ -622,7 +690,8 @@
         };
     }
 
-    var json = new jsonTexture();
+    var json = {}; // new jsonTexture();
+
     debugMode && console.log({"json texture":json});
 
     var Signal = signals.Signal;
@@ -1005,13 +1074,48 @@
 
     var textureDroplistChanged = new Signal();
 
- 
+    textureDroplistChanged.add(function(value){
+
+        if ( value ) {
+
+        //  Using window.URL.createObjectURL().
+            texturePreview.src = window.URL.createObjectURL( files[ value ] );
+
+            return;
+        } 
+        
+        if ( !value ) {
+
+            var slot = slotDroplist.value;
+            var gender = viewer.contentWindow.localPlayer.outfit.getGender();
+
+            if ( !gender || !slot || !viewer.contentWindow[gender][slot] ) {
+            //  reset texture preview image src and return.
+                // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
+                texturePreview.src = "//:0";  return;  // nosrc.  
+            }
+
+        //  This is the "THREE" of scene window that has UVsDebug().
+            var THREE = viewer.contentWindow.THREE;  //  important!
+            var geometry = viewer.contentWindow[gender][slot].geometry;
+
+        //  Using window.URL.createObjectURL().
+            THREE.UVsDebug(geometry, 512).toBlob(function(blob){
+                texturePreview.src = window.URL.createObjectURL(blob);
+            }, "image/jpeg");
+
+            return;
+
+        }
+
+    });
+
 //  BUTTON NEW.
 
     $(textureNewButton).on("click", function(){
         clearTimeout(this.interval);
         this.interval = setTimeout(function(){
-            json = new jsonTexture();
+            json = {}; // new jsonTexture();
             debugMode && console.log({"new":json});
         }, 200);
     });
@@ -1052,10 +1156,7 @@
 
         }
 
-        debugMode && console.log({
-            "files": files, 
-            "textures": textures,
-        });
+        debugMode && console.log({"files": files, "textures": textures});
 
     });
 
@@ -1078,41 +1179,6 @@
 
     });
 
-    textureDroplistChanged.add(function(value){
-
-        if ( value ) {
-
-        //  Using window.URL.createObjectURL().
-            texturePreview.src = window.URL.createObjectURL( files[ value ] );
-
-            return;
-        } 
-        
-        if ( !value ) {
-
-            var slot = slotDroplist.value;
-            var gender = viewer.contentWindow.localPlayer.outfit.getGender();
-
-            if ( !gender || !slot || !viewer.contentWindow[gender][slot] ) {
-            //  reset texture preview image src and return.
-                // "https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src".
-                texturePreview.src = "//:0";  return;  // nosrc.  
-            }
-
-        //  This is the "THREE" of scene window that has UVsDebug().
-            var THREE = viewer.contentWindow.THREE;  //  important!
-            var geometry = viewer.contentWindow[gender][slot].geometry;
-
-        //  Using window.URL.createObjectURL().
-            THREE.UVsDebug(geometry, 512).toBlob(function(blob){
-                texturePreview.src = window.URL.createObjectURL(blob);
-            }, "image/jpeg");
-
-            return;
-
-        }
-
-    });
 
 //  BUTTON DELETE.
     var deleteButtonClicked = new Signal();
@@ -1252,10 +1318,10 @@
             formdata.append("image", file);
             formdata.append("type",  file.type);
             formdata.append("name",  file.name);
-        //  formdata.append("title", file.name);
+            formdata.append("title", file.name);
 
             var xhttp = new XMLHttpRequest();
-            var clientid = "60db267c697bb33";  // textures.
+            var clientid = "60db267c697bb33";  // textures app Client-ID.
             var endpoint = "https://api.imgur.com/3/image";
             xhttp.open("POST", endpoint, true);
             xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
@@ -1287,55 +1353,86 @@
                 cache.add(data.link);
                 debugMode && console.log( data.link );
 
-            //  Success.
+            });
 
-                debugMode && console.log(`deleting "${file.name}" from files.`);
+            return data;
 
-                delete files[ file.name ];
-            //  delete textures[ file.name ];
+        }).then( function(data){
 
-                debugMode && console.log( "removing", $option.get(0) );
+        //  Add to collection.
 
-                $option.remove();
+            var entry = {};
 
-                if (textureDroplist.options.length == 0) {
-                    var option = document.createElement("option");
-                    option.value = "";  option.innerText = "Import textures:";
-                    $(textureDroplist).append(option);
-                }
+            entry._id = data.id;
+            entry.url = data.link;
+            entry.size = data.size;
+            entry.type = data.type;
+            entry.name = data.name || data.title;
+            entry.width = data.width;
+            entry.height = data.height;
+            entry.datetime = data.datetime;
+            entry.deletehash = data.deletehash;
+            entry.endpoint = "https://api.imgur.com/3/image/" + data.id;
+            entry.clientID = "60db267c697bb33";  // textures app Client-ID.
 
-                textureDroplistChanged.dispatch( textureDroplist.value );
-                var msg = `Texture ${file.name} uploaded successfully!`;
-                bootbox.dialog({
-                    size: "small",
-                    className: "middle",
-                    closeButton: false,
-                    title: `<div class="alert-icon icon-success">`
-                    + `</div><h2 style="margin:auto;">Success</h2>`,
-                    message: `<div>${msg}</div>`,
-                    buttons: {
-                        success: {
-                            label: "Close",
-                            className: "btn-success",
-                            callback: function(){
-                                bootbox.hideAll()
-                            },
+            var collection = db.collection("textures");
+            collection.insert(entry, function(err){
+                if (err) throw err;
+            }).catch(function(err){
+                console.error(err);
+            });
+
+        }).then( function(){
+
+        //  Success.
+
+            debugMode && console.log(`deleting "${file.name}" from files.`);
+
+            delete files[ file.name ];
+        //  delete textures[ file.name ];
+
+            debugMode && console.log( "removing", $option.get(0) );
+
+            $option.remove();
+
+            if (textureDroplist.options.length == 0) {
+                var option = document.createElement("option");
+                option.value = "";  option.innerText = "Import textures:";
+                $(textureDroplist).append(option);
+            }
+
+            textureDroplistChanged.dispatch( textureDroplist.value );
+
+            var msg = `Texture ${file.name} uploaded successfully!`;
+            bootbox.dialog({
+                size: "small",
+                className: "middle",
+                closeButton: false,
+                title: `<div class="alert-icon icon-success">`
+                + `</div><h2 style="margin:auto;">Success</h2>`,
+                message: `<div>${msg}</div>`,
+                buttons: {
+                    success: {
+                        label: "Close",
+                        className: "btn-success",
+                        callback: function(){
+                            bootbox.hideAll();
                         },
                     },
-                });
-
+                },
             });
 
         }).catch(function(err){
 
+            bootbox.hideAll();
             console.error(err);
-            dialog.modal("hide"); // important!
             bootbox.dialog( errorDialogOptions(err) );
 
         }).then(function(){
 
             dialog.modal("hide"); // important!
-            $(textureUploadButton).on("click", uploadSelectedTexture ); // important!
+        //  Enable upload button. // important!
+            $(textureUploadButton).on("click", uploadSelectedTexture );
             debugMode && console.log( "Upload button is enabled and ready to upload." );
 
         });
@@ -1358,6 +1455,51 @@
         }
 
     }
+
+    const maps = [
+        "map", 
+        "bumpMap", 
+        "emissiveMap", 
+        "metalnessMap", 
+        "roughnessMap", 
+        "displacementMap", 
+        "alphaMap", 
+        "normalMap", 
+        "lightMap", 
+    //  "envMap",
+        "aoMap", 
+    ];
+
+    const textureControls  = $("#texture-map-controls").get(0);
+
+    var propertyValueChanged = new Signal();
+    propertyValueChanged.add(function(key, value){
+        debugMode && console.log({"json":json});
+    });
+
+    maps.forEach(function( key ){
+        $(textureControls).find(`input#${key}`).on("click", function(){
+
+            if (!textureDroplist.value) return;
+
+            var name = textureDroplist.value;
+
+            if ( !this.checked ) {
+
+                var texture = null;
+                delete json[ key ];
+
+            } else {
+
+                var texture = textures[ name ];  //  json texture.
+                json[ key ] = textures[ name ];
+
+            }
+
+            propertyValueChanged.dispatch( key, texture );
+
+        });
+    });
 
 
 
@@ -1428,9 +1570,10 @@
     });
 */
 
+/*
     var json;
-//  var files = {};
-//  var uploads = [];
+    var files = {};
+    var uploads = [];
     var textures = {};
 
     const viewer = document.getElementById("viewer");
@@ -1531,8 +1674,7 @@
 
         });
     });
-
-})();
+*/
 
 /*
 //  BUTTON IMPORT.
@@ -1824,7 +1966,10 @@
         };
         return shift(Math.round(shift(number, precision, false)), precision, true);
     }
+
 */
+
+})();
 
 /*
     function jsonTexture() {

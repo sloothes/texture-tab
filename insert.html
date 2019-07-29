@@ -695,11 +695,11 @@ caches.open("textures").then(function(cache){
         return k;
     }
 
-    async function get_items(){
+    function get_items(){
 
         $(displayObjects).children().remove();
 
-        await collection.find(selectors).skip(skip)
+        return collection.find(selectors).skip(skip)
         .limit(limit).toArray(function(err){
             if (err) throw err;
         }).then(function(docs){

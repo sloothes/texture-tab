@@ -930,7 +930,7 @@ caches.open("textures").then(function(cache){
 
                 var url = await cache.keys()
                 .then(function(keys){
-                    return keys[skip + 1].url;
+                    return keys[ skip ].url;
                 });
 
                 textureSelected.dispatch(url);

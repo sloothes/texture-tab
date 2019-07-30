@@ -1936,7 +1936,7 @@ caches.open("textures").then(function(cache){
 
             case "_id":
 
-                (function _idControl(key){
+                (function _idControl(){
 
                     if ( !key || key != "_id" ) return;
 
@@ -1961,7 +1961,6 @@ caches.open("textures").then(function(cache){
 
             break;
 
-
             case "type":
             case "wrapS":
             case "wrapT":
@@ -1973,10 +1972,7 @@ caches.open("textures").then(function(cache){
             case "minFilter":
             case "sourceFile":
             case "unpackAlignment":
-
             break;
-
-
 
         }
 

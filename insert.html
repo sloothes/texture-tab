@@ -678,7 +678,7 @@ $(viewer.contentWindow).on("load", function(){
 
     <div style="height:35px;margin-top:20px;">
         <div style="width:65%;display:inline-block;">
-            <select id="texture-remove-map" class="form-control texture-map-droplist" readonly>
+            <select id="texture-map-droplist" class="form-control texture-map-droplist" readonly>
                 <option value="">Select map:</option>
                 <option value="map">map</option>
                 <option value="bumpMap">bumpMap</option>
@@ -692,7 +692,7 @@ $(viewer.contentWindow).on("load", function(){
                 <option value="aoMap">aoMap</option>
             </select>
         </div>
-        <div id="map-remove-button" class="form-control btn btn-danger btn-white-outline gradient-btn pull-right" style="max-width:fit-content;">Remove</div>
+        <div id="texture-remove-button" class="form-control btn btn-danger btn-white-outline gradient-btn pull-right" style="max-width:fit-content;">Remove</div>
     </div>
 
 </div>
@@ -916,6 +916,7 @@ caches.open("textures").then(function(cache){
     const propDroplist        = $("select#texture-property").get(0);
     const propControls        = $("#texture-property-controls").get(0);
 
+    const textureApplyBtn     = $("#apply-texture-button").get(0);
     const textureControls     = $("#texture-map-controls").get(0);
     const textureDroplist     = $("select#imported-textures").get(0);
     const textureNewButton    = $("#new-texture-button").get(0);
@@ -924,7 +925,8 @@ caches.open("textures").then(function(cache){
     const textureUploadBtn    = $("#upload-selected-texture").get(0);
     const textureDeleteBtn    = $("#delete-selected-texture").get(0);
     const texturesClearBtn    = $("#clear-imported-textures").get(0);
-    const textureApplyBtn     = $("#apply-texture-button").get(0);
+    const textureRemoveBtn    = ${"#texture-remove-button").get(0);
+    const textureMapDroplist  = $("select#texture-map-droplist").get(0);
     const textureUploadButton = $("#upload-selected-texture").get(0);
 
     const slotDroplist            = outfitDroplist;
@@ -1292,7 +1294,7 @@ caches.open("textures").then(function(cache){
         this.interval = setTimeout(function(){
             json = {}; // new jsonTexture();
             debugMode && console.log({"new":json});
-        }, 200);
+        }, delay);
     });
 
 //  BUTTON IMPORT.
@@ -1337,11 +1339,12 @@ caches.open("textures").then(function(cache){
 
     $(textureDroplist).on("change", function(){
 
+        const contentWindow = viewer.contentWindow;
+
     //  Reset texture map checkboxes.
         $(textureCheckboxSelector).attr({checked:false});
 
     //  Overwrite gender droplist value.
-        const contentWindow = viewer.contentWindow;
         genderDroplist.value = contentWindow.localPlayer.outfit.getGender();
 
         if ( !this.value ) {
@@ -1352,6 +1355,30 @@ caches.open("textures").then(function(cache){
 
         textureDroplistChanged.dispatch(this.value);
 
+    });
+
+//  BUTTON TEXTURE REMOVE.
+
+    $(textureRemoveBtn).on("click", function(){
+
+        const contentWindow = viewer.contentWindow;
+
+    //  Overwrite gender droplist value.
+        genderDroplist.value = contentWindow.localPlayer.outfit.getGender();
+
+        if (!slotDroplist.value) return;
+        if (!genderDroplist.value) return;
+        if (!textureMapDroplist.value) return;
+
+        var data = {
+            map: textureMapDroplist.value,
+            slot: slotDroplist.value,
+            gender: genderDroplist.value,
+        };
+
+        contentWindow.localPlayerTextureRemoveHandler(data);
+
+        textureMapDroplist.value = "";
     });
 
 

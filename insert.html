@@ -716,11 +716,113 @@ $(viewer.contentWindow).on("load", function(){
 
 <script>
 
+(function(){
+
+    const textureHeaderSelector = ".texture-header";
+    const helpersHeaderSelector = ".helpers-header";
+    const textureControlSelector = "#texture-map-controls";
+
+    var Signal = signals.Signal;
+    var dblclicked = new Signal();
+
+//  Event handlers.
+    function onDoubleClickEventHandler( element ){
+        if ( $(element).css("display") == "none" ) {
+            $(element).slideDown();
+        } else {
+            $(element).slideUp();
+        }
+    }
+
+//  Event listeners.
+    dblclicked.add(onDoubleClickEventHandler);
+
+//  Dispatch events.
+    $(textureHeaderSelector).on("dblclick", function(){
+        dblclicked.dispatch( $(textureControlSelector).get(0) );
+    });
+
+})();
+
+</script>
+
+<script>
+
+$(viewer.contentWindow).on("load", function(){
+
+    const contentWindow = this;
+
+//  const viewer = document.getElementById("viewer");
+    const checkbox = $("#texture-transparent-checkbox").get(0);
+    const outfitDroplist = $("#texture-outfit-slot").get(0);
+    const genderDroplist = $("#texture-gender-droplist").get(0);
+
+    var Signal = signals.Signal;
+    var transparentClicked = new Signal();
+
+    transparentClicked.add(function(checked){
+
+        genderDroplist.value = contentWindow.localPlayer.outfit.getGender();
+
+        if ( !genderDroplist.value || !outfitDroplist.value ) {
+            checkbox.checked = !checked; return;
+        }
+
+        contentWindow.localPlayerMaterialHandler({
+            value : checked,
+            key: "transparent",
+            slot: outfitDroplist.value,
+            gender: genderDroplist.value,
+        });
+
+    });
+
+    $(checkbox).on("click", function(){
+        clearTimeout(checkbox.interval);
+        checkbox.interval = setTimeout(function(){
+            transparentClicked.dispatch( checkbox.checked );
+        }, 200);
+    });
+
+});
+
+</script>
+
+<script>
+/*
+//  const VERSION = 5;
+    const NAME = "USER";
+
+    var db = new zango.Db( NAME, {
+        current:    true,
+        settings:   true,
+        animations: true,
+        outfits:    true,
+        materials:  true,
+        textures:   true,
+        products:   true,
+    });
+
+    db.open(function(err, database){
+        if (err) console.error(err);
+    }).then( function(){
+        debugMode && console.log(`Database ${db.name} (v${db.version}) opened.`);
+    }).catch(function(err){
+        console.error(err);
+    });
+*/
+</script>
+
+<script>
+
 caches.open("textures").then(function(cache){
 
 //  Pager.
 
     var json = {};
+    var files = {};
+    var uploads = [];
+    var textures = {};
 
     const maps = [
         "map", 
@@ -732,8 +834,8 @@ caches.open("textures").then(function(cache){
         "alphaMap", 
         "normalMap", 
         "lightMap", 
-    //  "envMap",
         "aoMap", 
+    //  "envMap",
     ];
 
     var timeout;
@@ -758,6 +860,7 @@ caches.open("textures").then(function(cache){
     const genderDroplist = $("#texture-gender-droplist").get(0);
     const textureItemsPanel  = $("#texture-items").get(0);
     const textureMapControls = $("#texture-map-controls").get(0);
+    const importedTextures   = $("select#imported-textures").get(0);
 
     const pageSelector = "#texture-pager .page-btn";
 
@@ -775,11 +878,37 @@ caches.open("textures").then(function(cache){
 
     const textureApplyBtn = $("#apply-texture-button").get(0);
 
+//  const NoScr = "//:0";  
+// "source: https://stackoverflow.com/questions/5775469/
+//  whats-the-valid-way-to-include-an-image-with-no-src".
+
+    const slotDroplist     = $("#texture-outfit-slot").get(0);
+    const texturePreview   = $("img#texture-preview").get(0);
+    const textureControls  = $("#texture-map-controls").get(0);
+    const textureDroplist  = $("select#imported-textures").get(0);
+    const textureNewButton = $("#new-texture-button").get(0);
+    const textureImportBtn = $("#import-texture-button").get(0);
+    const textureFileinput = $("input#texture-fileinput").get(0);
+    const textureUploadBtn = $("#upload-selected-texture").get(0);
+    const textureDeleteBtn = $("#delete-selected-texture").get(0);
+    const texturesClearBtn = $("#clear-imported-textures").get(0);
+    const textureUploadButton = $("#upload-selected-texture").get(0);
+
+    const textureControlSelector = "#texture-map-controls";
+    const textureCheckboxSelector = "input[type=checkbox].texture-checkbox-control";
+    const texturePropertyControls = document.getElementById("texture-property-controls");
+
+    const propDroplist = $("select#texture-property").get(0);
+    const propControls = $("#texture-property-controls").get(0);
+
 //  Signals.
 
     var Signal = signals.Signal;
     var textureSelected = new Signal();
+    var propertyValueChanged = new Signal();
     var textureApplyBtnClicked = new Signal();
+    var textureDroplistChanged = new Signal();
+    var propertiesDroplistChanged = new Signal();
 
     textureSelected.add(function(url){
 
@@ -830,52 +959,6 @@ caches.open("textures").then(function(cache){
             return max = keys.length;
         });
     }
-
-/*
-    async function count(){
-    //  too slow?
-        var k = skip;
-        await collection.find(selectors)
-        .skip(skip).forEach(function(){
-            ++k;  //  debugMode && console.log("k:", k);
-        });
-        return k;
-    }
-
-    function get_items(){
-
-        $(displayObjects).children().remove();
-        collection.find(selectors).skip(skip)
-        .limit(limit).toArray(function(err){
-            if (err) throw err;
-        }).then(function(docs){
-
-            $(displayObjects).children().remove();
-            debugMode && console.log({"docs":docs});
-
-            docs.forEach(function(json){
-                var element = document.createElement("div");
-                element.title = json.name;
-                element.classList.add("texture-item");
-                element.innerText = element.id = json._id; 
-                $(element).on("click", function(){
-                    clearTimeout(this.interval);
-                    this.interval = setTimeout( function(){
-                        $(".texture-item").removeClass("selected");
-                        $(element).addClass("selected");
-                        textureSelected.dispatch(element.id);
-                    }, delay );
-                });
-                $(displayObjects).append( element );
-            });
-
-        }).catch(function(err){
-            console.error(err);
-        });
-
-    }
-
-*/
 
     function pagerClicked(){
 
@@ -940,29 +1023,6 @@ caches.open("textures").then(function(cache){
         }
 
     }
-
-/*
-    await cache.match(url)
-        .then(function(response){
-        return response.blob();
-    }).then(function(blob){
-        texturePreview.src = window.URL.createObjectURL(blob);
-    });
-
-    //  Optional.
-    var element = document.createElement("div");
-    element.classList.add("texture-item");
-    element.innerText = element.url = url;
-    $(displayObjects).append( element );
-    $(element).on("click", function(){
-        clearTimeout(this.interval);
-        this.interval = setTimeout( function(){
-            $(".texture-item").removeClass("selected");
-            $(element).addClass("selected");
-            textureSelected.dispatch(element.url);
-        }, delay );
-    });
-*/
 
 //  BUTTON APPLY.
 
@@ -1171,6 +1231,791 @@ caches.open("textures").then(function(cache){
 
     });
 
+
+    textureDroplistChanged.add(function(value){
+
+        const contentWindow = viewer.contentWindow;
+
+        if ( value ) {
+
+            texturePreview.src = window.URL.createObjectURL( files[ value ] ); 
+
+        } else {
+
+            var slot = slotDroplist.value;
+            var gender = contentWindow.localPlayer.outfit.getGender();
+
+        //  "source: http://stackoverflow.com/questions/5775469/
+        //  whats-the-valid-way-to-include-an-image-with-no-src".
+
+            if ( !gender || !slot || !contentWindow[gender][slot] ) {
+                texturePreview.src = "//:0"; return;
+            }
+
+        //  This is the "THREE" of scene window that has UVsDebug().
+            var THREE = contentWindow.THREE;  //  important!
+            var geometry = contentWindow[gender][slot].geometry;
+
+        //  Using window.URL.createObjectURL().
+            THREE.UVsDebug(geometry, 512).toBlob(function(blob){
+                texturePreview.src = window.URL.createObjectURL(blob);
+            }, "image/jpeg");
+
+        }
+
+    });
+
+//  BUTTON NEW.
+
+    $(textureNewButton).on("click", function(){
+
+    //  Reset texture map checkboxes.
+        $(textureCheckboxSelector).attr({checked:false});
+
+        clearTimeout(this.interval);
+        this.interval = setTimeout(function(){
+            json = {}; // new jsonTexture();
+            debugMode && console.log({"new":json});
+        }, 200);
+    });
+
+//  BUTTON IMPORT.
+
+    $(textureImportBtn).on("click", function(){
+        $(textureFileinput).val("");
+        $(textureFileinput).click();
+    });
+
+    $(textureFileinput).on("change", function(){
+
+        if ( this.files.length == 0 ) return;
+
+        $(textureCheckboxSelector).attr({checked:false});
+    //  $(textureDroplist).find(`option[value=""]`).remove();
+
+        for (var i = 0; i < this.files.length; i++ ) {
+
+            var file = textureFileinput.files[i];
+            var name = textureFileinput.files[i].name;
+
+            files[ name ] = file;
+
+        //  textures[ name ] = {};         //  new jsonTexture();
+        //  textures[ name ].name = name;
+        //  textures[ name ].sourceFile = files[ name ]; // file;
+
+            var option = document.createElement("option");
+            option.name = option.value = option.innerText = name;
+
+            $(textureDroplist).append(option);
+            textureDroplist.value = option.value;
+            textureDroplistChanged.dispatch(option.value);
+
+        }
+
+        debugMode && console.log({"files": files});
+
+    });
+
+//  SELECT TEXTURE DROPLIST.
+
+    $(textureDroplist).on("change", function(){
+
+    //  Reset texture map checkboxes.
+        $(textureCheckboxSelector).attr({checked:false});
+
+    //  Overwrite gender droplist value.
+        const contentWindow = viewer.contentWindow;
+        genderDroplist.value = contentWindow.localPlayer.outfit.getGender();
+
+        if ( !this.value ) {
+            $(textureControlSelector).slideUp();
+        } else {
+            $(textureControlSelector).slideDown();
+        }
+
+        textureDroplistChanged.dispatch(this.value);
+
+    });
+
+
+//  BUTTON DELETE.
+
+    var deleteButtonClicked = new Signal();
+
+    $(textureDeleteBtn).on("click", function(){
+        clearTimeout(this.interval);
+        this.interval = setTimeout( function(){
+            deleteButtonClicked.dispatch();
+        }, 200 );
+    });
+
+    deleteButtonClicked.add( function(){
+    //  This signal function first. important!
+
+        if ( !textureDroplist.value ) {
+            debugMode && console.log("files:", files);
+            return;
+        }
+
+        if ( !textureDroplist.selectedOptions.length ) {
+            debugMode && console.log("files:", files);
+            return;
+        }
+
+    //  Optional.
+
+        var name = textureDroplist.value;
+        debugMode && console.log("delete from files:", name);
+
+        delete files[ name ];
+        delete textures[ name ];
+
+        debugMode && console.log("files:", files);
+    //  debugMode && console.log("textures:", textures);
+
+    });
+
+    deleteButtonClicked.add( function(){
+    //  This signal function last. important!
+
+        var option = textureDroplist.selectedOptions[0];
+
+        if ( !option ) return;
+        if ( !option.value ) return;
+
+        $(option).remove();
+
+        if (textureDroplist.options.length == 0) {
+            var option = document.createElement("option");
+            option.value = "";  option.innerText = "Import textures:";
+            $(textureDroplist).append(option);
+        }
+
+        $(textureControlSelector).slideUp();
+        $(textureCheckboxSelector).attr({checked:false});
+        textureDroplistChanged.dispatch( textureDroplist.value );  // == $(textureDroplist).change();
+
+    });
+
+//  BUTTON CLEAR.
+
+    $(texturesClearBtn).on("click", function(){
+
+        clearTimeout(this.interval);
+        this.interval = setTimeout( function(){
+        //  debugMode && console.log({"files":files, "textures": textures});
+
+            $(textureDroplist).children().remove();
+
+            if (textureDroplist.options.length == 0) {
+                var option = document.createElement("option");
+                option.value = "";  option.innerText = "Import textures:";
+                $(textureDroplist).append(option);
+            }
+
+            $(textureControlSelector).slideUp();
+            $(textureCheckboxSelector).attr({checked:false});
+            textureDroplistChanged.dispatch( textureDroplist.value );  // == $(textureDroplist).change();
+
+        //  Optional.
+
+            for (var name in files){
+                delete files[name];
+                delete textures[name];
+            }
+
+        //  files = {}; textures = {};
+
+            debugMode && console.log("files:", files);
+        //  debugMode && console.log("textures:", textures);
+
+        }, 250 );
+
+    });
+
+//  BUTTON UPLOAD.
+
+    $(textureUploadButton).on("click", uploadSelectedTexture );
+
+    function errorDialogOptions(err){
+        return {
+            size: "small",
+            className: "middle",
+            closeButton: false,
+            title: `<div class="alert-icon icon-warning">` 
+            + `</div><h2 style="margin:auto;">Error!</h2>`,
+            message: `<div>Sorry! An error occurred.</div><div>${err}</div>`,
+            buttons: {
+                cancel: {
+                    label: "Close",
+                    className: "btn-default",
+                },
+            },
+        };
+    }
+
+    function uploadSelectedTexture(){
+
+    //  Using files.
+
+        if ( !navigator.onLine ) {
+            var err = "Your connection to the internet is down.";
+            debugMode && console.error(err);
+            return bootbox.dialog( errorDialogOptions(err) );
+        }
+
+        if ( !importedTextures.value ) {
+            var err = "There isn&#39;t selected texture to upload.";
+            debugMode && console.error(err);
+            return bootbox.dialog( errorDialogOptions(err) );
+        }
+
+        if ( !files[ textureDroplist.value ] ) return;
+
+        var file = files[ textureDroplist.value ];
+        var $option = $( textureDroplist.selectedOptions[0] );
+
+        var dialog = bootbox.dialog({
+            message: `<div class="text-center meter">`
+            + `<span style="width:100%;">Uploading...`
+            + `</span></div>`,
+            buttons: false,
+            closeButton: false,
+            className: "middle",
+        });
+
+        new Promise(function(resolve, reject){
+
+            $(textureUploadButton).off(); // important!
+            debugMode && console.log(`uploading ${file.name}...`);
+
+            var formdata = new FormData();
+            formdata.append("image", file);
+            formdata.append("type",  file.type);
+            formdata.append("name",  file.name);
+            formdata.append("title", file.name);
+
+            var xhttp = new XMLHttpRequest();
+            var clientid = "60db267c697bb33";  // textures app Client-ID.
+            var endpoint = "https://api.imgur.com/3/image";
+            xhttp.open("POST", endpoint, true);
+            xhttp.setRequestHeader("Authorization", "Client-ID " + clientid);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    var response = "";
+                    if (this.status >= 200 && this.status < 300) {
+                        response = JSON.parse(this.responseText);
+                        resolve( response ); // resolve promise.
+                    } else {
+                        var err = JSON.parse(this.responseText).data.error;
+                        console.error( err.type, err );
+                        throw err;
+                    }
+                }
+            };
+
+            xhttp.send(formdata);
+            xhttp = null;
+
+        }).then( function( response ){
+
+            var data = response.data;
+            debugMode && console.log({"data": data});
+
+        //  Add to cache.
+            caches.open("textures").then(async function(cache){
+
+                await cache.add(data.link).then(function(){ count(); });
+
+                json.sourceFile = data.link; // important!
+                debugMode && console.log( data.link );
+
+                cache.match(data.link).then(function(response){
+                    return response.blob();
+                }).then(function(blob){
+                    texturePreview.src = window.URL.createObjectURL(blob);
+                });
+
+            });
+
+            return data;
+
+        }).then( function(data){
+
+        //  Add to collection.
+
+            var entry = {};
+
+            entry._id = data.id;
+            entry.url = data.link;
+            entry.size = data.size;
+            entry.type = data.type;
+            entry.name = data.name || data.title;
+            entry.width = data.width;
+            entry.height = data.height;
+            entry.datetime = data.datetime;
+            entry.deletehash = data.deletehash;
+            entry.endpoint = "https://api.imgur.com/3/image/" + data.id;
+            entry.clientID = "60db267c697bb33";  // textures app Client-ID.
+
+            var collection = db.collection("textures");
+            collection.insert(entry, function(err){
+                if (err) throw err;
+            }).catch(function(err){
+                console.error(err);
+            });
+            
+            return data.link;
+
+        }).then( function(url){
+
+        //  Success.
+
+            $(textureCheckboxSelector).attr({checked:false});
+            debugMode && console.log(`deleting "${file.name}" from files.`);
+
+            delete files[ file.name ];
+        //  delete textures[ file.name ];
+
+            debugMode && console.log( "removing", $option.get(0) );
+
+            $option.remove();
+
+            if (textureDroplist.options.length == 0) {
+                var option = document.createElement("option");
+                option.value = "";  option.innerText = "Import textures:";
+                $(textureDroplist).append(option);
+            }
+
+        //  textureDroplistChanged.dispatch( textureDroplist.value );
+
+            var msg = `Texture ${file.name} uploaded successfully!`;
+            bootbox.dialog({
+                size: "small",
+                className: "middle",
+                closeButton: false,
+                title: `<div class="alert-icon icon-success">`
+                + `</div><h2 style="margin:auto;">Success</h2>`,
+                message: `<div>${msg}</div>`,
+                buttons: {
+                    success: {
+                        label: "Close",
+                        className: "btn-success",
+                        callback: function(){
+                            bootbox.hideAll();
+                        },
+                    },
+                },
+            });
+
+        }).catch(function(err){
+
+            bootbox.hideAll();
+            console.error(err);
+            bootbox.dialog( errorDialogOptions(err) );
+
+        }).then(function(){
+
+            dialog.modal("hide"); // important!
+        //  Enable upload button. // important!
+            $(textureUploadButton).on("click", uploadSelectedTexture );
+            debugMode && console.log( "Upload button is enabled and ready to upload." );
+
+        });
+
+    }
+
+    function propertyDroplistReset(){
+
+        $(propDroplist).children().remove();
+        $(propControls).children().remove();
+
+        var option = document.createElement("option");
+        option.value = ""; option.innerText = "Select key:";
+        $(propDroplist).append(option);
+
+        json = {}; // new jsonTexture();
+
+    //  Sort json keys.
+        var sortedKeys = Object.keys(json).sort();
+        for ( var i = 0; i < sortedKeys.length; i++ ) {
+
+            var key = sortedKeys[i];
+            var option = document.createElement("option");
+
+            option.value = key; 
+            option.innerText = key;
+
+            $(propDroplist).append(option);
+
+        }
+
+    }
+
+    $(propDroplist).on("change", function(){
+        propertiesDroplistChanged.dispatch(this.value);
+    });
+
+    propertiesDroplistChanged.add(function (key){
+
+        if ( !key ) return;
+
+        $(propControls).css({height:""});
+        $(propControls).children().remove();
+
+        switch (key) {
+
+            case "anisotropy":
+
+                (function anisotropyControl(){
+
+                    if ( !key || key != "anisotropy" ) return;
+
+                    var span = document.createElement("span");
+                    span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+                    var input = document.createElement("input"); 
+                    input.classList.add("form-control", "pull-right", "texture-input-number");
+                    input.id = `texture-input_${key}`; input.type = "number"; input.step = 0.1;
+
+                    input.value = json[key];
+
+                    $(input).on("input", function(){
+                        json[key] = round(this.value, 2);
+                    });
+
+                    $(input).on("change", function(){
+                        debugMode && console.log({[key]:json[key]});
+                    });
+
+                    $(propControls).append(span, input);
+
+                })();
+
+            break;
+
+            case "flipY":
+
+                (function flipYControl(){
+
+                    if ( !key || key != "flipY" ) return;
+
+                    var span = document.createElement("span");
+                    span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+                    var input = document.createElement("input"); 
+                    input.id = `texture-input_${key}`; input.type = "checkbox"; 
+                    input.classList.add("form-control", "pull-right", "texture-checkbox");
+
+                    input.checked = json[key] || "";
+
+                    $(input).on("click", function(){
+                        json[key] = this.checked;
+                    });
+
+                    $(propControls).append(span, input);
+
+                })();
+
+            break;
+
+            case "generateMipmaps":
+
+                (function generateMipmapsControl(){
+
+                    if ( !key || key != "generateMipmaps" ) return;
+
+                    var span = document.createElement("span");
+                    span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+                    var input = document.createElement("input"); 
+                    input.id = `texture-input_${key}`; input.type = "checkbox"; 
+                    input.classList.add("form-control", "pull-right", "texture-checkbox");
+
+                    input.checked = json[key] || "";
+
+                    $(input).on("click", function(){
+                        json[key] = this.checked;
+                    });
+
+                    $(propControls).append(span, input);
+
+                })();
+
+            break;
+
+            case "name":
+
+                (function nameControl(){
+
+                    if ( !key || key != "name" ) return;
+
+                    var span = document.createElement("span");
+                    span.innerText = "name"; span.style.cssText = "vertical-align:-0.7rem;";
+
+                    var input = document.createElement("input"); 
+                    input.id = `texture-input_${key}`; input.type = "text";
+                    input.classList.add("form-control", "pull-right", "texture-textfield");
+
+                    input.value = json[key]; // name.
+
+                    $(input).on("input", function(){
+                        json[key] = this.value;
+                    });
+
+                    $(input).on("change", function(){
+                        debugMode && console.log({[key]:json[key]});
+                    });
+
+                    $(propControls).append(span, input);
+
+                })();
+
+            break;
+
+            case "premultiplyAlpha":
+
+                (function premultiplyAlpha(){
+
+                    if ( !key || key != "premultiplyAlpha" ) return;
+
+                    var span = document.createElement("span");
+                    span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+                    var input = document.createElement("input"); 
+                    input.id = `texture-input_${key}`; input.type = "checkbox"; 
+                    input.classList.add("form-control", "pull-right", "texture-checkbox");
+
+                    input.checked = json[key] || "";
+
+                    $(input).on("click", function(){
+                        json[key] = this.checked;
+                        debugMode && console.log({[key]:json[key]});
+                    });
+
+                    $(propControls).append(span, input);
+
+                })();
+
+            break;
+
+            case "offset":
+
+                (function offsetControl(){
+
+                    if ( !key || key != "offset" ) return;
+
+                    var span = document.createElement("span");
+                //  span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+                    var divX = document.createElement("div"); 
+                    divX.innerText = "x:"; divX.style.cssText = "display:inline;"; 
+                    var inputx = document.createElement("input"); 
+                    inputx.id = `texture-input_${key}-x`; inputx.type = "number"; inputx.step = 0.01;
+                    inputx.classList.add("form-control", "texture-input-number");
+                    inputx.style.cssText = "display:inline;"; $(divX).append(inputx);
+
+                    var divY = document.createElement("div"); 
+                    divY.innerText = "y:"; divY.style.cssText = "display:inline;float:right;";
+                    var inputy = document.createElement("input"); 
+                    inputy.id = `texture-input_${key}-y`; inputy.type = "number"; inputy.step = 0.01;
+                    inputy.classList.add("form-control", "texture-input-number");
+                    inputy.style.cssText = "display:inline;";  $(divY).append(inputy);
+
+                    if ( json[key] && Array.isArray(json[key]) ) {
+                        inputx.value = json[key][0];
+                        inputy.value = json[key][1];
+                    }
+
+                    $(inputx).on("input", function(){
+                        json[key][0] = round(this.value, 2);
+                    });
+
+                    $(inputy).on("input", function(){
+                        json[key][1] = round(this.value, 2);
+                    });
+
+                    $(inputx).on("change", function(){
+                        debugMode && console.log({[key]:json[key]});
+                    });
+
+                    $(inputy).on("change", function(){
+                        debugMode && console.log({[key]:json[key]});
+                    });
+
+                    $(propControls).append(span, divX, divY);
+
+                })();
+
+            break;
+
+            case "repeat":
+
+                (function repeatControl(){
+
+                    if ( !key || key != "repeat" ) return;
+
+                    var span = document.createElement("span");
+                    span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+                    var input = document.createElement("input"); 
+                    input.id = `texture-input_${key}`; input.type = "number"; input.step = 1;
+                    input.classList.add("form-control", "pull-right", "texture-input-number");
+
+                    if ( json[key] && Array.isArray(json[key]) ) {
+                        input.value = json[key][0];
+                    }
+
+                    $(input).on("input", function(){
+                        json[key][0] = json[key][1] = parseInt(this.value);
+                    });
+
+                    $(input).on("change", function(){
+                        debugMode && console.log({[key]:json[key]});
+                    });
+
+                    $(propControls).append(span, input);
+
+                })();
+
+            break;
+
+            case "uuid":
+
+                (function uuidControl(){
+
+                    if ( !key || key != "uuid" ) return;
+
+                    var button = document.createElement("div");
+                    button.classList.add("form-control", "btn", "btn-info", "btn-white-outline", "gradient-btn");
+                    button.id = "texture-button_uuid"; button.innerText = "⟳"; button.style.cssText = "width:fit-content;";
+
+                    var input = document.createElement("input");
+                    input.id = `texture-input_${key}`; input.type = "text"; input.readOnly = true;
+                    input.classList.add("form-control", "pull-right", "uuid-texture-textfield");
+
+                    input.value = json[key]; // generateUUID();
+
+                    $(button).on("click", function(){
+                        input.value = json[key] = generateUUID();
+                    });
+
+                    $(propControls).append(button, input);
+
+                })();
+
+            break;
+
+            case "version":
+
+                (function versionControl(){
+
+                    if ( !key || key != "version" ) return;
+
+                    var span = document.createElement("span");
+                    span.innerText = "version"; span.style.cssText = "vertical-align:-0.7rem;";
+
+                    var input = document.createElement("input"); 
+                    input.id = `texture-input_${key}`; 
+                    input.type = "number"; input.min = 1; input.step = 1;
+                    input.classList.add("form-control", "pull-right", "texture-input-number");
+
+                    input.value = json[key];
+
+                    $(input).on("input", function(){
+                        json[key] = parseInt(this.value);
+                    });
+
+                    $(input).on("change", function(){
+                        debugMode && console.log({[key]:json[key]});
+                    });
+
+                    $(propControls).append(span, input);
+
+                })();
+
+            break;
+
+            case "_id":
+
+                (function _idControl(key){
+
+                    if ( !key || key != "_id" ) return;
+
+                    var button = document.createElement("div");
+                    button.classList.add("form-control", "btn", "btn-info", "btn-white-outline", "gradient-btn");
+                    button.id = "texture-button_id"; button.innerText = "⟳"; button.style.cssText = "width:fit-content;";
+
+                    var input = document.createElement("input");
+                    input.id = "texture-input_id"; input.type = "text"; input.readOnly = true;
+                    input.classList.add("form-control", "text-center", "pull-right", "uuid-texture-textfield");
+
+                    input.value = json[key]; // ObjectId();
+
+                    $(button).on("click", function(){
+                        input.value = json[key] = ObjectId();
+                        debugMode && console.log({[key]:json[key]});
+                    });
+
+                    $(propControls).append(button, input);
+
+                })();
+
+            break;
+
+
+            case "type":
+            case "wrapS":
+            case "wrapT":
+            case "format":
+            case "mipmaps":
+            case "mapping":
+            case "encoding":
+            case "magFilter":
+            case "minFilter":
+            case "sourceFile":
+            case "unpackAlignment":
+
+            break;
+
+
+
+        }
+
+        $(propControls).slideDown();
+
+    });
+
+    propertyValueChanged.add(function(key, value){
+        debugMode && console.log({"json":json});
+    });
+
+
+    maps.forEach(function( key ){
+        $(textureControls).find(`input#${key}`).on("click", function(){
+
+            if (!textureDroplist.value) return;
+
+            var name = textureDroplist.value;
+
+            if ( !this.checked ) {
+
+                var texture = null;
+                delete json[ key ];
+
+            } else {
+
+                var texture = textures[ name ];  //  json texture.
+                json[ key ] = textures[ name ];
+
+            }
+
+            propertyValueChanged.dispatch( key, texture );
+
+        });
+    });
+
     count().then(function(){
         pagerClicked();
     });
@@ -1181,105 +2026,47 @@ caches.open("textures").then(function(cache){
 
 <script>
 
-(function(){
+/*
+//  deepCopy.js
 
-    const textureHeaderSelector = ".texture-header";
-    const helpersHeaderSelector = ".helpers-header";
-    const textureControlSelector = "#texture-map-controls";
-
-    var Signal = signals.Signal;
-    var dblclicked = new Signal();
-
-//  Event handlers.
-    function onDoubleClickEventHandler( element ){
-        if ( $(element).css("display") == "none" ) {
-            $(element).slideDown();
-        } else {
-            $(element).slideUp();
+    function deepCopy(obj) {
+        if (Object.prototype.toString.call(obj) === "[object Array]") {
+            var out = [], i = 0, len = obj.length;
+            for ( ; i < len; i++ ) {
+                out[i] = arguments.callee(obj[i]);
+            }
+            return out;
         }
+        if (typeof obj === "object") {
+            var out = {}, i;
+            for ( i in obj ) {
+                out[i] = arguments.callee(obj[i]);
+            }
+            return out;
+        }
+        return obj;
     }
 
-//  Event listeners.
-    dblclicked.add(onDoubleClickEventHandler);
+//  round.js  source: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round"
 
-//  Dispatch events.
-    $(textureHeaderSelector).on("dblclick", function(){
-        dblclicked.dispatch( $(textureControlSelector).get(0) );
-    });
-
-})();
-
-</script>
-
-<script>
-
-$(viewer.contentWindow).on("load", function(){
-
-    const contentWindow = this;
-
-//  const viewer = document.getElementById("viewer");
-    const checkbox = $("#texture-transparent-checkbox").get(0);
-    const outfitDroplist = $("#texture-outfit-slot").get(0);
-    const genderDroplist = $("#texture-gender-droplist").get(0);
-
-    var Signal = signals.Signal;
-    var transparentClicked = new Signal();
-
-    transparentClicked.add(function(checked){
-
-        genderDroplist.value = contentWindow.localPlayer.outfit.getGender();
-
-        if ( !genderDroplist.value || !outfitDroplist.value ) {
-            checkbox.checked = !checked; return;
-        }
-
-        contentWindow.localPlayerMaterialHandler({
-            value : checked,
-            key: "transparent",
-            slot: outfitDroplist.value,
-            gender: genderDroplist.value,
-        });
-
-    });
-
-    $(checkbox).on("click", function(){
-        clearTimeout(checkbox.interval);
-        checkbox.interval = setTimeout(function(){
-            transparentClicked.dispatch( checkbox.checked );
-        }, 200);
-    });
-
-});
-
-</script>
-
-<script>
-
-/*
-//  const VERSION = 5;
-    const NAME = "USER";
-
-    var db = new zango.Db( NAME, {
-        current:    true,
-        settings:   true,
-        animations: true,
-        outfits:    true,
-        materials:  true,
-        textures:   true,
-        products:   true,
-    });
-
-    db.open(function(err, database){
-        if (err) console.error(err);
-    }).then( function(){
-        debugMode && console.log(`Database ${db.name} (v${db.version}) opened.`);
-    }).catch(function(err){
-        console.error(err);
-    });
+    function round(number, precision) {
+        var shift = function (number, precision, reverseShift) {
+            if (reverseShift) {
+                precision = -precision;
+            }  
+            numArray = ("" + number).split("e");
+            return +(numArray[0] + "e" + (numArray[1] ? (+numArray[1] + precision) : precision));
+        };
+        return shift(Math.round(shift(number, precision, false)), precision, true);
+    }
 */
 
-(function(){
+</script>
 
+<script>
+/*
+
+(function(){
     var json = {}; // new jsonTexture();
 
     const viewer = document.getElementById("viewer");
@@ -1673,6 +2460,7 @@ $(viewer.contentWindow).on("load", function(){
     const textureCheckboxSelector = "input[type=checkbox].texture-checkbox-control";
     const texturePropertyControls = document.getElementById("texture-property-controls");
 
+
     var textureDroplistChanged = new Signal();
     textureDroplistChanged.add(function(value){
 
@@ -1969,7 +2757,7 @@ $(viewer.contentWindow).on("load", function(){
         //  Add to cache.
             caches.open("textures").then(async function(cache){
 
-                await cache.add(data.link);
+                await cache.add(data.link).then(function(){ count(); });
 
                 json.sourceFile = data.link; // important!
                 debugMode && console.log( data.link );
@@ -2098,48 +2886,14 @@ $(viewer.contentWindow).on("load", function(){
         });
     });
 
-/*
-//  deepCopy.js
-
-    function deepCopy(obj) {
-        if (Object.prototype.toString.call(obj) === "[object Array]") {
-            var out = [], i = 0, len = obj.length;
-            for ( ; i < len; i++ ) {
-                out[i] = arguments.callee(obj[i]);
-            }
-            return out;
-        }
-        if (typeof obj === "object") {
-            var out = {}, i;
-            for ( i in obj ) {
-                out[i] = arguments.callee(obj[i]);
-            }
-            return out;
-        }
-        return obj;
-    }
-
-//  round.js  source: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round"
-
-    function round(number, precision) {
-        var shift = function (number, precision, reverseShift) {
-            if (reverseShift) {
-                precision = -precision;
-            }  
-            numArray = ("" + number).split("e");
-            return +(numArray[0] + "e" + (numArray[1] ? (+numArray[1] + precision) : precision));
-        };
-        return shift(Math.round(shift(number, precision, false)), precision, true);
-    }
-*/
-
 })();
 
+*/
 </script>
 
 <script>
-
 /*
+
 (function(){
 
 //  const VERSION = 5;
@@ -2552,7 +3306,6 @@ $(viewer.contentWindow).on("load", function(){
 })();
 
 */
-
 </script>
 
 <script>
@@ -2667,10 +3420,81 @@ $(viewer.contentWindow).on("load", function(){
     });
 */
 
+/*
+    async function count(){
+    //  too slow?
+        var k = skip;
+        await collection.find(selectors)
+        .skip(skip).forEach(function(){
+            ++k;  //  debugMode && console.log("k:", k);
+        });
+        return k;
+    }
+
+    function get_items(){
+
+        $(displayObjects).children().remove();
+        collection.find(selectors).skip(skip)
+        .limit(limit).toArray(function(err){
+            if (err) throw err;
+        }).then(function(docs){
+
+            $(displayObjects).children().remove();
+            debugMode && console.log({"docs":docs});
+
+            docs.forEach(function(json){
+                var element = document.createElement("div");
+                element.title = json.name;
+                element.classList.add("texture-item");
+                element.innerText = element.id = json._id; 
+                $(element).on("click", function(){
+                    clearTimeout(this.interval);
+                    this.interval = setTimeout( function(){
+                        $(".texture-item").removeClass("selected");
+                        $(element).addClass("selected");
+                        textureSelected.dispatch(element.id);
+                    }, delay );
+                });
+                $(displayObjects).append( element );
+            });
+
+        }).catch(function(err){
+            console.error(err);
+        });
+
+    }
+
+*/
+
+
+/*
+    await cache.match(url)
+        .then(function(response){
+        return response.blob();
+    }).then(function(blob){
+        texturePreview.src = window.URL.createObjectURL(blob);
+    });
+
+    //  Optional.
+    var element = document.createElement("div");
+    element.classList.add("texture-item");
+    element.innerText = element.url = url;
+    $(displayObjects).append( element );
+    $(element).on("click", function(){
+        clearTimeout(this.interval);
+        this.interval = setTimeout( function(){
+            $(".texture-item").removeClass("selected");
+            $(element).addClass("selected");
+            textureSelected.dispatch(element.url);
+        }, delay );
+    });
+*/
+
 </script>
 
 <script>
 /*
+
 (function(){
 
     const viewer = document.getElementById("viewer");

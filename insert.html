@@ -4,7 +4,7 @@
         var component_ID = {
             type: "tab",
             beta: true,
-            version: 2.3,
+            version: 2.4,
             kind: "component",
             name: "insert.html",
             path: "/texture-tab/insert.html",
@@ -583,7 +583,17 @@ $(viewer.contentWindow).on("load", function(){
 
         <div id="texture-viewer" style="text-align:center;margin-bottom:10px;border:1px solid;">
             <img id="texture-preview" style="max-width:100%;max-height:300px;margin:auto;">
+            <script>
+                (function(){
+                    const texturePreview = $("img#texture-preview").get(0);
+                    $(texturePreview).on("load", function(){
+                        window.URL.revokeObjectURL(this.src); // important!
+                        debugMode && console.log("revoked", this.src);
+                    });
+                })();
+            </script>
         </div>
+
 
         <div style="margin:10px 0px 10px;height:35px;">
             <li class="btn btn-primary btn-white-outline first-page-btn pull-left" style="margin-right:5px;">First</li>
@@ -612,25 +622,105 @@ $(viewer.contentWindow).on("load", function(){
 
 </div>
 
-<script>
+<div id="texture-map-controls" class="well" style="background:none;border-radius:8px;height:auto;">
 
-(function(){
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">Map:</span>
+        <input type="checkbox" id="map" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">BumpMap:</span>
+        <input type="checkbox" id="bumpMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">EmissiveMap:</span>
+        <input type="checkbox" id="emissiveMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">MetalnessMap:</span>
+        <input type="checkbox" id="metalnessMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">RoughnessMap:</span>
+        <input type="checkbox" id="roughnessMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">DisplacementMap:</span>
+        <input type="checkbox" id="displacementMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">AOMap:</span>
+        <input type="checkbox" id="aoMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">AlphaMap:</span>
+        <input type="checkbox" id="alphaMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">LightMap:</span>
+        <input type="checkbox" id="lightMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">NormalMap:</span>
+        <input type="checkbox" id="normalMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
+    </h4>
+    <h4 class="texture-checkbox-helper">
+        <span style="vertical-align:-0.7rem;">Transparent:</span>
+        <input type="checkbox" id="texture-transparent-checkbox" class="form-control pull-right texture-checkbox transparent-checkbox-control">
+    </h4>
 
-    const texturePreview = $("img#texture-preview").get(0);
-    $(texturePreview).on("load", function(){
-        window.URL.revokeObjectURL(this.src); // important!
-        debugMode && console.log("revoked", this.src);
-    });
+</div>
 
-})();
+<div style="height:35px;margin-bottom:10px;">
+    <h4><span style="vertical-align:-0.5rem;">Select property:</span>
+        <div style="width:40%;display:inline-block;float:right;">
+            <select id="texture-property" class="form-control texture-property-droplist" readonly>
+                <option value="">Select key:</option>
+                <option value="_id">_id</option>
+                <option value="uuid">uuid</option>
+                <option value="name">name</option>
+                <option value="flipY">flipY</option>
+                <option value="offset">offset</option>
+                <option value="repeat">repeat</option>
+                <option value="version">version</option>
+                <option value="generateMipmaps">generate</option>
+                <option value="premultiplyAlpha">premultiply</option>
+                <!-- ----------------------------------------------- -->
+                <option value="type" style="display:none;">type</option>
+                <option value="wrapS" style="display:none;">wrapS</option>
+                <option value="wrapT" style="display:none;">wrapT</option>
+                <option value="unpackAlignment" style="display:none;">unpack</option>
+                <option value="anisotropy" style="display:none;">anisotropy</option>
+                <option value="encoding" style="display:none;">encoding</option>
+                <option value="format" style="display:none;">format</option>
+                <option value="magFilter" style="display:none;">magFilter</option>
+                <option value="mapping" style="display:none;">mapping</option>
+                <option value="minFilter" style="display:none;">minFilter</option>
+                <option value="mipmaps" style="display:none;">mipmaps</option>
+                <option value="sourceFile" style="display:none;">sourceFile</option>
+            </select>
+        </div>
+    </h4>
+</div>
 
-</script>
+<div id="texture-property-controls" class="well"></div>
+
+<hr/>
+
+<div style="margin-bottom:10px;">
+    <div id="new-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn pull-left" style="width:24%;">New</div>
+    <div id="copy-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn" style="width:24%;margin-left:1%;">Copy</div>
+    <div id="apply-texture-button" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;">Apply</div>
+    <div id="save-texture-button" class="form-control btn btn-success btn-white-outline gradient-btn pull-right" style="width:24%;">Save</div>
+</div>
 
 <script>
 
 caches.open("textures").then(function(cache){
 
 //  Pager.
+
+    var json = {};
 
     const maps = [
         "map", 
@@ -645,8 +735,6 @@ caches.open("textures").then(function(cache){
     //  "envMap",
         "aoMap", 
     ];
-
-    var json = {};
 
     var timeout;
     var interval;
@@ -744,6 +832,13 @@ caches.open("textures").then(function(cache){
 
     }
 
+    function count(){
+        cache.keys().then(function(keys){
+            max = keys.length;
+        });
+    }
+
+/*
     async function count(){
     //  too slow?
         var k = skip;
@@ -786,6 +881,8 @@ caches.open("textures").then(function(cache){
         });
 
     }
+
+*/
 
     function pagerClicked(){
 
@@ -837,46 +934,15 @@ caches.open("textures").then(function(cache){
             interval = setTimeout( function getItem(){
 
                 $(displayObjects).children().remove();
-                collection.find().skip(skip).limit(1)
-                .toArray(function(err){
-                    if (err) throw err;
-                }).then( function(docs){
-                    return docs[0];
-                }).then( function(doc){
 
-                    json.sourceFile = doc.url; // important!
-                //  debugMode && console.log({"doc":doc});
 
-            /*
-                //  Optional.
-                    var element = document.createElement("div");
-                    element.title = doc.name;
-                    element.classList.add("texture-item");
-                    element.innerText = element.id = doc._id;
-                    $(displayObjects).append( element );
-                    $(element).on("click", function(){
-                        clearTimeout(this.interval);
-                        this.interval = setTimeout( function(){
-                            $(".texture-item").removeClass("selected");
-                            $(element).addClass("selected");
-                            textureSelected.dispatch(element.id);
-                        }, delay );
-                    });
-            */
-                    return doc.url;
 
-                }).then( function(url){
-                    debugMode && console.log({"url":url});
 
-                    cache.match(url).then(function(response){
-                        return response.blob();
-                    }).then(function(blob){
-                        texturePreview.src = window.URL.createObjectURL(blob);
-                    });
 
-                }).catch(function(err){
-                    console.error(err);
-                });
+
+
+
+
 
             }, 500 );
 
@@ -1098,55 +1164,6 @@ caches.open("textures").then(function(cache){
 
 </script>
 
-<div id="texture-map-controls" class="well" style="background:none;border-radius:8px;height:auto;">
-
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">Map:</span>
-        <input type="checkbox" id="map" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">BumpMap:</span>
-        <input type="checkbox" id="bumpMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">EmissiveMap:</span>
-        <input type="checkbox" id="emissiveMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">MetalnessMap:</span>
-        <input type="checkbox" id="metalnessMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">RoughnessMap:</span>
-        <input type="checkbox" id="roughnessMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">DisplacementMap:</span>
-        <input type="checkbox" id="displacementMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">AOMap:</span>
-        <input type="checkbox" id="aoMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">AlphaMap:</span>
-        <input type="checkbox" id="alphaMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">LightMap:</span>
-        <input type="checkbox" id="lightMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">NormalMap:</span>
-        <input type="checkbox" id="normalMap" class="form-control pull-right texture-checkbox texture-checkbox-control">
-    </h4>
-    <h4 class="texture-checkbox-helper">
-        <span style="vertical-align:-0.7rem;">Transparent:</span>
-        <input type="checkbox" id="texture-transparent-checkbox" class="form-control pull-right texture-checkbox transparent-checkbox-control">
-    </h4>
-
-</div>
-
 <script>
 
 (function(){
@@ -1221,52 +1238,7 @@ $(viewer.contentWindow).on("load", function(){
 
 </script>
 
-<div style="height:35px;margin-bottom:10px;">
-    <h4><span style="vertical-align:-0.5rem;">Select property:</span>
-        <div style="width:40%;display:inline-block;float:right;">
-            <select id="texture-property" class="form-control texture-property-droplist" readonly>
-                <option value="">Select key:</option>
-                <option value="_id">_id</option>
-                <option value="uuid">uuid</option>
-                <option value="name">name</option>
-                <option value="flipY">flipY</option>
-                <option value="offset">offset</option>
-                <option value="repeat">repeat</option>
-                <option value="version">version</option>
-                <option value="generateMipmaps">generate</option>
-                <option value="premultiplyAlpha">premultiply</option>
-                <!-- ----------------------------------------------- -->
-                <option value="type" style="display:none;">type</option>
-                <option value="wrapS" style="display:none;">wrapS</option>
-                <option value="wrapT" style="display:none;">wrapT</option>
-                <option value="unpackAlignment" style="display:none;">unpack</option>
-                <option value="anisotropy" style="display:none;">anisotropy</option>
-                <option value="encoding" style="display:none;">encoding</option>
-                <option value="format" style="display:none;">format</option>
-                <option value="magFilter" style="display:none;">magFilter</option>
-                <option value="mapping" style="display:none;">mapping</option>
-                <option value="minFilter" style="display:none;">minFilter</option>
-                <option value="mipmaps" style="display:none;">mipmaps</option>
-                <option value="sourceFile" style="display:none;">sourceFile</option>
-            </select>
-        </div>
-    </h4>
-</div>
-
-<div id="texture-property-controls" class="well"></div>
-
-<hr/>
-
-<div style="margin-bottom:10px;">
-    <div id="new-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn pull-left" style="width:24%;">New</div>
-    <div id="copy-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn" style="width:24%;margin-left:1%;">Copy</div>
-    <div id="apply-texture-button" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;">Apply</div>
-    <div id="save-texture-button" class="form-control btn btn-success btn-white-outline gradient-btn pull-right" style="width:24%;">Save</div>
-</div>
-
 <script>
-
-(function(){
 
 /*
 //  const VERSION = 5;
@@ -1291,53 +1263,14 @@ $(viewer.contentWindow).on("load", function(){
     });
 */
 
-/*
-    function generateUUID(){
-        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
-        .replace(/[xy]/g, function(c) {
-            var r = Math.random()*16|0;
-            var v = c == 'x'?r:r&0x3|0x8;
-            return v.toString(16);
-        }).toLocaleUpperCase();
-    };
+(function(){
 
-    function jsonTexture(options) {
-
-        var options = options || {}; // important!
-
-        return {
-            _id       : ObjectId(),
-            uuid      : generateUUID(),
-            name      : options.name  || "",
-            type      : options.type  || 1009,
-            flipY     : options.flipY || true,
-            wrapS     : options.wrapS || 1001,
-            wrapT     : options.wrapT || 1001,
-            offset    : options.offset || [0, 0],
-            repeat    : options.repeat || [1, 1],
-            format    : options.format  || 1021,
-            version   : options.version || 0,
-            mapping   : options.mapping || 300,
-            mipmaps   : options.mipmaps || [],
-            minFilter : options.minFilter || 1008,
-            magFilter : options.magFilter || 1006,
-            encoding  : options.encoding  || 3000,
-            anisotropy: options.anisotropy || 1,
-            sourceFile: options.sourceFile || "",
-            unpackAlignment : options.unpackAlignment  || 4,
-            generateMipmaps : options.generateMipmaps  || true,
-            premultiplyAlpha: options.premultiplyAlpha || false,
-        };
-    }
-
-*/
+    var json = {}; // new jsonTexture();
 
     const viewer = document.getElementById("viewer");
     const propDroplist = $("select#texture-property").get(0);
     const propControls = $("#texture-property-controls").get(0);
     const importedTextures = $("select#imported-textures").get(0);
-
-    var json = {}; // new jsonTexture();
 
     var Signal = signals.Signal;
     var propertiesDroplistChanged = new Signal();
@@ -2191,9 +2124,9 @@ $(viewer.contentWindow).on("load", function(){
 
 <script>
 
+/*
 (function(){
 
-/*
 //  const VERSION = 5;
     const NAME = "USER";
 
@@ -2214,9 +2147,7 @@ $(viewer.contentWindow).on("load", function(){
     }).catch(function(err){
         console.error(err);
     });
-*/
 
-/*
     var json;
     var files = {};
     var uploads = [];
@@ -2320,9 +2251,7 @@ $(viewer.contentWindow).on("load", function(){
 
         });
     });
-*/
 
-/*
 //  BUTTON IMPORT.
 
     $(textureImportBtn).on("click", function(){
@@ -2386,9 +2315,7 @@ $(viewer.contentWindow).on("load", function(){
 
     });
 
-*/
 
-/*
 //  SELECT TEXTURE DROPLIST.
 
     $(textureDroplist).on("change", function(){
@@ -2436,9 +2363,7 @@ $(viewer.contentWindow).on("load", function(){
 
     });
 
-*/
 
-/*
 //  BUTTON DELETE.
 
     $(textureDeleteBtn).on("click", function(){
@@ -2507,9 +2432,7 @@ $(viewer.contentWindow).on("load", function(){
 
     });
 
-*/
 
-/*
 //  BUTTON UPLOAD.
     $(textureUploadBtn).on("click", function(){
         debugMode && console.log({"uploads":uploads});
@@ -2577,9 +2500,7 @@ $(viewer.contentWindow).on("load", function(){
         }, 200);
     });
 
-*/
 
-/*
 //  deepCopy.js
 
     function deepCopy(obj) {
@@ -2613,9 +2534,54 @@ $(viewer.contentWindow).on("load", function(){
         return shift(Math.round(shift(number, precision, false)), precision, true);
     }
 
+})();
+
 */
 
-})();
+</script>
+
+<script>
+
+/*
+    function generateUUID(){
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+        .replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0;
+            var v = c == 'x'?r:r&0x3|0x8;
+            return v.toString(16);
+        }).toLocaleUpperCase();
+    };
+
+    function jsonTexture(options) {
+
+        var options = options || {}; // important!
+
+        return {
+            _id       : ObjectId(),
+            uuid      : generateUUID(),
+            name      : options.name  || "",
+            type      : options.type  || 1009,
+            flipY     : options.flipY || true,
+            wrapS     : options.wrapS || 1001,
+            wrapT     : options.wrapT || 1001,
+            offset    : options.offset || [0, 0],
+            repeat    : options.repeat || [1, 1],
+            format    : options.format  || 1021,
+            version   : options.version || 0,
+            mapping   : options.mapping || 300,
+            mipmaps   : options.mipmaps || [],
+            minFilter : options.minFilter || 1008,
+            magFilter : options.magFilter || 1006,
+            encoding  : options.encoding  || 3000,
+            anisotropy: options.anisotropy || 1,
+            sourceFile: options.sourceFile || "",
+            unpackAlignment : options.unpackAlignment  || 4,
+            generateMipmaps : options.generateMipmaps  || true,
+            premultiplyAlpha: options.premultiplyAlpha || false,
+        };
+    }
+
+*/
 
 /*
     function jsonTexture() {
@@ -2645,8 +2611,48 @@ $(viewer.contentWindow).on("load", function(){
     };
 */
 
-</script>
+/*
+    collection.find().skip(skip).limit(1)
+        .toArray(function(err){
+        if (err) throw err;
+    }).then( function(docs){
+        return docs[0];
+    }).then( function(doc){
 
+        json.sourceFile = doc.url; // important!
+        //  debugMode && console.log({"doc":doc});
+
+        //  Optional.
+        var element = document.createElement("div");
+        element.title = doc.name;
+        element.classList.add("texture-item");
+        element.innerText = element.id = doc._id;
+        $(displayObjects).append( element );
+        $(element).on("click", function(){
+            clearTimeout(this.interval);
+            this.interval = setTimeout( function(){
+                $(".texture-item").removeClass("selected");
+                $(element).addClass("selected");
+                textureSelected.dispatch(element.id);
+            }, delay );
+        });
+        return doc.url;
+
+    }).then( function(url){
+        debugMode && console.log({"url":url});
+
+        cache.match(url).then(function(response){
+            return response.blob();
+        }).then(function(blob){
+            texturePreview.src = window.URL.createObjectURL(blob);
+        });
+
+    }).catch(function(err){
+        console.error(err);
+    });
+*/
+
+</script>
 
 <script>
 /*

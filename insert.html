@@ -825,8 +825,9 @@ caches.open("textures").then(function(cache){
     }
 
     function count(){
-        cache.keys().then(function(keys){
-            max = keys.length;
+        return cache.keys()
+        .then(function(keys){
+            return max = keys.length;
         });
     }
 
@@ -1170,8 +1171,9 @@ caches.open("textures").then(function(cache){
 
     });
 
-    count();
-    pagerClicked();
+    count().then(function(){
+        pagerClicked();
+    });
 
 });
 

@@ -781,23 +781,15 @@ caches.open("textures").then(function(cache){
     var textureSelected = new Signal();
     var textureApplyBtnClicked = new Signal();
 
-    textureSelected.add(function(id){
+    textureSelected.add(function(url){
 
-        collection.findOne({"_id":id}, function(err){
-            if (err) throw err;
-        }).then(function(doc){
-            return doc.url;
-        }).then(function(url){
-            cache.match(url).then(function(response){
-                return response.blob();
-            }).then(function(blob){
+        cache.match(url).then(function(response){
+            return response.blob();
+        }).then(function(blob){
 
-                json.sourceFile = url; // important!
-                texturePreview.src = window.URL.createObjectURL(blob);
+            json.sourceFile = url; // important!
+            texturePreview.src = window.URL.createObjectURL(blob);
 
-            }).catch(function(err){
-                console.error(err);
-            });
         }).catch(function(err){
             console.error(err);
         });
@@ -930,35 +922,58 @@ caches.open("textures").then(function(cache){
         debugMode && console.log({"max":max, "skip":skip, "index": currentindex});
 
         if ( max && skip < max ) {
+
             clearTimeout(interval);
-            interval = setTimeout( function getItem(){
+            interval = setTimeout(async function getItem(){
 
                 $(displayObjects).children().remove();
 
+                var url = await cache.keys()
+                .then(function(keys){
+                    return keys[skip + 1].url;
+                });
 
+                textureSelected.dispatch(url);
 
-
-
-
-
-
-
-
-            }, 500 );
-
+            }, delay );
         }
 
     }
 
+/*
+    await cache.match(url)
+        .then(function(response){
+        return response.blob();
+    }).then(function(blob){
+        texturePreview.src = window.URL.createObjectURL(blob);
+    });
+
+    //  Optional.
+    var element = document.createElement("div");
+    element.classList.add("texture-item");
+    element.innerText = element.url = url;
+    $(displayObjects).append( element );
+    $(element).on("click", function(){
+        clearTimeout(this.interval);
+        this.interval = setTimeout( function(){
+            $(".texture-item").removeClass("selected");
+            $(element).addClass("selected");
+            textureSelected.dispatch(element.url);
+        }, delay );
+    });
+*/
+
 //  BUTTON APPLY.
 
     $(textureApplyBtn).on("click", function(){
+
         if ( !outfitDroplist.value ) return;
 
         clearTimeout(this.interval);
         this.interval = setTimeout(function(){
             textureApplyBtnClicked.dispatch();
         }, delay);
+
     });
 
     textureApplyBtnClicked.add(function(){
@@ -986,7 +1001,8 @@ caches.open("textures").then(function(cache){
         data.gender  = genderDroplist.value;
         data.texture = json;
 
-        $(textureMapControls).find("input[type=checkbox].texture-checkbox-control")
+        var checkboxesSelector = "input[type=checkbox].texture-checkbox-control";
+        $(textureMapControls).find( checkboxesSelector )
         .toArray().forEach(function(item){
             if (item.checked) {
                 data.maps.push(item.id);
@@ -1026,33 +1042,34 @@ caches.open("textures").then(function(cache){
 
     $(lastPageBtn).on("click", function(){
 
-        if ( max && max > 0 ) {
+        clearTimeout(this.interval);
+        this.interval = setTimeout(async function(){
 
-            var lastpage = parseInt(max / limit);
+            await count();
 
-            if ( limit * lastpage < max ) {
+            if ( max && max > 0 ) {
 
-                skip = limit * lastpage;          //  limit * parseInt(max / limit);
+                var lastpage = parseInt(max / limit);
+
+                if ( limit * lastpage < max ) {
+
+                    skip = limit * lastpage;          //  limit * parseInt(max / limit);
+
+                } else {
+
+                    skip = limit * ( lastpage - 1 );  //  limit * ( parseInt(max / limit) - 1 );
+
+                }
 
             } else {
 
-                skip = limit * ( lastpage - 1 );  //  limit * ( parseInt(max / limit) - 1 );
+                skip = 0;
 
             }
 
-        } else {
+            pagerClicked();
 
-            skip = 0;
-
-        }
-
-        pagerClicked();
-
-    //  Count for next time.
-        clearTimeout(this.interval);
-        this.interval = setTimeout(function(){
-            count().then(function(k){ max = k; });
-        }, delay);
+        }, delay );
 
     });
 
@@ -1153,10 +1170,7 @@ caches.open("textures").then(function(cache){
 
     });
 
-    count().then(function(k){
-        max = k; 
-        return max;
-    }).then(function(max){
+    count().then(function(){
         pagerClicked();
     });
 

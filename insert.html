@@ -676,8 +676,9 @@ $(viewer.contentWindow).on("load", function(){
         <input type="checkbox" id="texture-transparent-checkbox" class="form-control pull-right texture-checkbox transparent-checkbox-control">
     </h4>
 
-    <div style="height:35px;margin-top:20px;">
-        <div style="width:65%;display:inline-block;">
+    <div style="height:35px;margin-top:10px;">
+        <div id="texture-remove-button" class="form-control btn btn-danger btn-white-outline gradient-btn" style="max-width:fit-content;">Remove</div>
+        <div style="max-width:fit-content;display:inline-block;float-right;">
             <select id="texture-map-droplist" class="form-control texture-map-droplist" readonly>
                 <option value="">Select map:</option>
                 <option value="map">map</option>
@@ -692,7 +693,6 @@ $(viewer.contentWindow).on("load", function(){
                 <option value="aoMap">aoMap</option>
             </select>
         </div>
-        <div id="texture-remove-button" class="form-control btn btn-danger btn-white-outline gradient-btn pull-right" style="max-width:fit-content;">Remove</div>
     </div>
 
 </div>

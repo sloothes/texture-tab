@@ -90,7 +90,7 @@
         background-color:#73b8f3;
     }
 
-    #texture-items {
+    #texture-items-panel {
         max-width:475px;
     /*  max-height:710px; */
         color:#fff;
@@ -256,7 +256,10 @@
 
 <script>
 
+//  const viewer = document.getElementById("viewer");
+
     const NoSrc = "//:0";
+
 // "source: https://stackoverflow.com/questions/5775469/
 //  whats-the-valid-way-to-include-an-image-with-no-src".
 
@@ -368,16 +371,40 @@
     <h2 style="margin-bottom:20px;">Texture:</h2>
 </div>
 
-<div style="height:35px;margin-bottom:10px;">
-    <h4><span style="vertical-align:-0.5rem;">Select gender:</span>
-        <div style="width:40%;display:inline-block;float:right;">
-            <select id="texture-gender-droplist" class="form-control gender-droplist" readonly>
-                <option value="">Select sex:</option>
-                <option value="male">male</option>
-                <option value="female">female</option>
-            </select>
-        </div>
-    </h4>
+<div id="outfit-selectors-panel">
+
+    <div style="height:35px;margin-bottom:10px;">
+        <h4><span style="vertical-align:-0.5rem;">Select gender:</span>
+            <div style="width:40%;display:inline-block;float:right;">
+                <select id="texture-gender-droplist" class="form-control gender-droplist" readonly>
+                    <option value="">Select sex:</option>
+                    <option value="male">male</option>
+                    <option value="female">female</option>
+                </select>
+            </div>
+        </h4>
+    </div>
+
+    <div style="height:35px;margin-bottom:10px;">
+        <h4><span style="vertical-align:-0.5rem;">Select outfit slot:</span>
+            <div style="width:40%;display:inline-block;float:right;">
+                <select id="texture-outfit-slot" class="form-control outfit-slot-droplist" readonly>
+                    <option value="">Select slot:</option>
+                    <option value="body">body</option>
+                    <option value="eyes">eyes</option>
+                    <option value="hairs">hairs</option>
+                    <option value="stockings">stockings</option>
+                    <option value="underwears">underwears</option>
+                    <option value="costume">costume</option>
+                    <option value="tshirt">tshirt</option>
+                    <option value="trousers">trousers</option>
+                    <option value="dress">dress</option>
+                    <option value="shoes">shoes</option>
+                </select>
+            </div>
+        </h4>
+    </div>
+
 </div>
 
 <script>
@@ -467,26 +494,6 @@ $(viewer.contentWindow).on("load", function(){
 
 </script>
 
-<div style="height:35px;margin-bottom:10px;">
-    <h4><span style="vertical-align:-0.5rem;">Select outfit slot:</span>
-        <div style="width:40%;display:inline-block;float:right;">
-            <select id="texture-outfit-slot" class="form-control outfit-slot-droplist" readonly>
-                <option value="">Select slot:</option>
-                <option value="body">body</option>
-                <option value="eyes">eyes</option>
-                <option value="hairs">hairs</option>
-                <option value="stockings">stockings</option>
-                <option value="underwears">underwears</option>
-                <option value="costume">costume</option>
-                <option value="tshirt">tshirt</option>
-                <option value="trousers">trousers</option>
-                <option value="dress">dress</option>
-                <option value="shoes">shoes</option>
-            </select>
-        </div>
-    </h4>
-</div>
-
 <script>
 
 (function(){
@@ -556,7 +563,7 @@ $(viewer.contentWindow).on("load", function(){
 
 </script>
 
-<div id="texture-items" class="well">
+<div id="texture-items-panel" class="well">
 
     <hr />
 
@@ -671,39 +678,43 @@ $(viewer.contentWindow).on("load", function(){
 
 </div>
 
-<div style="height:35px;margin-bottom:10px;">
-    <h4><span style="vertical-align:-0.5rem;">Select property:</span>
-        <div style="width:40%;display:inline-block;float:right;">
-            <select id="texture-property" class="form-control texture-property-droplist" readonly>
-                <option value="">Select key:</option>
-                <option value="_id">_id</option>
-                <option value="uuid">uuid</option>
-                <option value="name">name</option>
-                <option value="flipY">flipY</option>
-                <option value="offset">offset</option>
-                <option value="repeat">repeat</option>
-                <option value="version">version</option>
-                <option value="generateMipmaps">generate</option>
-                <option value="premultiplyAlpha">premultiply</option>
-                <!-- ----------------------------------------------- -->
-                <option value="type" style="display:none;">type</option>
-                <option value="wrapS" style="display:none;">wrapS</option>
-                <option value="wrapT" style="display:none;">wrapT</option>
-                <option value="unpackAlignment" style="display:none;">unpack</option>
-                <option value="anisotropy" style="display:none;">anisotropy</option>
-                <option value="encoding" style="display:none;">encoding</option>
-                <option value="format" style="display:none;">format</option>
-                <option value="magFilter" style="display:none;">magFilter</option>
-                <option value="mapping" style="display:none;">mapping</option>
-                <option value="minFilter" style="display:none;">minFilter</option>
-                <option value="mipmaps" style="display:none;">mipmaps</option>
-                <option value="sourceFile" style="display:none;">sourceFile</option>
-            </select>
-        </div>
-    </h4>
-</div>
+<div id="texture-properties-panel">
 
-<div id="texture-property-controls" class="well"></div>
+    <div style="height:35px;margin-bottom:10px;">
+        <h4><span style="vertical-align:-0.5rem;">Select property:</span>
+            <div style="width:40%;display:inline-block;float:right;">
+                <select id="texture-property" class="form-control texture-property-droplist" readonly>
+                    <option value="">Select key:</option>
+                    <option value="_id">_id</option>
+                    <option value="uuid">uuid</option>
+                    <option value="name">name</option>
+                    <option value="flipY">flipY</option>
+                    <option value="offset">offset</option>
+                    <option value="repeat">repeat</option>
+                    <option value="version">version</option>
+                    <option value="generateMipmaps">generate</option>
+                    <option value="premultiplyAlpha">premultiply</option>
+                    <!-- ----------------------------------------------- -->
+                    <option value="type" style="display:none;">type</option>
+                    <option value="wrapS" style="display:none;">wrapS</option>
+                    <option value="wrapT" style="display:none;">wrapT</option>
+                    <option value="unpackAlignment" style="display:none;">unpack</option>
+                    <option value="anisotropy" style="display:none;">anisotropy</option>
+                    <option value="encoding" style="display:none;">encoding</option>
+                    <option value="format" style="display:none;">format</option>
+                    <option value="magFilter" style="display:none;">magFilter</option>
+                    <option value="mapping" style="display:none;">mapping</option>
+                    <option value="minFilter" style="display:none;">minFilter</option>
+                    <option value="mipmaps" style="display:none;">mipmaps</option>
+                    <option value="sourceFile" style="display:none;">sourceFile</option>
+                </select>
+            </div>
+        </h4>
+    </div>
+
+    <div id="texture-property-controls" class="well"></div>
+
+</div>
 
 <hr/>
 
@@ -825,17 +836,10 @@ caches.open("textures").then(function(cache){
     var textures = {};
 
     const maps = [
-        "map", 
-        "bumpMap", 
-        "emissiveMap", 
-        "metalnessMap", 
-        "roughnessMap", 
-        "displacementMap", 
-        "alphaMap", 
-        "normalMap", 
-        "lightMap", 
-        "aoMap", 
-    //  "envMap",
+        "map", "bumpMap", "emissiveMap", 
+        "metalnessMap", "roughnessMap", 
+        "displacementMap", "alphaMap", 
+        "normalMap", "lightMap", "aoMap", 
     ];
 
     var timeout;
@@ -851,54 +855,83 @@ caches.open("textures").then(function(cache){
     var currentpage = 0;
     var currentindex = 0;
 
+    function reset(){
+
+        max = 0;
+        skip = 0;
+        lastpage = 0;
+        currentpage = 0;
+        currentindex = 0;
+
+    }
+
+    function count(){
+        return cache.keys()
+        .then(function(keys){
+            return max = keys.length;
+        });
+    }
+
     const collection = db.collection("textures");
     debugMode && console.log({"collection":collection});
 
-    const viewer = document.getElementById("viewer");
-    const texturePreview = $("img#texture-preview").get(0);
-    const outfitDroplist = $("#texture-outfit-slot").get(0);
-    const genderDroplist = $("#texture-gender-droplist").get(0);
-    const textureItemsPanel  = $("#texture-items").get(0);
-    const textureMapControls = $("#texture-map-controls").get(0);
-    const importedTextures   = $("select#imported-textures").get(0);
+    const viewer              = document.getElementById("viewer");
+    const texturePreview      = $("img#texture-preview").get(0);
+    const outfitDroplist      = $("#texture-outfit-slot").get(0);
+    const genderDroplist      = $("#texture-gender-droplist").get(0);
+    const textureItemsPanel   = $("#texture-items-panel").get(0);
+    const textureMapControls  = $("#texture-map-controls").get(0);
 
-    const pageSelector = "#texture-pager .page-btn";
+    const pager               = document.getElementById("texture-pager");
+    const counter             = $(textureItemsPanel).find("#counter").get(0);
+    const firstPageBtn        = $(pager).find(".first-page-btn").get(0);
+    const lastPageBtn         = $(pager).find(".last-page-btn").get(0);
+    const prevPageBtn         = $(pager).find(".get-prev-btn").get(0);
+    const nextPageBtn         = $(pager).find(".get-next-btn").get(0);
+    const prevGroupBtn        = $(pager).find(".get-prev-group-btn").get(0);
+    const nextGroupBtn        = $(pager).find(".get-next-group-btn").get(0);
+    const pagebuttons         = $(pager).find(".page-btn");
+    const pageslength         = $(pager).find(".page-btn").length;
+    const displayObjects      = $(pager).find("#documents-display").get(0);
 
-    const pager = document.getElementById("texture-pager");
-    const counter        = $("#texture-items").find("#counter").get(0);
-    const firstPageBtn   = $(pager).find(".first-page-btn").get(0);
-    const lastPageBtn    = $(pager).find(".last-page-btn").get(0);
-    const prevPageBtn    = $(pager).find(".get-prev-btn").get(0);
-    const nextPageBtn    = $(pager).find(".get-next-btn").get(0);
-    const prevGroupBtn   = $(pager).find(".get-prev-group-btn").get(0);
-    const nextGroupBtn   = $(pager).find(".get-next-group-btn").get(0);
-    const pagebuttons    = $(pager).find(".page-btn");
-    const pageslength    = $(pager).find(".page-btn").length;
-    const displayObjects = $(pager).find("#documents-display").get(0);
+    const propDroplist        = $("select#texture-property").get(0);
+    const propControls        = $("#texture-property-controls").get(0);
 
-    const textureApplyBtn = $("#apply-texture-button").get(0);
-
-//  const NoScr = "//:0";  
-// "source: https://stackoverflow.com/questions/5775469/
-//  whats-the-valid-way-to-include-an-image-with-no-src".
-
-    const slotDroplist     = $("#texture-outfit-slot").get(0);
-    const textureControls  = $("#texture-map-controls").get(0);
-    const textureDroplist  = $("select#imported-textures").get(0);
-    const textureNewButton = $("#new-texture-button").get(0);
-    const textureImportBtn = $("#import-texture-button").get(0);
-    const textureFileinput = $("input#texture-fileinput").get(0);
-    const textureUploadBtn = $("#upload-selected-texture").get(0);
-    const textureDeleteBtn = $("#delete-selected-texture").get(0);
-    const texturesClearBtn = $("#clear-imported-textures").get(0);
+    const textureControls     = $("#texture-map-controls").get(0);
+    const textureDroplist     = $("select#imported-textures").get(0);
+    const textureNewButton    = $("#new-texture-button").get(0);
+    const textureImportBtn    = $("#import-texture-button").get(0);
+    const textureFileinput    = $("input#texture-fileinput").get(0);
+    const textureUploadBtn    = $("#upload-selected-texture").get(0);
+    const textureDeleteBtn    = $("#delete-selected-texture").get(0);
+    const texturesClearBtn    = $("#clear-imported-textures").get(0);
+    const textureApplyBtn     = $("#apply-texture-button").get(0);
     const textureUploadButton = $("#upload-selected-texture").get(0);
 
-    const textureControlSelector = "#texture-map-controls";
+    const slotDroplist            = outfitDroplist;
+    const importedTextures        = textureDroplist;
+    const pageSelector            = "#texture-pager .page-btn";
+    const textureControlSelector  = "#texture-map-controls";
     const textureCheckboxSelector = "input[type=checkbox].texture-checkbox-control";
-    const texturePropertyControls = document.getElementById("texture-property-controls");
+    const texturePropertyControls = $("#texture-property-controls").get(0);
 
-    const propDroplist = $("select#texture-property").get(0);
-    const propControls = $("#texture-property-controls").get(0);
+    function init(){
+
+    //  Page buttons numbering.
+        pagebuttons.each(function(i){
+            pagebuttons[i].skip = limit * i;
+            $(pagebuttons[i]).text( i + 1 );
+        });
+
+    //  Current button setup.
+        pagebuttons.removeClass("btn-primary");
+        var currentButton = pagebuttons.get(0);
+        $(currentButton).addClass("btn-primary");
+
+    //  Clear listed objects.
+        $(displayObjects).children().remove();
+
+    }
 
 //  Signals.
 
@@ -923,41 +956,6 @@ caches.open("textures").then(function(cache){
         });
 
     });
-
-    function reset(){
-
-        max = 0;
-        skip = 0;
-        lastpage = 0;
-        currentpage = 0;
-        currentindex = 0;
-
-    }
-
-    function init(){
-
-    //  Page buttons numbering.
-        pagebuttons.each(function(i){
-            pagebuttons[i].skip = limit * i;
-            $(pagebuttons[i]).text( i + 1 );
-        });
-
-    //  Current button setup.
-        pagebuttons.removeClass("btn-primary");
-        var currentButton = pagebuttons.get(0);
-        $(currentButton).addClass("btn-primary");
-
-    //  Clear listed objects.
-        $(displayObjects).children().remove();
-
-    }
-
-    function count(){
-        return cache.keys()
-        .then(function(keys){
-            return max = keys.length;
-        });
-    }
 
     function pagerClicked(){
 
@@ -1517,32 +1515,26 @@ caches.open("textures").then(function(cache){
             xhttp.send(formdata);
             xhttp = null;
 
-        }).then( function( response ){
+        }).then( async function( response ){
 
             var data = response.data;
             debugMode && console.log({"data": data});
 
         //  Add to cache.
-            caches.open("textures").then(async function(cache){
 
-                await cache.add(data.link).then(function(){ count(); });
+            await cache.add(data.link).then(count);
+            json.sourceFile = data.link; // important!
 
-                json.sourceFile = data.link; // important!
-                debugMode && console.log( data.link );
-
-                cache.match(data.link).then(function(response){
-                    return response.blob();
-                }).then(function(blob){
-                    texturePreview.src = window.URL.createObjectURL(blob);
-                });
-
+        //  Preview texture.
+            cache.match(data.link).then(function(response){
+                return response.blob();
+            }).then(function(blob){
+                texturePreview.src = window.URL.createObjectURL(blob);
             });
 
             return data;
 
         }).then( function(data){
-
-        //  Add to collection.
 
             var entry = {};
 
@@ -1558,7 +1550,10 @@ caches.open("textures").then(function(cache){
             entry.endpoint = "https://api.imgur.com/3/image/" + data.id;
             entry.clientID = "60db267c697bb33";  // textures app Client-ID.
 
-            var collection = db.collection("textures");
+            debugMode && console.log({"entry":entry});
+
+        //  Add to collection.
+
             collection.insert(entry, function(err){
                 if (err) throw err;
             }).catch(function(err){
@@ -1568,8 +1563,7 @@ caches.open("textures").then(function(cache){
             return data.link;
 
         }).then( function(url){
-
-        //  Success.
+            debugMode && console.log(url);
 
             $(textureCheckboxSelector).attr({checked:false});
             debugMode && console.log(`deleting "${file.name}" from files.`);
@@ -1577,9 +1571,9 @@ caches.open("textures").then(function(cache){
             delete files[ file.name ];
         //  delete textures[ file.name ];
 
-            debugMode && console.log( "removing", $option.get(0) );
+            debugMode && console.log("removing", $option.get(0));
 
-            $option.remove();
+            $option.remove();  
 
             if (textureDroplist.options.length == 0) {
                 var option = document.createElement("option");
@@ -1588,6 +1582,8 @@ caches.open("textures").then(function(cache){
             }
 
         //  textureDroplistChanged.dispatch( textureDroplist.value );
+
+        //  Success.
 
             var msg = `Texture ${file.name} uploaded successfully!`;
             bootbox.dialog({
@@ -1603,6 +1599,8 @@ caches.open("textures").then(function(cache){
                         className: "btn-success",
                         callback: function(){
                             bootbox.hideAll();
+                        //  Go to last texture.
+                            $(lastPageBtn).click();
                         },
                     },
                 },

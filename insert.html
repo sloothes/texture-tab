@@ -887,10 +887,32 @@ caches.open("textures").then(function(cache){
 //  BUTTON APPLY.
 
     $(textureApplyBtn).on("click", function(){
-        textureApplyBtnClicked.dispatch();
+        if ( !outfitDroplist.value ) return;
+
+        clearTimeout(this.interval);
+        this.interval = setTimeout(function(){
+            textureApplyBtnClicked.dispatch();
+        }, delay);
     });
 
     textureApplyBtnClicked.add(function(){
+
+        const contentWindow = viewer.contentWindow;
+
+        if ( !genderDroplist.value ) {
+
+            var gender = contentWindow.localPlayer.outfit.getGender();
+
+            if (!gender) {
+                genderDroplist.value = "";
+            } else {
+                genderDroplist.value = gender;
+            }
+
+        }
+
+        if ( !outfitDroplist.value ) return;
+        if ( !genderDroplist.value ) return;
 
         var data = {};
         data.maps    = [];
@@ -907,7 +929,7 @@ caches.open("textures").then(function(cache){
         });
 
         debugMode && console.log({"data":data});
-        viewer.contentWindow.localPlayerTextureHandler(data);
+        contentWindow.localPlayerTextureHandler(data);
 
     });
 

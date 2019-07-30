@@ -961,6 +961,7 @@ caches.open("textures").then(function(cache){
     var propertyValueChanged = new Signal();
     var textureApplyBtnClicked = new Signal();
     var textureDroplistChanged = new Signal();
+    var textureRemoveBtnClicked = new Signal();
     var propertiesDroplistChanged = new Signal();
 
     textureSelected.add(function(url){
@@ -1335,7 +1336,7 @@ caches.open("textures").then(function(cache){
 
     });
 
-//  SELECT TEXTURE DROPLIST.
+//  DROPLIST TEXTURE.
 
     $(textureDroplist).on("change", function(){
 
@@ -1357,9 +1358,9 @@ caches.open("textures").then(function(cache){
 
     });
 
-//  BUTTON TEXTURE REMOVE.
+//  BUTTON REMOVE.
 
-    $(textureRemoveBtn).on("click", function(){
+    textureRemoveBtnClicked.add(function(){
 
         const contentWindow = viewer.contentWindow;
 
@@ -1378,6 +1379,10 @@ caches.open("textures").then(function(cache){
 
         contentWindow.localPlayerTextureRemoveHandler(data);
 
+    });
+
+    $(textureRemoveBtn).on("click", function(){
+        textureRemoveBtnClicked.dispatch();
         textureMapDroplist.value = "";
     });
 

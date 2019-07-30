@@ -676,30 +676,24 @@ $(viewer.contentWindow).on("load", function(){
         <input type="checkbox" id="texture-transparent-checkbox" class="form-control pull-right texture-checkbox transparent-checkbox-control">
     </h4>
 
-    <h4 class="texture-checkbox-helper">
-        <div style="height:35px;margin-bottom:10px;">
-            <h4><span style="vertical-align:-0.5rem;">Select outfit slot:</span>
-                <div style="width:70%;display:inline-block;float:left;">
-                    <select id="texture-remove-map" class="form-control texture-map-droplist" readonly>
-                        <option value="">Select map:</option>
-                        <option value="map">map</option>
-                        <option value="bumpMap">bumpMap</option>
-                        <option value="emissiveMap">emissiveMap</option>
-                        <option value="metalnessMap">metalnessMap</option>
-                        <option value="roughnessMap">roughnessMap</option>
-                        <option value="displacementMap">displacementMap</option>
-                        <option value="alphaMap">alphaMap</option>
-                        <option value="normalMap">normalMap</option>
-                        <option value="lightMap">lightMap</option>
-                        <option value="aoMap">aoMap</option>
-                    </select>
-                </div>
-            </h4>
+    <div class="texture-checkbox-helper">
+        <div style="width:70%;display:inline-block;float:left;">
+            <select id="texture-remove-map" class="form-control texture-map-droplist" readonly>
+                <option value="">Select map:</option>
+                <option value="map">map</option>
+                <option value="bumpMap">bumpMap</option>
+                <option value="emissiveMap">emissiveMap</option>
+                <option value="metalnessMap">metalnessMap</option>
+                <option value="roughnessMap">roughnessMap</option>
+                <option value="displacementMap">displacementMap</option>
+                <option value="alphaMap">alphaMap</option>
+                <option value="normalMap">normalMap</option>
+                <option value="lightMap">lightMap</option>
+                <option value="aoMap">aoMap</option>
+            </select>
         </div>
-
         <div id="map-remove-button" class="form-control btn btn-danger btn-white-outline gradient-btn pull-left" style="width:28%;">Remove</div>
-
-    </h4>
+    </div>
 
 </div>
 

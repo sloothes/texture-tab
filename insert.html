@@ -1923,11 +1923,13 @@ caches.open("textures").then(function(cache){
 
         $(checkbox).on("click", function(){
             if (this.checked) input.value = json[key][0];
-        }
+            debugMode && console.log({[key]:json[key]});
+        });
 
         $(checkboy).on("click", function(){
             if (this.checked) input.value = json[key][1];
-        }
+            debugMode && console.log({[key]:json[key]});
+        });
 
         $(input).on("input", function(){
 

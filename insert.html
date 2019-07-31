@@ -1917,6 +1917,7 @@ caches.open("textures").then(function(cache){
         input.classList.add("form-control", "pull-right", "texture-input-number");
 
         if ( json[key] && Array.isArray(json[key]) ) {
+            checkbox.checked = true;
             input.value = json[key][0];
         }
 

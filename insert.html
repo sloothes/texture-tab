@@ -1900,13 +1900,15 @@ caches.open("textures").then(function(cache){
         var control = document.createElement("div");
 
         var span = document.createElement("span");
-        span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+        span.innerText = key; span.style.cssText = "vertical-align:1.7rem;";
 
         var checkbox = document.createElement("input"); 
+        checkbox.style.cssText = "display:inline;margin:0 5px;";
         checkbox.id = `${key}-helper-x`; checkbox.type = "checkbox"; 
         checkbox.classList.add("form-control", "checkbox-x", "texture-checkbox", "texture-checkbox-helper");
 
         var checkboy = document.createElement("input"); 
+        checkboy.style.cssText = "display:inline;margin:0 5px;";
         checkboy.id = `${key}-helper-y`; checkboy.type = "checkbox"; 
         checkboy.classList.add("form-control", "checkbox-y", "texture-checkbox", "texture-checkbox-helper");
 

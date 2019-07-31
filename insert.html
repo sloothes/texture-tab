@@ -253,6 +253,43 @@
 
 </style>
 
+<script>
+
+//  deepCopy.js
+
+    function deepCopy(obj) {
+        if (Object.prototype.toString.call(obj) === "[object Array]") {
+            var out = [], i = 0, len = obj.length;
+            for ( ; i < len; i++ ) {
+                out[i] = arguments.callee(obj[i]);
+            }
+            return out;
+        }
+        if (typeof obj === "object") {
+            var out = {}, i;
+            for ( i in obj ) {
+                out[i] = arguments.callee(obj[i]);
+            }
+            return out;
+        }
+        return obj;
+    }
+
+//  round.js  source: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round"
+
+    function round(number, precision) {
+        var shift = function (number, precision, reverseShift) {
+            if (reverseShift) {
+                precision = -precision;
+            }  
+            numArray = ("" + number).split("e");
+            return +(numArray[0] + "e" + (numArray[1] ? (+numArray[1] + precision) : precision));
+        };
+        return shift(Math.round(shift(number, precision, false)), precision, true);
+    }
+
+
+</script>
 
 <script>
 
@@ -2090,45 +2127,6 @@ caches.open("textures").then(function(cache){
     });
 
 });
-
-</script>
-
-<script>
-
-/*
-//  deepCopy.js
-
-    function deepCopy(obj) {
-        if (Object.prototype.toString.call(obj) === "[object Array]") {
-            var out = [], i = 0, len = obj.length;
-            for ( ; i < len; i++ ) {
-                out[i] = arguments.callee(obj[i]);
-            }
-            return out;
-        }
-        if (typeof obj === "object") {
-            var out = {}, i;
-            for ( i in obj ) {
-                out[i] = arguments.callee(obj[i]);
-            }
-            return out;
-        }
-        return obj;
-    }
-
-//  round.js  source: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round"
-
-    function round(number, precision) {
-        var shift = function (number, precision, reverseShift) {
-            if (reverseShift) {
-                precision = -precision;
-            }  
-            numArray = ("" + number).split("e");
-            return +(numArray[0] + "e" + (numArray[1] ? (+numArray[1] + precision) : precision));
-        };
-        return shift(Math.round(shift(number, precision, false)), precision, true);
-    }
-*/
 
 </script>
 

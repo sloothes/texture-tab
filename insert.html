@@ -4,7 +4,7 @@
         var component_ID = {
             type: "tab",
             beta: true,
-            version: 2.4,
+            version: 2.5,
             kind: "component",
             name: "insert.html",
             path: "/texture-tab/insert.html",
@@ -415,12 +415,13 @@ $(viewer.contentWindow).on("load", function(){
 
 //  const viewer = document.getElementById("viewer");
     const titleTextfield = $("input#material-title").get(0);
-    const slotDroplist   = $("#texture-outfit-slot").get(0);
+    const outfitDroplist = $("#texture-outfit-slot").get(0);
     const genderDroplist = $("#texture-gender-droplist").get(0);
     const texturePreview = $("img#texture-preview").get(0);
     const importedTextures = $("select#imported-textures").get(0);
 
     var Signal = signals.Signal;
+    var outfitSlotChanged = new Signal();
     var genderDroplistChanged = new Signal();
 
     $(genderDroplist).on("change", function(){
@@ -455,11 +456,11 @@ $(viewer.contentWindow).on("load", function(){
 
     genderDroplistChanged.add(function(){
 
-        if ( !slotDroplist.value ) return;
         if ( !genderDroplist.value ) return;
+        if ( !outfitDroplist.value ) return;
         if ( importedTextures.value ) return;
 
-        var slot = slotDroplist.value;
+        var slot = outfitDroplist.value;
         var gender = genderDroplist.value;
 
     //  Null outfit NOT allowed.
@@ -469,6 +470,58 @@ $(viewer.contentWindow).on("load", function(){
         var THREE = contentWindow.THREE;  //  important!
 
         var geometry = contentWindow[ gender ][ slot ].geometry;
+    //  texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
+
+    //  Using window.URL.createObjectURL().
+        THREE.UVsDebug(geometry, 512).toBlob(function(blob){
+            texturePreview.src = window.URL.createObjectURL(blob);
+        }, "image/jpeg");
+
+    });
+
+    $(outfitDroplist).on("change", function(){
+
+    //  Null value IS allowed!
+        outfitSlotChanged.dispatch(this.value);
+
+    });
+
+    outfitSlotChanged.add(function(value){
+
+    //  Null value IS allowed!
+
+        var data = "/select/" + value;
+        contentWindow.localPlayerHandler(data);
+
+    });
+
+    outfitSlotChanged.add(function(){
+
+    // "source: https://stackoverflow.com/questions/5775469/
+    //  whats-the-valid-way-to-include-an-image-with-no-src"
+
+        if ( !genderDroplist.value ) {
+            texturePreview.src = "//:0"; return;
+        }
+
+        if ( !outfitDroplist.value ) {
+            texturePreview.src = "//:0"; return;
+        }
+
+        if ( importedTextures.value ) {
+            texturePreview.src = "//:0"; return;
+        }
+
+        var slot = outfitDroplist.value;
+        var gender = genderDroplist.value;
+
+    //  Null outfit NOT allowed.
+        if ( !contentWindow[gender][slot] ) return;
+
+    //  This is the "THREE" of scene window that has UVsDebug().
+        var THREE = contentWindow.THREE;  //  important!
+
+        var geometry = contentWindow[gender][slot].geometry;
     //  texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
 
     //  Using window.URL.createObjectURL().
@@ -491,75 +544,6 @@ $(viewer.contentWindow).on("load", function(){
     });
 
 });
-
-</script>
-
-<script>
-
-(function(){
-
-    const viewer = document.getElementById("viewer");
-    const slotDroplist   = $("#texture-outfit-slot").get(0);
-    const genderDroplist = $("#texture-gender-droplist").get(0);
-    const texturePreview = $("img#texture-preview").get(0);
-    const importedTextures = $("select#imported-textures").get(0);
-
-    var Signal = signals.Signal;
-    var outfitSlotChanged = new Signal();
-
-    $(slotDroplist).on("change", function(){
-
-    //  Null value IS allowed!
-        outfitSlotChanged.dispatch(this.value);
-
-    });
-
-    outfitSlotChanged.add(function(value){
-
-    //  Null value IS allowed!
-
-        var data = "/select/" + value;
-        viewer.contentWindow.localPlayerHandler(data);
-
-    });
-
-    outfitSlotChanged.add(function(){
-
-    // "source: https://stackoverflow.com/questions/5775469/
-    //  whats-the-valid-way-to-include-an-image-with-no-src"
-
-        if ( !genderDroplist.value ) {
-            texturePreview.src = "//:0"; return;
-        }
-
-        if ( !slotDroplist.value ) {
-            texturePreview.src = "//:0"; return;
-        }
-
-        if ( importedTextures.value ) {
-            texturePreview.src = "//:0"; return;
-        }
-
-        var slot = slotDroplist.value;
-        var gender = genderDroplist.value;
-
-    //  Null outfit NOT allowed.
-        if ( !viewer.contentWindow[gender][slot] ) return;
-
-    //  This is the "THREE" of scene window that has UVsDebug().
-        var THREE = viewer.contentWindow.THREE;  //  important!
-
-        var geometry = viewer.contentWindow[gender][slot].geometry;
-    //  texturePreview.src = THREE.UVsDebug(geometry, 512).toDataURL();
-
-    //  Using window.URL.createObjectURL().
-        THREE.UVsDebug(geometry, 512).toBlob(function(blob){
-            texturePreview.src = window.URL.createObjectURL(blob);
-        }, "image/jpeg");
-
-    });
-
-})();
 
 </script>
 
@@ -931,8 +915,9 @@ caches.open("textures").then(function(cache){
     const textureMapDroplist  = $("select#texture-map-droplist").get(0);
     const textureUploadButton = $("#upload-selected-texture").get(0);
 
-    const slotDroplist            = outfitDroplist;
-    const importedTextures        = textureDroplist;
+//  const slotDroplist            = outfitDroplist;
+//  const importedTextures        = textureDroplist;
+
     const pageSelector            = "#texture-pager .page-btn";
     const textureControlSelector  = "#texture-map-controls";
     const textureCheckboxSelector = "input[type=checkbox].texture-checkbox-control";
@@ -1263,7 +1248,7 @@ caches.open("textures").then(function(cache){
 
         } else {
 
-            var slot = slotDroplist.value;
+            var slot = outfitDroplist.value;
             var gender = contentWindow.localPlayer.outfit.getGender();
 
         //  "source: http://stackoverflow.com/questions/5775469/
@@ -1369,13 +1354,13 @@ caches.open("textures").then(function(cache){
     //  Overwrite gender droplist value.
         genderDroplist.value = contentWindow.localPlayer.outfit.getGender();
 
-        if (!slotDroplist.value) return;
+        if (!outfitDroplist.value) return;
         if (!genderDroplist.value) return;
         if (!textureMapDroplist.value) return;
 
         var data = {
             map: textureMapDroplist.value,
-            slot: slotDroplist.value,
+            slot: outfitDroplist.value,
             gender: genderDroplist.value,
         };
 
@@ -1515,7 +1500,7 @@ caches.open("textures").then(function(cache){
             return bootbox.dialog( errorDialogOptions(err) );
         }
 
-        if ( !importedTextures.value ) {
+        if ( !textureDroplist.value ) {
             var err = "There isn&#39;t selected texture to upload.";
             debugMode && console.error(err);
             return bootbox.dialog( errorDialogOptions(err) );

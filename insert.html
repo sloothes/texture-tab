@@ -531,20 +531,6 @@ $(viewer.contentWindow).on("load", function(){
 
     });
 
-    contentWindow.localPlayer.outfit.changed.add(function(){
-
-        var selector = ".gender-droplist";
-        var gender = contentWindow.localPlayer.outfit.getGender();
-
-        if ( !gender ) 
-            $(selector).val("");
-        else 
-            $(selector).val( gender );
-
-        return;
-
-    });
-
 });
 
 </script>

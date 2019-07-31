@@ -1900,6 +1900,56 @@ caches.open("textures").then(function(cache){
         var control = document.createElement("div");
 
         var span = document.createElement("span");
+        span.innerText = key; span.style.cssText = "vertical-align:1rem;";
+
+        var divX = document.createElement("div"); 
+        divX.innerText = "x:"; divX.style.cssText = "display:inline;"; 
+        var inputx = document.createElement("input"); 
+        inputx.id = `texture-input_${key}-x`; inputx.type = "number"; inputx.step = 0.1;
+        inputx.classList.add("form-control", "texture-input-number");
+        inputx.style.cssText = "display:inline;"; $(divX).append(inputx);
+
+        var divY = document.createElement("div"); 
+        divY.innerText = "y:"; divY.style.cssText = "display:inline;float:right;";
+        var inputy = document.createElement("input"); 
+        inputy.id = `texture-input_${key}-y`; inputy.type = "number"; inputy.step = 0.1;
+        inputy.classList.add("form-control", "texture-input-number");
+        inputy.style.cssText = "display:inline;";  $(divY).append(inputy);
+
+        if ( json[key] && Array.isArray(json[key]) ) {
+            inputx.value = json[key][0];
+            inputy.value = json[key][1];
+        }
+
+        $(inputx).on("input", function(){
+            json[key][0] = round(this.value, 1);
+        });
+
+        $(inputy).on("input", function(){
+            json[key][1] = round(this.value, 1);
+        });
+
+        $(inputx).on("change", function(){
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(inputy).on("change", function(){
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(control).append(span, divX, divY);
+
+        return control;
+    }
+
+/*
+    function repeatControl(key){
+
+        if ( key != "repeat" ) return;
+
+        var control = document.createElement("div");
+
+        var span = document.createElement("span");
         span.innerText = key; span.style.cssText = "vertical-align:1.7rem;";
 
         var checkbox = document.createElement("input"); 
@@ -1959,6 +2009,7 @@ caches.open("textures").then(function(cache){
 
         return control;
     }
+*/
 
     function versionControl(key){
 

@@ -1999,6 +1999,8 @@ caches.open("textures").then(function(cache){
             case "minFilter":
             case "sourceFile":
             case "unpackAlignment":
+            default:
+                $(propControls).children().remove();
             break;
 
         }

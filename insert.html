@@ -388,7 +388,7 @@
     <div style="height:35px;margin-bottom:10px;">
         <h4><span style="vertical-align:-0.5rem;">Select outfit slot:</span>
             <div style="width:40%;display:inline-block;float:right;">
-                <select id="texture-outfit-slot" class="form-control outfit-slot-droplist" readonly>
+                <select id="texture-outfit-slot" class="form-control slot-droplist outfit-slot-droplist" readonly>
                     <option value="">Select slot:</option>
                     <option value="body">body</option>
                     <option value="eyes">eyes</option>
@@ -533,13 +533,15 @@ $(viewer.contentWindow).on("load", function(){
 
     contentWindow.localPlayer.outfit.changed.add(function(){
 
+        var selector = ".gender-droplist";
         var gender = contentWindow.localPlayer.outfit.getGender();
 
-        if ( !gender ) {
-            genderDroplist.value = "";
-        } else {
-            genderDroplist.value = gender;
-        }
+        if ( !gender ) 
+            (selector).val("");
+        else 
+            (selector).val( gender );
+
+        return;
 
     });
 

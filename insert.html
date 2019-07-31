@@ -2039,10 +2039,12 @@ caches.open("textures").then(function(cache){
             break;
 
             case "offset":
+                if (json.offset == null) json.offset = [0, 0]; // important!
                 $(propControls).append( offsetControl(key) );
             break;
 
             case "repeat":
+                if (json.repeat == null) json.repeat = [1, 1]; // important!
                 $(propControls).append( repeatControl(key) );
             break;
 

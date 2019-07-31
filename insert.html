@@ -1920,6 +1920,14 @@ caches.open("textures").then(function(cache){
             input.value = json[key][0];
         }
 
+        $(checkbox).on("click", function(){
+            this.checked && input.value = json[key][0];
+        }
+
+        $(checkboy).on("click", function(){
+            this.checked && input.value = json[key][1];
+        }
+
         $(input).on("input", function(){
 
             if (checkbox.checked && !checkboy.checked) {

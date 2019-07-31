@@ -1903,7 +1903,7 @@ caches.open("textures").then(function(cache){
         span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
 
         var input = document.createElement("input"); 
-        input.id = `texture-input_${key}`; input.type = "number"; input.step = 1;
+        input.id = `texture-input_${key}`; input.type = "number"; input.step = 0.1;
         input.classList.add("form-control", "pull-right", "texture-input-number");
 
         if ( json[key] && Array.isArray(json[key]) ) {

@@ -1677,9 +1677,301 @@ caches.open("textures").then(function(cache){
 
     }
 
+//  PROPERTY CONTROLS.
+
+    function nameControl(key){
+
+        if ( key != "name" ) return;
+
+        var control = document.createElement("div");
+
+        var span = document.createElement("span");
+        span.innerText = "name"; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.id = `texture-input_${key}`; input.type = "text";
+        input.classList.add("form-control", "pull-right", "texture-textfield");
+
+        input.value = json[key]; // name.
+
+        $(input).on("input", function(){
+            json[key] = this.value;
+        });
+
+        $(input).on("change", function(){
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(control).append(span, input);
+
+        return control;
+    }
+
+    function flipYControl(key){
+
+        if ( key != "flipY" ) return;
+
+        var control = document.createElement("div");
+
+        var span = document.createElement("span");
+        span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.id = `texture-input_${key}`; input.type = "checkbox"; 
+        input.classList.add("form-control", "pull-right", "texture-checkbox");
+
+        input.checked = json[key] || "";
+
+        $(input).on("click", function(){
+            json[key] = this.checked;
+        });
+
+        $(control).append(span, input);
+
+        return control;
+    }
+
+    function anisotropyControl(key){
+
+        if ( key != "anisotropy" ) return;
+
+        var control = document.createElement("div");
+
+        var span = document.createElement("span");
+        span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.classList.add("form-control", "pull-right", "texture-input-number");
+        input.id = `texture-input_${key}`; input.type = "number"; input.step = 0.1;
+
+        input.value = json[key];
+
+        $(input).on("input", function(){
+            json[key] = round(this.value, 2);
+        });
+
+        $(input).on("change", function(){
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(control).append(span, input);
+
+        return control;
+    }
+
+    function generateMipmapsControl(key){
+
+        if ( key != "generateMipmaps" ) return;
+
+        var control = document.createElement("div");
+
+        var span = document.createElement("span");
+        span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.id = `texture-input_${key}`; input.type = "checkbox"; 
+        input.classList.add("form-control", "pull-right", "texture-checkbox");
+
+        input.checked = json[key] || "";
+
+        $(input).on("click", function(){
+            json[key] = this.checked;
+        });
+
+        $(control).append(span, input);
+
+        return control;
+    }
+
+    function premultiplyAlpha(key){
+
+        if ( key != "premultiplyAlpha" ) return;
+
+        var control = document.createElement("div");
+
+        var span = document.createElement("span");
+        span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.id = `texture-input_${key}`; input.type = "checkbox"; 
+        input.classList.add("form-control", "pull-right", "texture-checkbox");
+
+        input.checked = json[key] || "";
+
+        $(input).on("click", function(){
+            json[key] = this.checked;
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(control).append(span, input);
+
+        return control;
+    }
+
+    function offsetControl(key){
+
+        if ( key != "offset" ) return;
+
+        var control = document.createElement("div");
+
+        var span = document.createElement("span");
+    //  span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var divX = document.createElement("div"); 
+        divX.innerText = "x:"; divX.style.cssText = "display:inline;"; 
+        var inputx = document.createElement("input"); 
+        inputx.id = `texture-input_${key}-x`; inputx.type = "number"; inputx.step = 0.01;
+        inputx.classList.add("form-control", "texture-input-number");
+        inputx.style.cssText = "display:inline;"; $(divX).append(inputx);
+
+        var divY = document.createElement("div"); 
+        divY.innerText = "y:"; divY.style.cssText = "display:inline;float:right;";
+        var inputy = document.createElement("input"); 
+        inputy.id = `texture-input_${key}-y`; inputy.type = "number"; inputy.step = 0.01;
+        inputy.classList.add("form-control", "texture-input-number");
+        inputy.style.cssText = "display:inline;";  $(divY).append(inputy);
+
+        if ( json[key] && Array.isArray(json[key]) ) {
+            inputx.value = json[key][0];
+            inputy.value = json[key][1];
+        }
+
+        $(inputx).on("input", function(){
+            json[key][0] = round(this.value, 2);
+        });
+
+        $(inputy).on("input", function(){
+            json[key][1] = round(this.value, 2);
+        });
+
+        $(inputx).on("change", function(){
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(inputy).on("change", function(){
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(control).append(span, divX, divY);
+
+        return control;
+    }
+
+    function repeatControl(key){
+
+        if ( key != "repeat" ) return;
+
+        var control = document.createElement("div");
+
+        var span = document.createElement("span");
+        span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.id = `texture-input_${key}`; input.type = "number"; input.step = 1;
+        input.classList.add("form-control", "pull-right", "texture-input-number");
+
+        if ( json[key] && Array.isArray(json[key]) ) {
+            input.value = json[key][0];
+        }
+
+        $(input).on("input", function(){
+            json[key][0] = json[key][1] = parseInt(this.value);
+        });
+
+        $(input).on("change", function(){
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(control).append(span, input);
+
+        return control;
+    }
+
+    function versionControl(key){
+
+        if ( key != "version" ) return;
+
+        var control = document.createElement("div");
+
+        var span = document.createElement("span");
+        span.innerText = "version"; span.style.cssText = "vertical-align:-0.7rem;";
+
+        var input = document.createElement("input"); 
+        input.id = `texture-input_${key}`; 
+        input.type = "number"; input.min = 1; input.step = 1;
+        input.classList.add("form-control", "pull-right", "texture-input-number");
+
+        input.value = json[key];
+
+        $(input).on("input", function(){
+            json[key] = parseInt(this.value);
+        });
+
+        $(input).on("change", function(){
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(control).append(span, input);
+
+        return control;
+    }
+
+    function uuidControl(key){
+
+        if ( key != "uuid" ) return;
+
+        var control = document.createElement("div");
+
+        var button = document.createElement("div");
+        button.classList.add("form-control", "btn", "btn-info", "btn-white-outline", "gradient-btn");
+        button.id = "texture-button_uuid"; button.innerText = "⟳"; button.style.cssText = "width:fit-content;";
+
+        var input = document.createElement("input");
+        input.id = `texture-input_${key}`; input.type = "text"; input.readOnly = true;
+        input.classList.add("form-control", "pull-right", "uuid-texture-textfield");
+
+        input.value = json[key]; // generateUUID();
+
+        $(button).on("click", function(){
+            input.value = json[key] = generateUUID();
+        });
+
+        $(control).append(button, input);
+
+        return control;
+    }
+
+    function _idControl(key){
+
+        if ( key != "_id" ) return;
+
+        var control = document.createElement("div");
+
+        var button = document.createElement("div");
+        button.classList.add("form-control", "btn", "btn-info", "btn-white-outline", "gradient-btn");
+        button.id = "texture-button_id"; button.innerText = "⟳"; button.style.cssText = "width:fit-content;";
+
+        var input = document.createElement("input");
+        input.id = "texture-input_id"; input.type = "text"; input.readOnly = true;
+        input.classList.add("form-control", "text-center", "pull-right", "uuid-texture-textfield");
+
+        input.value = json[key]; // ObjectId();
+
+        $(button).on("click", function(){
+            input.value = json[key] = ObjectId();
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(control).append(button, input);
+
+        return control;
+    }
+
+
     $(propDroplist).on("change", function(){
         propertiesDroplistChanged.dispatch(this.value);
     });
+
 
     propertiesDroplistChanged.add(function (key){
 
@@ -1690,302 +1982,44 @@ caches.open("textures").then(function(cache){
 
         switch (key) {
 
-            case "anisotropy":
-
-                (function anisotropyControl(){
-
-                    if ( !key || key != "anisotropy" ) return;
-
-                    var span = document.createElement("span");
-                    span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
-
-                    var input = document.createElement("input"); 
-                    input.classList.add("form-control", "pull-right", "texture-input-number");
-                    input.id = `texture-input_${key}`; input.type = "number"; input.step = 0.1;
-
-                    input.value = json[key];
-
-                    $(input).on("input", function(){
-                        json[key] = round(this.value, 2);
-                    });
-
-                    $(input).on("change", function(){
-                        debugMode && console.log({[key]:json[key]});
-                    });
-
-                    $(propControls).append(span, input);
-
-                })();
-
+            case "name":
+                $(propControls).append( nameControl(key) );
             break;
 
             case "flipY":
+                $(propControls).append( flipYControl(key) );
+            break;
 
-                (function flipYControl(){
-
-                    if ( !key || key != "flipY" ) return;
-
-                    var span = document.createElement("span");
-                    span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
-
-                    var input = document.createElement("input"); 
-                    input.id = `texture-input_${key}`; input.type = "checkbox"; 
-                    input.classList.add("form-control", "pull-right", "texture-checkbox");
-
-                    input.checked = json[key] || "";
-
-                    $(input).on("click", function(){
-                        json[key] = this.checked;
-                    });
-
-                    $(propControls).append(span, input);
-
-                })();
-
+            case "anisotropy":
+                $(propControls).append( anisotropyControl(key) );
             break;
 
             case "generateMipmaps":
-
-                (function generateMipmapsControl(){
-
-                    if ( !key || key != "generateMipmaps" ) return;
-
-                    var span = document.createElement("span");
-                    span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
-
-                    var input = document.createElement("input"); 
-                    input.id = `texture-input_${key}`; input.type = "checkbox"; 
-                    input.classList.add("form-control", "pull-right", "texture-checkbox");
-
-                    input.checked = json[key] || "";
-
-                    $(input).on("click", function(){
-                        json[key] = this.checked;
-                    });
-
-                    $(propControls).append(span, input);
-
-                })();
-
-            break;
-
-            case "name":
-
-                (function nameControl(){
-
-                    if ( !key || key != "name" ) return;
-
-                    var span = document.createElement("span");
-                    span.innerText = "name"; span.style.cssText = "vertical-align:-0.7rem;";
-
-                    var input = document.createElement("input"); 
-                    input.id = `texture-input_${key}`; input.type = "text";
-                    input.classList.add("form-control", "pull-right", "texture-textfield");
-
-                    input.value = json[key]; // name.
-
-                    $(input).on("input", function(){
-                        json[key] = this.value;
-                    });
-
-                    $(input).on("change", function(){
-                        debugMode && console.log({[key]:json[key]});
-                    });
-
-                    $(propControls).append(span, input);
-
-                })();
-
+                $(propControls).append( generateMipmapsControl(key) );
             break;
 
             case "premultiplyAlpha":
-
-                (function premultiplyAlpha(){
-
-                    if ( !key || key != "premultiplyAlpha" ) return;
-
-                    var span = document.createElement("span");
-                    span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
-
-                    var input = document.createElement("input"); 
-                    input.id = `texture-input_${key}`; input.type = "checkbox"; 
-                    input.classList.add("form-control", "pull-right", "texture-checkbox");
-
-                    input.checked = json[key] || "";
-
-                    $(input).on("click", function(){
-                        json[key] = this.checked;
-                        debugMode && console.log({[key]:json[key]});
-                    });
-
-                    $(propControls).append(span, input);
-
-                })();
-
+                $(propControls).append( premultiplyAlpha(key) );
             break;
 
             case "offset":
-
-                (function offsetControl(){
-
-                    if ( !key || key != "offset" ) return;
-
-                    var span = document.createElement("span");
-                //  span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
-
-                    var divX = document.createElement("div"); 
-                    divX.innerText = "x:"; divX.style.cssText = "display:inline;"; 
-                    var inputx = document.createElement("input"); 
-                    inputx.id = `texture-input_${key}-x`; inputx.type = "number"; inputx.step = 0.01;
-                    inputx.classList.add("form-control", "texture-input-number");
-                    inputx.style.cssText = "display:inline;"; $(divX).append(inputx);
-
-                    var divY = document.createElement("div"); 
-                    divY.innerText = "y:"; divY.style.cssText = "display:inline;float:right;";
-                    var inputy = document.createElement("input"); 
-                    inputy.id = `texture-input_${key}-y`; inputy.type = "number"; inputy.step = 0.01;
-                    inputy.classList.add("form-control", "texture-input-number");
-                    inputy.style.cssText = "display:inline;";  $(divY).append(inputy);
-
-                    if ( json[key] && Array.isArray(json[key]) ) {
-                        inputx.value = json[key][0];
-                        inputy.value = json[key][1];
-                    }
-
-                    $(inputx).on("input", function(){
-                        json[key][0] = round(this.value, 2);
-                    });
-
-                    $(inputy).on("input", function(){
-                        json[key][1] = round(this.value, 2);
-                    });
-
-                    $(inputx).on("change", function(){
-                        debugMode && console.log({[key]:json[key]});
-                    });
-
-                    $(inputy).on("change", function(){
-                        debugMode && console.log({[key]:json[key]});
-                    });
-
-                    $(propControls).append(span, divX, divY);
-
-                })();
-
+                $(propControls).append( offsetControl(key) );
             break;
 
             case "repeat":
-
-                (function repeatControl(){
-
-                    if ( !key || key != "repeat" ) return;
-
-                    var span = document.createElement("span");
-                    span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
-
-                    var input = document.createElement("input"); 
-                    input.id = `texture-input_${key}`; input.type = "number"; input.step = 1;
-                    input.classList.add("form-control", "pull-right", "texture-input-number");
-
-                    if ( json[key] && Array.isArray(json[key]) ) {
-                        input.value = json[key][0];
-                    }
-
-                    $(input).on("input", function(){
-                        json[key][0] = json[key][1] = parseInt(this.value);
-                    });
-
-                    $(input).on("change", function(){
-                        debugMode && console.log({[key]:json[key]});
-                    });
-
-                    $(propControls).append(span, input);
-
-                })();
-
+                $(propControls).append( repeatControl(key) );
             break;
 
             case "uuid":
-
-                (function uuidControl(){
-
-                    if ( !key || key != "uuid" ) return;
-
-                    var button = document.createElement("div");
-                    button.classList.add("form-control", "btn", "btn-info", "btn-white-outline", "gradient-btn");
-                    button.id = "texture-button_uuid"; button.innerText = "⟳"; button.style.cssText = "width:fit-content;";
-
-                    var input = document.createElement("input");
-                    input.id = `texture-input_${key}`; input.type = "text"; input.readOnly = true;
-                    input.classList.add("form-control", "pull-right", "uuid-texture-textfield");
-
-                    input.value = json[key]; // generateUUID();
-
-                    $(button).on("click", function(){
-                        input.value = json[key] = generateUUID();
-                    });
-
-                    $(propControls).append(button, input);
-
-                })();
-
-            break;
-
-            case "version":
-
-                (function versionControl(){
-
-                    if ( !key || key != "version" ) return;
-
-                    var span = document.createElement("span");
-                    span.innerText = "version"; span.style.cssText = "vertical-align:-0.7rem;";
-
-                    var input = document.createElement("input"); 
-                    input.id = `texture-input_${key}`; 
-                    input.type = "number"; input.min = 1; input.step = 1;
-                    input.classList.add("form-control", "pull-right", "texture-input-number");
-
-                    input.value = json[key];
-
-                    $(input).on("input", function(){
-                        json[key] = parseInt(this.value);
-                    });
-
-                    $(input).on("change", function(){
-                        debugMode && console.log({[key]:json[key]});
-                    });
-
-                    $(propControls).append(span, input);
-
-                })();
-
+                $(propControls).append( uuidControl(key) );
             break;
 
             case "_id":
+                $(propControls).append( _idControl(key) );
+            break;
 
-                (function _idControl(){
-
-                    if ( !key || key != "_id" ) return;
-
-                    var button = document.createElement("div");
-                    button.classList.add("form-control", "btn", "btn-info", "btn-white-outline", "gradient-btn");
-                    button.id = "texture-button_id"; button.innerText = "⟳"; button.style.cssText = "width:fit-content;";
-
-                    var input = document.createElement("input");
-                    input.id = "texture-input_id"; input.type = "text"; input.readOnly = true;
-                    input.classList.add("form-control", "text-center", "pull-right", "uuid-texture-textfield");
-
-                    input.value = json[key]; // ObjectId();
-
-                    $(button).on("click", function(){
-                        input.value = json[key] = ObjectId();
-                        debugMode && console.log({[key]:json[key]});
-                    });
-
-                    $(propControls).append(button, input);
-
-                })();
-
+            case "version":
+                $(propControls).append( versionControl(key) );
             break;
 
             case "type":
@@ -2010,9 +2044,22 @@ caches.open("textures").then(function(cache){
     });
 
     propertyValueChanged.add(function(key, value){
+
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+
         debugMode && console.log({"json":json});
     });
-
 
     maps.forEach(function( key ){
         $(textureControls).find(`input#${key}`).on("click", function(){
@@ -2023,17 +2070,17 @@ caches.open("textures").then(function(cache){
 
             if ( !this.checked ) {
 
-                var texture = null;
+                var object = null;
                 delete json[ key ];
 
             } else {
 
-                var texture = textures[ name ];  //  json texture.
-                json[ key ] = textures[ name ];
+                var object  = textures[ name ];  //  json texture.
+                json[ key ] = textures[ name ];  //  json texture.
 
             }
 
-            propertyValueChanged.dispatch( key, texture );
+            propertyValueChanged.dispatch( key, object );
 
         });
     });

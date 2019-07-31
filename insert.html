@@ -1902,6 +1902,14 @@ caches.open("textures").then(function(cache){
         var span = document.createElement("span");
         span.innerText = key; span.style.cssText = "vertical-align:-0.7rem;";
 
+        var checkbox = document.createElement("input"); 
+        checkbox.id = `${key}-helper-x`; checkbox.type = "checkbox"; 
+        checkbox.classList.add("form-control", "checkbox-x", "texture-checkbox", "texture-checkbox-helper");
+
+        var checkboy = document.createElement("input"); 
+        checkboy.id = `${key}-helper-y`; checkboy.type = "checkbox"; 
+        checkboy.classList.add("form-control", "checkbox-y", "texture-checkbox", "texture-checkbox-helper");
+
         var input = document.createElement("input"); 
         input.id = `texture-input_${key}`; input.type = "number"; input.step = 0.1;
         input.classList.add("form-control", "pull-right", "texture-input-number");
@@ -1911,14 +1919,30 @@ caches.open("textures").then(function(cache){
         }
 
         $(input).on("input", function(){
-            json[key][0] = json[key][1] = parseInt(this.value);
+
+            if (checkbox.checked && !checkboy.checked) {
+                json[key][0] = round(this.value, 1);
+            }
+
+            if (!checkbox.checked && checkboy.checked) {
+                json[key][1] = round(this.value, 1);
+            }
+
+            if (!checkbox.checked && !checkboy.checked) {
+                json[key][0] = json[key][1] = round(this.value, 1);
+            }
+
+            if (checkbox.checked && checkboy.checked) {
+                json[key][0] = json[key][1] = round(this.value, 1);
+            }
+
         });
 
         $(input).on("change", function(){
             debugMode && console.log({[key]:json[key]});
         });
 
-        $(control).append(span, input);
+        $(control).append(span, checkbox, checkboy, input);
 
         return control;
     }

@@ -1371,35 +1371,6 @@ caches.open("textures").then(function(cache){
 
     });
 
-//  BUTTON REMOVE.
-
-    textureRemoveBtnClicked.add(function(){
-
-        const contentWindow = viewer.contentWindow;
-
-    //  Overwrite gender droplist value.
-        genderDroplist.value = contentWindow.localPlayer.outfit.getGender();
-
-        if (!outfitDroplist.value) return;
-        if (!genderDroplist.value) return;
-        if (!textureMapDroplist.value) return;
-
-        var data = {
-            map: textureMapDroplist.value,
-            slot: outfitDroplist.value,
-            gender: genderDroplist.value,
-        };
-
-        contentWindow.localPlayerTextureRemoveHandler(data);
-
-    });
-
-    $(textureRemoveBtn).on("click", function(){
-        textureRemoveBtnClicked.dispatch();
-        textureMapDroplist.value = "";
-    });
-
-
 //  BUTTON DELETE.
 
     var deleteButtonClicked = new Signal();
@@ -1713,6 +1684,34 @@ caches.open("textures").then(function(cache){
         }
 
     }
+
+//  BUTTON REMOVE.
+
+    textureRemoveBtnClicked.add(function(){
+
+        const contentWindow = viewer.contentWindow;
+
+    //  Overwrite gender droplist value.
+        genderDroplist.value = contentWindow.localPlayer.outfit.getGender();
+
+        if (!outfitDroplist.value) return;
+        if (!genderDroplist.value) return;
+        if (!textureMapDroplist.value) return;
+
+        var data = {
+            map: textureMapDroplist.value,
+            slot: outfitDroplist.value,
+            gender: genderDroplist.value,
+        };
+
+        contentWindow.localPlayerTextureRemoveHandler(data);
+
+    });
+
+    $(textureRemoveBtn).on("click", function(){
+        textureRemoveBtnClicked.dispatch();
+        textureMapDroplist.value = "";
+    });
 
 //  PROPERTY CONTROLS.
 

@@ -987,14 +987,14 @@ caches.open("textures").then(function(cache){
         };
     }
 
-    function abortDialogOptions(msg){
+    function cancelDialogOptions(msg){
         return {
             size: "small",
             className: "middle",
             closeButton: true,
             title: `<div class="alert-icon icon-warning">` 
-            + `</div><h2 style="margin:auto;">Abort!</h2>`,
-            message: `<div>${msg}!</div>`,
+            + `</div><h2 style="margin:auto;">Cancel</h2>`,
+            message: `<div>${msg}</div>`,
             buttons: {
                 cancel: {
                     label: "Close",
@@ -1837,15 +1837,15 @@ caches.open("textures").then(function(cache){
         });
 
         function callback(result){
-            var msg = `Save aborted!`;
+            var msg = `Save aborted.`;
             var err = `Name is required. Save cancelled.`;
             debugMode && console.log({"result":result});
 
-            if ( result == null ) {
-                return bootbox.dialog( abortDialogOptions(msg) );
+            if ( result == defaultValue ) {
+                return $(avatarSaveButton).click();
+            } else if ( result == null ) {
+                return bootbox.dialog( cancelDialogOptions(msg) );
             } else if ( result.length == 0 ) {
-                return bootbox.dialog( errorDialogOptions(err) );
-            } else if ( result == defaultValue ) {
                 return bootbox.dialog( errorDialogOptions(err) );
             } else {
                 return avatarSaveButtonClicked.dispatch(result);

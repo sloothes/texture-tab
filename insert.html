@@ -1754,6 +1754,72 @@ caches.open("textures").then(function(cache){
 
     });
 
+//  BUTTON COPY (texture).
+    var textureCopyBtnClicked = new Signal();
+
+    $(textureCopyButton).on("click", function(){
+
+        if ( !outfitDroplist.value ) return;
+
+        clearTimeout(this.interval);
+        this.interval = setTimeout(function(){
+            textureCopyBtnClicked.dispatch();
+        }, delay);
+
+    });
+
+    textureCopyBtnClicked.add(function(){
+
+        const contentWindow = viewer.contentWindow;
+        const checkboxSelector = "input[type=checkbox].texture-checkbox-control";
+
+        if ( !genderDroplist.value ) {
+
+            var gender = contentWindow.localPlayer.outfit.getGender();
+
+            if (!gender) {
+                genderDroplist.value = "";
+            } else {
+                genderDroplist.value = gender;
+            }
+
+        }
+
+        if ( !outfitDroplist.value ) return;
+        if ( !genderDroplist.value ) return;
+
+        var checkboxes = $(textureMapControls).find(checkboxSelector)
+        .toArray().filter(function(item){ return item.checked; });
+
+        debugMode && console.log(checkboxes);
+        if ( checkboxes.length == 0 ) return;
+
+        if (checkboxes.length) (function(){
+
+            var map = checkboxes.shift.id;
+            var slot = outfitDroplist.value;
+            var sourceFile = contentWindow[gender][slot].material[map].sourceFile;
+
+            debugMode && console.log({ 
+                "gender":gender,
+                "map":map, "slot":slot,
+                "sourceFile":sourceFile,
+            });
+
+            if (sourceFile) json = {
+                sourcFile: sourceFile,
+            };
+
+            checkboxes.forEach(function(item){
+                item.checked = false;
+            });
+
+            debugMode && console.log({"copy":json});
+
+        })();
+
+    });
+
 
 //  BUTTON SAVE (avatar).
 
@@ -2050,74 +2116,6 @@ caches.open("textures").then(function(cache){
         return control;
     }
 
-/*
-    function repeatControl(key){
-
-        if ( key != "repeat" ) return;
-
-        var control = document.createElement("div");
-
-        var span = document.createElement("span");
-        span.innerText = key; span.style.cssText = "vertical-align:1.7rem;";
-
-        var checkbox = document.createElement("input"); 
-        checkbox.style.cssText = "display:inline;margin:0 5px;";
-        checkbox.id = `${key}-helper-x`; checkbox.type = "checkbox"; 
-        checkbox.classList.add("form-control", "checkbox-x", "texture-checkbox", "texture-checkbox-helper");
-
-        var checkboy = document.createElement("input"); 
-        checkboy.style.cssText = "display:inline;margin:0 5px;float:right;";
-        checkboy.id = `${key}-helper-y`; checkboy.type = "checkbox"; 
-        checkboy.classList.add("form-control", "checkbox-y", "texture-checkbox", "texture-checkbox-helper");
-
-        var input = document.createElement("input"); 
-        input.id = `texture-input_${key}`; input.type = "number"; input.step = 0.1;
-        input.classList.add("form-control", "pull-right", "texture-input-number");
-
-        if ( json[key] && Array.isArray(json[key]) ) {
-            checkbox.checked = true;
-            input.value = json[key][0];
-        }
-
-        $(checkbox).on("click", function(){
-            if (this.checked) input.value = json[key][0];
-            debugMode && console.log({[key]:json[key]});
-        });
-
-        $(checkboy).on("click", function(){
-            if (this.checked) input.value = json[key][1];
-            debugMode && console.log({[key]:json[key]});
-        });
-
-        $(input).on("input", function(){
-
-            if (checkbox.checked && !checkboy.checked) {
-                json[key][0] = round(this.value, 1);
-            }
-
-            if (!checkbox.checked && checkboy.checked) {
-                json[key][1] = round(this.value, 1);
-            }
-
-            if (!checkbox.checked && !checkboy.checked) {
-                json[key][0] = json[key][1] = round(this.value, 1);
-            }
-
-            if (checkbox.checked && checkboy.checked) {
-                json[key][0] = json[key][1] = round(this.value, 1);
-            }
-
-        });
-
-        $(input).on("change", function(){
-            debugMode && console.log({[key]:json[key]});
-        });
-
-        $(control).append(span, checkbox, checkboy, input);
-
-        return control;
-    }
-*/
 
     function versionControl(key){
 
@@ -2324,6 +2322,78 @@ caches.open("textures").then(function(cache){
     });
 
 });
+
+</script>
+
+<script>
+/*
+    function repeatControl(key){
+
+        if ( key != "repeat" ) return;
+
+        var control = document.createElement("div");
+
+        var span = document.createElement("span");
+        span.innerText = key; span.style.cssText = "vertical-align:1.7rem;";
+
+        var checkbox = document.createElement("input"); 
+        checkbox.style.cssText = "display:inline;margin:0 5px;";
+        checkbox.id = `${key}-helper-x`; checkbox.type = "checkbox"; 
+        checkbox.classList.add("form-control", "checkbox-x", "texture-checkbox", "texture-checkbox-helper");
+
+        var checkboy = document.createElement("input"); 
+        checkboy.style.cssText = "display:inline;margin:0 5px;float:right;";
+        checkboy.id = `${key}-helper-y`; checkboy.type = "checkbox"; 
+        checkboy.classList.add("form-control", "checkbox-y", "texture-checkbox", "texture-checkbox-helper");
+
+        var input = document.createElement("input"); 
+        input.id = `texture-input_${key}`; input.type = "number"; input.step = 0.1;
+        input.classList.add("form-control", "pull-right", "texture-input-number");
+
+        if ( json[key] && Array.isArray(json[key]) ) {
+            checkbox.checked = true;
+            input.value = json[key][0];
+        }
+
+        $(checkbox).on("click", function(){
+            if (this.checked) input.value = json[key][0];
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(checkboy).on("click", function(){
+            if (this.checked) input.value = json[key][1];
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(input).on("input", function(){
+
+            if (checkbox.checked && !checkboy.checked) {
+                json[key][0] = round(this.value, 1);
+            }
+
+            if (!checkbox.checked && checkboy.checked) {
+                json[key][1] = round(this.value, 1);
+            }
+
+            if (!checkbox.checked && !checkboy.checked) {
+                json[key][0] = json[key][1] = round(this.value, 1);
+            }
+
+            if (checkbox.checked && checkboy.checked) {
+                json[key][0] = json[key][1] = round(this.value, 1);
+            }
+
+        });
+
+        $(input).on("change", function(){
+            debugMode && console.log({[key]:json[key]});
+        });
+
+        $(control).append(span, checkbox, checkboy, input);
+
+        return control;
+    }
+*/
 
 </script>
 

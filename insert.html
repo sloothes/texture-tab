@@ -969,6 +969,41 @@ caches.open("textures").then(function(cache){
 
     }
 
+    function errorDialogOptions(err){
+        return {
+            size: "small",
+            className: "middle",
+            closeButton: false,
+            title: `<div class="alert-icon icon-warning">` 
+            + `</div><h2 style="margin:auto;">Error!</h2>`,
+            message: `<div>Sorry! An error occurred.</div>`
+            + `<div>${err}</div>`,
+            buttons: {
+                cancel: {
+                    label: "Close",
+                    className: "btn-default",
+                },
+            },
+        };
+    }
+
+    function abortDialogOptions(msg){
+        return {
+            size: "small",
+            className: "middle",
+            closeButton: true,
+            title: `<div class="alert-icon icon-warning">` 
+            + `</div><h2 style="margin:auto;">Abort!</h2>`,
+            message: `<div>${msg}!</div>`,
+            buttons: {
+                cancel: {
+                    label: "Close",
+                    className: "btn-default",
+                },
+            }
+        };
+    }
+
     function successDialogOptions(msg){
         return {
             size: "small",
@@ -986,24 +1021,6 @@ caches.open("textures").then(function(cache){
                     }
                 },
             }
-        };
-    }
-
-    function errorDialogOptions(err){
-        return {
-            size: "small",
-            className: "middle",
-            closeButton: false,
-            title: `<div class="alert-icon icon-warning">` 
-            + `</div><h2 style="margin:auto;">Error!</h2>`,
-            message: `<div>Sorry! An error occurred.</div>`
-            + `<div>${err}</div>`,
-            buttons: {
-                cancel: {
-                    label: "Close",
-                    className: "btn-default",
-                },
-            },
         };
     }
 
@@ -1747,18 +1764,19 @@ caches.open("textures").then(function(cache){
             + `</div><h4 style="margin:auto;">${msg}</h4>`;
         var defaultValue = "untitled avatar";
 
-        var callback = function(result){
+        function callback(result){
+            var msg = `Save aborted!`;
+            var err = `Name is required. Save cancelled.`;
             debugMode && console.log({"result":result});
+
             if ( result == null ) {
-                var msg = `Save aborted!`;
-                bootbox.dialog( successDialogOptions(msg) );
+                return bootbox.dialog( abortDialogOptions(msg) );
             } else if ( result.length == 0 ) {
-                var err = `Name is required. Save cancelled.`;
                 return bootbox.dialog( errorDialogOptions(err) );
             } else {
                 return avatarSaveButtonClicked.dispatch(result);
             }
-        };
+        }
 
         return bootbox.prompt({
 
@@ -1776,9 +1794,10 @@ caches.open("textures").then(function(cache){
     avatarSaveButtonClicked.add( function(name){
 
         const contentWindow = viewer.contentWindow;
+        var err = `Name is required. Save cancelled.`;
+        var msg = `Avatar ${name} saved successfully!`;
 
         if ( !name ) {
-            var err = `Name is required. Save cancelled.`;
             bootbox.dialog( errorDialogOptions(err) );
             throw err; return;
         }
@@ -1789,16 +1808,14 @@ caches.open("textures").then(function(cache){
         json._id = ObjectId();
         json.uuid = generateUUID();
 
-        return bootbox.dialog( successDialogOptions(`Avatar ${name} saved successfully!`) ); // breakpoint!
-
         db.collection("outfits").insert(json, function(err){
             if (err) throw err;
         }).then(function(){
-            var msg = `Avatar ${name} saved successfully!`;
+            debugMode && console.log(msg);
             bootbox.dialog( successDialogOptions(msg) );
         }).catch(function(err){
+            debugMode && console.error(err);
             bootbox.dialog( errorDialogOptions(err) );
-            console.error(err);
         });
 
     });

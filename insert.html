@@ -1836,22 +1836,30 @@ caches.open("textures").then(function(cache){
             var outfit = contentWindow[gender][slot];
             if (outfit) material = outfit.material;
             if (material) map = checkboxes.shift().id;
-            if (material[map].sourceFile) {
+
+        //  Uncheck.
+
+            if ( map ) {
+
+                var items = $(textureMapControls)
+                .find(checkSelector).toArray();
+                while ( items.length ) {
+                    var item = items.shift();
+                    if ( item.id == map )
+                        item.checked = true;
+                    else
+                        item.checked = false;
+                }
+
+            }
+
+        //  Copy sourceFile.
+
+            if ( map && material[map].sourceFile ) {
 
                 json = {};  // reset texture json.
                 json.sourceFile = material[map].sourceFile;
                 debugMode && console.log({"copy":json});
-
-            //  Uncheck checkboxes.
-                while ( checkboxes.length ) {
-                    checkboxes.shift().checked = false;
-                }
-
-                debugMode && console.log({ 
-                    "gender":gender,
-                    "slot":slot, "map":map,
-                    "sourceFile":json.sourceFile,
-                });
 
                 var msg = `${gender} ${slot} ${map} copied.`;
                 return userNotificationDialogMessage( msg );

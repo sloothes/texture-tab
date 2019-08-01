@@ -404,6 +404,74 @@
 
 </script>
 
+<script>
+
+    function errorDialogOptions(err){
+        return {
+            size: "small",
+            className: "middle",
+            closeButton: false,
+            title: `<div class="alert-icon icon-warning">` 
+            + `</div><h2 style="margin:auto;">Error!</h2>`,
+            message: `<div>Sorry! An error occurred.</div>`
+            + `<div>${err}</div>`,
+            buttons: {
+                cancel: {
+                    label: "Close",
+                    className: "btn-default",
+                },
+            },
+        };
+    }
+
+    function cancelDialogOptions(msg){
+        return {
+            size: "small",
+            className: "middle",
+            closeButton: true,
+            title: `<div class="alert-icon icon-warning">` 
+            + `</div><h2 style="margin:auto;">Cancel</h2>`,
+            message: `<div>${msg}</div>`,
+            buttons: {
+                cancel: {
+                    label: "Close",
+                    className: "btn-default",
+                },
+            }
+        };
+    }
+
+    function successDialogOptions(msg){
+        return {
+            size: "small",
+            className: "middle",
+            closeButton: false,
+            title: `<div class="alert-icon icon-success">`
+            + `</div><h2 style="margin:auto;">Success</h2>`,
+            message: `<div>${msg}</div>`,
+            buttons: { 
+                success: {
+                    label: "Close",
+                    className: "btn-success",
+                    callback: function(){ 
+                        bootbox.hideAll(); 
+                    }
+                },
+            }
+        };
+    }
+
+    function userNotificationDialogMessage(msg){
+        return bootbox.dialog({
+            buttons: false,
+            closeButton: true,
+            className: "middle",
+            message: `<div class="text-center">${msg}</div>`,
+        });
+    }
+
+</script>
+
 <div class="helpers-header texture-header">
     <h2 style="margin-bottom:20px;">Texture:</h2>
 </div>
@@ -969,60 +1037,6 @@ caches.open("textures").then(function(cache){
 
     }
 
-    function errorDialogOptions(err){
-        return {
-            size: "small",
-            className: "middle",
-            closeButton: false,
-            title: `<div class="alert-icon icon-warning">` 
-            + `</div><h2 style="margin:auto;">Error!</h2>`,
-            message: `<div>Sorry! An error occurred.</div>`
-            + `<div>${err}</div>`,
-            buttons: {
-                cancel: {
-                    label: "Close",
-                    className: "btn-default",
-                },
-            },
-        };
-    }
-
-    function cancelDialogOptions(msg){
-        return {
-            size: "small",
-            className: "middle",
-            closeButton: true,
-            title: `<div class="alert-icon icon-warning">` 
-            + `</div><h2 style="margin:auto;">Cancel</h2>`,
-            message: `<div>${msg}</div>`,
-            buttons: {
-                cancel: {
-                    label: "Close",
-                    className: "btn-default",
-                },
-            }
-        };
-    }
-
-    function successDialogOptions(msg){
-        return {
-            size: "small",
-            className: "middle",
-            closeButton: false,
-            title: `<div class="alert-icon icon-success">`
-            + `</div><h2 style="margin:auto;">Success</h2>`,
-            message: `<div>${msg}</div>`,
-            buttons: { 
-                success: {
-                    label: "Close",
-                    className: "btn-success",
-                    callback: function(){ 
-                        bootbox.hideAll(); 
-                    }
-                },
-            }
-        };
-    }
 
 //  Signals.
 
@@ -1114,6 +1128,7 @@ caches.open("textures").then(function(cache){
 
     }
 
+
 //  BUTTON APPLY.
 
     $(textureApplyBtn).on("click", function(){
@@ -1165,6 +1180,9 @@ caches.open("textures").then(function(cache){
         contentWindow.localPlayerTextureHandler(data);
 
     });
+
+
+//  PAGER BUTTONS.
 
 //  For performance we count items only when we ask last page 
 //  or we change droplist selectors. Not need to count on backward.
@@ -1322,6 +1340,28 @@ caches.open("textures").then(function(cache){
     });
 
 
+//  DROPLIST TEXTURE.
+
+    $(textureDroplist).on("change", function(){
+
+        const contentWindow = viewer.contentWindow;
+
+    //  Reset texture map checkboxes.
+        $(textureCheckboxSelector).attr({checked:false});
+
+    //  Overwrite gender droplist value.
+        genderDroplist.value = contentWindow.localPlayer.outfit.getGender();
+
+        if ( !this.value ) {
+            $(textureControlSelector).slideUp();
+        } else {
+            $(textureControlSelector).slideDown();
+        }
+
+        textureDroplistChanged.dispatch(this.value);
+
+    });
+
     textureDroplistChanged.add(function(value){
 
         const contentWindow = viewer.contentWindow;
@@ -1355,6 +1395,7 @@ caches.open("textures").then(function(cache){
 
     });
 
+
 //  BUTTON NEW.
 
     $(textureNewButton).on("click", function(){
@@ -1368,6 +1409,7 @@ caches.open("textures").then(function(cache){
             debugMode && console.log({"new":json});
         }, delay);
     });
+
 
 //  BUTTON IMPORT.
 
@@ -1407,27 +1449,6 @@ caches.open("textures").then(function(cache){
 
     });
 
-//  DROPLIST TEXTURE.
-
-    $(textureDroplist).on("change", function(){
-
-        const contentWindow = viewer.contentWindow;
-
-    //  Reset texture map checkboxes.
-        $(textureCheckboxSelector).attr({checked:false});
-
-    //  Overwrite gender droplist value.
-        genderDroplist.value = contentWindow.localPlayer.outfit.getGender();
-
-        if ( !this.value ) {
-            $(textureControlSelector).slideUp();
-        } else {
-            $(textureControlSelector).slideDown();
-        }
-
-        textureDroplistChanged.dispatch(this.value);
-
-    });
 
 //  BUTTON DELETE.
 
@@ -1488,6 +1509,7 @@ caches.open("textures").then(function(cache){
 
     });
 
+
 //  BUTTON CLEAR.
 
     $(texturesClearBtn).on("click", function(){
@@ -1523,6 +1545,7 @@ caches.open("textures").then(function(cache){
         }, 250 );
 
     });
+
 
 //  BUTTON UPLOAD.
 
@@ -1726,6 +1749,7 @@ caches.open("textures").then(function(cache){
 
     }
 
+
 //  BUTTON REMOVE.
 
     $(textureRemoveBtn).on("click", function(){
@@ -1754,7 +1778,9 @@ caches.open("textures").then(function(cache){
 
     });
 
+
 //  BUTTON COPY (texture).
+
     var textureCopyBtnClicked = new Signal();
 
     $(textureCopyButton).on("click", function(){
@@ -1771,7 +1797,7 @@ caches.open("textures").then(function(cache){
     textureCopyBtnClicked.add(function(){
 
         const contentWindow = viewer.contentWindow;
-        const checkboxSelector = "input[type=checkbox].texture-checkbox-control";
+        const checkSelector = "input[type=checkbox].texture-checkbox-control";
 
     //  Update gender droplist value.
         var gender = contentWindow.localPlayer.outfit.getGender();
@@ -1784,32 +1810,58 @@ caches.open("textures").then(function(cache){
 
         (function(){
 
-            var checkboxes = $(textureMapControls).find(checkboxSelector)
-            .toArray().filter(function(item){ return item.checked; });
+        //  Copy 1st checked map sourceFile.
 
-            debugMode && console.log(checkboxes);
-            if ( checkboxes.length == 0 ) return;
-
-            var map = checkboxes.shift.id;
             var slot = outfitDroplist.value;
             var gender = contentWindow.localPlayer.outfit.getGender();
-            var sourceFile = contentWindow[gender][slot].material[map].sourceFile;
-
-            debugMode && console.log({ 
-                "gender":gender,
-                "map":map, "slot":slot,
-                "sourceFile":sourceFile,
+            var checkboxes = $(textureMapControls).find(checkSelector)
+            .toArray().filter(function(item){ 
+                return item.checked; 
+            }).filter(function(item){
+                return !!contentWindow[gender][slot].material[item.id];
             });
 
-            if (sourceFile) json = {
-                sourcFile: sourceFile,
-            };
+            var err = `Can't copy null texture.`;
+            debugMode && console.log(checkboxes);
 
-            checkboxes.forEach(function(item){
-                item.checked = false;
-            });
+            if ( checkboxes.length == 0 ) {
+                return bootbox.dialog( errorDialogOptions(err) );
+            }
 
-            debugMode && console.log({"copy":json});
+        //  var map = checkboxes.shift().id;
+        //  var sourceFile = contentWindow[gender][slot].material[map].sourceFile;
+
+            if ( contentWindow[ gender ][ slot ] ) {
+
+                var material, map;
+                var outfit = contentWindow[gender][slot];
+                if (outfit) material = outfit.material;
+                if (material) map = checkboxes.shift().id;
+                if (material[map].sourceFile) {
+
+                    json = {};  // reset texture json.
+                    json.sourcFile = material[map].sourceFile;
+                    debugMode && console.log({"copy":json});
+
+                //  Uncheck checkboxes.
+                    while ( checkboxes.length ) {
+                        checkboxes.shift().checked = false;
+                    }
+
+                    debugMode && console.log({ 
+                        "gender":gender,
+                        "slot":slot, "map":map,
+                        "sourceFile":sourceFile,
+                    });
+
+                    var msg = `${gender} ${slot} ${map} copied.`;
+                    return userNotificationDialogMessage( msg );
+
+                }
+
+            }
+
+            return bootbox.dialog( errorDialogOptions(err) );
 
         })();
 
@@ -2113,7 +2165,6 @@ caches.open("textures").then(function(cache){
         return control;
     }
 
-
     function versionControl(key){
 
         if ( key != "version" ) return;
@@ -2195,10 +2246,11 @@ caches.open("textures").then(function(cache){
     }
 
 
+//  PROPERTIES DROPLIST.
+
     $(propDroplist).on("change", function(){
         propertiesDroplistChanged.dispatch(this.value);
     });
-
 
     propertiesDroplistChanged.add(function (key){
 

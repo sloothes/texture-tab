@@ -1743,8 +1743,8 @@ caches.open("textures").then(function(cache){
     $(avatarSaveButton).on("click", function(){
 
         var msg = "Please type a name for this avatar:";
-        var title = `<div class="alert-icon icon-danger">`
-            + `</div><h3 style="margin:auto;">${msg}</h3>`;
+        var title = `<div class="alert-icon icon-warning">`
+            + `</div><h4 style="margin:auto;">${msg}</h4>`;
         var defaultValue = "untitled avatar";
 
         var callback = function(result){
@@ -1785,7 +1785,7 @@ caches.open("textures").then(function(cache){
         json._id = ObjectId();
         json.uuid = generateUUID();
 
-        return bootbox.dialog( successDialogOptions(msg) ); // breakpoint!
+        return bootbox.dialog( successDialogOptions(`Avatar ${name} saved successfully!`) ); // breakpoint!
 
         db.collection("outfits").insert(json, function(err){
             if (err) throw err;

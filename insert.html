@@ -1773,31 +1773,26 @@ caches.open("textures").then(function(cache){
         const contentWindow = viewer.contentWindow;
         const checkboxSelector = "input[type=checkbox].texture-checkbox-control";
 
-        if ( !genderDroplist.value ) {
+    //  Update gender droplist value.
+        var gender = contentWindow.localPlayer.outfit.getGender();
 
-            var gender = contentWindow.localPlayer.outfit.getGender();
-
-            if (!gender) {
-                genderDroplist.value = "";
-            } else {
-                genderDroplist.value = gender;
-            }
-
-        }
+        if (!gender) genderDroplist.value = "";
+        else genderDroplist.value = gender;
 
         if ( !outfitDroplist.value ) return;
         if ( !genderDroplist.value ) return;
 
-        var checkboxes = $(textureMapControls).find(checkboxSelector)
-        .toArray().filter(function(item){ return item.checked; });
+        (function(){
 
-        debugMode && console.log(checkboxes);
-        if ( checkboxes.length == 0 ) return;
+            var checkboxes = $(textureMapControls).find(checkboxSelector)
+            .toArray().filter(function(item){ return item.checked; });
 
-        if (checkboxes.length) (function(){
+            debugMode && console.log(checkboxes);
+            if ( checkboxes.length == 0 ) return;
 
             var map = checkboxes.shift.id;
             var slot = outfitDroplist.value;
+            var gender = contentWindow.localPlayer.outfit.getGender();
             var sourceFile = contentWindow[gender][slot].material[map].sourceFile;
 
             debugMode && console.log({ 

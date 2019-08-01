@@ -410,7 +410,7 @@
         return {
             size: "small",
             className: "middle",
-            closeButton: false,
+            closeButton: true,
             title: `<div class="alert-icon icon-warning">` 
             + `</div><h2 style="margin:auto;">Error!</h2>`,
             message: `<div>Sorry! An error occurred.</div>`
@@ -1820,8 +1820,8 @@ caches.open("textures").then(function(cache){
             return !!contentWindow[gender][slot].material[item.id];
         });
 
-        var err = `Can't copy null texture.`;
         debugMode && console.log(checkboxes);
+        var err = `Can't copy null texture map.`;
 
         if ( checkboxes.length == 0 ) {
             return bootbox.dialog( errorDialogOptions(err) );

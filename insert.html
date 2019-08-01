@@ -753,7 +753,7 @@ $(viewer.contentWindow).on("load", function(){
     <div id="new-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn pull-left" style="width:24%;">New</div>
     <div id="copy-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn" style="width:24%;margin-left:1%;">Copy</div>
     <div id="apply-texture-button" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;">Apply</div>
-    <div id="save-texture-button" class="form-control btn btn-success btn-white-outline gradient-btn pull-right" style="width:24%;">Save</div>
+    <div id="save-avatar-button" class="form-control btn btn-success btn-white-outline gradient-btn pull-right" style="width:24%;">Save</div>
 </div>
 
 <script>
@@ -938,6 +938,8 @@ caches.open("textures").then(function(cache){
     const textureDeleteBtn    = $("#delete-selected-texture").get(0);
     const texturesClearBtn    = $("#clear-imported-textures").get(0);
     const textureRemoveBtn    = $("#texture-remove-button").get(0);
+    const avatarSaveButton    = $("#save-avatar-button").get(0);
+    const textureCopyButton   = $("#copy-texture-button").get(0);
     const textureMapDroplist  = $("select#texture-map-droplist").get(0);
     const textureUploadButton = $("#upload-selected-texture").get(0);
 
@@ -967,6 +969,44 @@ caches.open("textures").then(function(cache){
 
     }
 
+    function successDialogOptions(msg){
+        return {
+            size: "small",
+            className: "middle",
+            closeButton: false,
+            title: `<div class="alert-icon icon-success">`
+            + `</div><h2 style="margin:auto;">Success</h2>`,
+            message: `<div>${msg}</div>`,
+            buttons: { 
+                success: {
+                    label: "Close",
+                    className: "btn-success",
+                    callback: function(){ 
+                        bootbox.hideAll(); 
+                    }
+                },
+            }
+        };
+    }
+
+    function errorDialogOptions(err){
+        return {
+            size: "small",
+            className: "middle",
+            closeButton: false,
+            title: `<div class="alert-icon icon-warning">` 
+            + `</div><h2 style="margin:auto;">Error!</h2>`,
+            message: `<div>Sorry! An error occurred.</div>`
+            + `<div>${err}</div>`,
+            buttons: {
+                cancel: {
+                    label: "Close",
+                    className: "btn-default",
+                },
+            },
+        };
+    }
+
 //  Signals.
 
     var Signal = signals.Signal;
@@ -975,6 +1015,7 @@ caches.open("textures").then(function(cache){
     var textureApplyBtnClicked = new Signal();
     var textureDroplistChanged = new Signal();
     var textureRemoveBtnClicked = new Signal();
+    var avatarSaveButtonClicked = new Signal();
     var propertiesDroplistChanged = new Signal();
 
     textureSelected.add(function(url){
@@ -1470,23 +1511,6 @@ caches.open("textures").then(function(cache){
 
     $(textureUploadButton).on("click", uploadSelectedTexture );
 
-    function errorDialogOptions(err){
-        return {
-            size: "small",
-            className: "middle",
-            closeButton: false,
-            title: `<div class="alert-icon icon-warning">` 
-            + `</div><h2 style="margin:auto;">Error!</h2>`,
-            message: `<div>Sorry! An error occurred.</div><div>${err}</div>`,
-            buttons: {
-                cancel: {
-                    label: "Close",
-                    className: "btn-default",
-                },
-            },
-        };
-    }
-
     function uploadSelectedTexture(){
 
     //  Using files.
@@ -1687,6 +1711,11 @@ caches.open("textures").then(function(cache){
 
 //  BUTTON REMOVE.
 
+    $(textureRemoveBtn).on("click", function(){
+        textureRemoveBtnClicked.dispatch();
+        textureMapDroplist.value = "";
+    });
+
     textureRemoveBtnClicked.add(function(){
 
         const contentWindow = viewer.contentWindow;
@@ -1708,10 +1737,68 @@ caches.open("textures").then(function(cache){
 
     });
 
-    $(textureRemoveBtn).on("click", function(){
-        textureRemoveBtnClicked.dispatch();
-        textureMapDroplist.value = "";
+
+//  BUTTON SAVE (avatar).
+
+    $(avatarSaveButton).on("click", function(){
+
+        var msg = "Please type a name for this avatar:";
+        var title = `<div class="alert-icon icon-danger">`
+            + `</div><h3 style="margin:auto;">${msg}</h3>`;
+        var defaultValue = "untitled avatar";
+
+        var callback = function(result){
+            if ( result ) {
+                avatarSaveButtonClicked.dispatch(result);
+            } else {
+                var err = `Name is required. Save cancelled.`;
+                return bootbox.dialog( errorDialogOptions(err) );
+            }
+        };
+
+        return bootbox.prompt({
+
+            title: title,
+            size: "small",
+            className: "middle",
+            value: defaultValue,
+            closeButton: false,
+            callback: callback,
+
+        });
+
     });
+
+    avatarSaveButtonClicked.add( function(name){
+
+        const contentWindow = viewer.contentWindow;
+
+        if ( !name ) {
+            var err = `Name is required. Save cancelled.`;
+            bootbox.dialog( errorDialogOptions(err) );
+            throw err; return;
+        }
+
+        var json = contentWindow.localPlayer.outfit.toJSON();
+
+        json.name = name;
+        json._id = ObjectId();
+        json.uuid = generateUUID();
+
+        return bootbox.dialog( successDialogOptions(msg) ); // breakpoint!
+
+        db.collection("outfits").insert(json, function(err){
+            if (err) throw err;
+        }).then(function(){
+            var msg = `Avatar ${name} saved successfully!`;
+            bootbox.dialog( successDialogOptions(msg) );
+        }).catch(function(err){
+            bootbox.dialog( errorDialogOptions(err) );
+            console.error(err);
+        });
+
+    });
+
 
 //  PROPERTY CONTROLS.
 

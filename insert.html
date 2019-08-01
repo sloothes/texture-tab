@@ -1825,20 +1825,6 @@ caches.open("textures").then(function(cache){
             + `</div><h4 style="margin:auto;">${msg}</h4>`;
         var defaultValue = "untitled avatar";
 
-        function callback(result){
-            var msg = `Save aborted!`;
-            var err = `Name is required. Save cancelled.`;
-            debugMode && console.log({"result":result});
-
-            if ( result == null ) {
-                return bootbox.dialog( abortDialogOptions(msg) );
-            } else if ( result.length == 0 ) {
-                return bootbox.dialog( errorDialogOptions(err) );
-            } else {
-                return avatarSaveButtonClicked.dispatch(result);
-            }
-        }
-
         return bootbox.prompt({
 
             title: title,
@@ -1849,6 +1835,22 @@ caches.open("textures").then(function(cache){
             callback: callback,
 
         });
+
+        function callback(result){
+            var msg = `Save aborted!`;
+            var err = `Name is required. Save cancelled.`;
+            debugMode && console.log({"result":result});
+
+            if ( result == null ) {
+                return bootbox.dialog( abortDialogOptions(msg) );
+            } else if ( result.length == 0 ) {
+                return bootbox.dialog( errorDialogOptions(err) );
+            } else if ( result == defaultValue ) {
+                return bootbox.dialog( errorDialogOptions(err) );
+            } else {
+                return avatarSaveButtonClicked.dispatch(result);
+            }
+        }
 
     });
 

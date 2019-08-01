@@ -1748,6 +1748,7 @@ caches.open("textures").then(function(cache){
         var defaultValue = "untitled avatar";
 
         var callback = function(result){
+            debugMode && console.log({"result":result});
             if ( result ) {
                 avatarSaveButtonClicked.dispatch(result);
             } else {

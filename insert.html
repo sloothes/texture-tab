@@ -1800,6 +1800,7 @@ caches.open("textures").then(function(cache){
         const checkSelector = "input[type=checkbox].texture-checkbox-control";
 
     //  Update gender droplist value.
+
         var gender = contentWindow.localPlayer.outfit.getGender();
 
         if (!gender) genderDroplist.value = "";
@@ -1808,62 +1809,58 @@ caches.open("textures").then(function(cache){
         if ( !outfitDroplist.value ) return;
         if ( !genderDroplist.value ) return;
 
-        (function(){
+    //  Copy 1st checked map sourceFile.
 
-        //  Copy 1st checked map sourceFile.
+        var slot = outfitDroplist.value;
+        var gender = contentWindow.localPlayer.outfit.getGender();
+        var checkboxes = $(textureMapControls).find(checkSelector)
+        .toArray().filter(function(item){ 
+            return item.checked; 
+        }).filter(function(item){
+            return !!contentWindow[gender][slot].material[item.id];
+        });
 
-            var slot = outfitDroplist.value;
-            var gender = contentWindow.localPlayer.outfit.getGender();
-            var checkboxes = $(textureMapControls).find(checkSelector)
-            .toArray().filter(function(item){ 
-                return item.checked; 
-            }).filter(function(item){
-                return !!contentWindow[gender][slot].material[item.id];
-            });
+        var err = `Can't copy null texture.`;
+        debugMode && console.log(checkboxes);
 
-            var err = `Can't copy null texture.`;
-            debugMode && console.log(checkboxes);
+        if ( checkboxes.length == 0 ) {
+            return bootbox.dialog( errorDialogOptions(err) );
+        }
 
-            if ( checkboxes.length == 0 ) {
-                return bootbox.dialog( errorDialogOptions(err) );
-            }
+    //  var map = checkboxes.shift().id;
+    //  var sourceFile = contentWindow[gender][slot].material[map].sourceFile;
 
-        //  var map = checkboxes.shift().id;
-        //  var sourceFile = contentWindow[gender][slot].material[map].sourceFile;
+        if ( contentWindow[ gender ][ slot ] ) {
 
-            if ( contentWindow[ gender ][ slot ] ) {
+            var material, map;
+            var outfit = contentWindow[gender][slot];
+            if (outfit) material = outfit.material;
+            if (material) map = checkboxes.shift().id;
+            if (material[map].sourceFile) {
 
-                var material, map;
-                var outfit = contentWindow[gender][slot];
-                if (outfit) material = outfit.material;
-                if (material) map = checkboxes.shift().id;
-                if (material[map].sourceFile) {
+                json = {};  // reset texture json.
+                json.sourcFile = material[map].sourceFile;
+                debugMode && console.log({"copy":json});
 
-                    json = {};  // reset texture json.
-                    json.sourcFile = material[map].sourceFile;
-                    debugMode && console.log({"copy":json});
-
-                //  Uncheck checkboxes.
-                    while ( checkboxes.length ) {
-                        checkboxes.shift().checked = false;
-                    }
-
-                    debugMode && console.log({ 
-                        "gender":gender,
-                        "slot":slot, "map":map,
-                        "sourceFile":sourceFile,
-                    });
-
-                    var msg = `${gender} ${slot} ${map} copied.`;
-                    return userNotificationDialogMessage( msg );
-
+            //  Uncheck checkboxes.
+                while ( checkboxes.length ) {
+                    checkboxes.shift().checked = false;
                 }
 
+                debugMode && console.log({ 
+                    "gender":gender,
+                    "slot":slot, "map":map,
+                    "sourceFile":json.sourceFile,
+                });
+
+                var msg = `${gender} ${slot} ${map} copied.`;
+                return userNotificationDialogMessage( msg );
+
             }
 
-            return bootbox.dialog( errorDialogOptions(err) );
+        }
 
-        })();
+        return bootbox.dialog( errorDialogOptions(err) );
 
     });
 

@@ -1749,11 +1749,14 @@ caches.open("textures").then(function(cache){
 
         var callback = function(result){
             debugMode && console.log({"result":result});
-            if ( result ) {
-                avatarSaveButtonClicked.dispatch(result);
-            } else {
+            if ( result == null ) {
+                var msg = `Save aborted!`;
+                bootbox.dialog( successDialogOptions(msg) );
+            } else if ( result.length == 0 ) {
                 var err = `Name is required. Save cancelled.`;
                 return bootbox.dialog( errorDialogOptions(err) );
+            } else {
+                return avatarSaveButtonClicked.dispatch(result);
             }
         };
 

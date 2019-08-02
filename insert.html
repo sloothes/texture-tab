@@ -14,6 +14,34 @@
 
 </script>
 
+<script>
+/*
+(function(){
+
+//  const VERSION = 5;
+    const NAME = "USER";
+
+    USER = new zango.Db( NAME, {
+        current:    true,
+        settings:   true,
+        animations: true,
+        outfits:    true,
+        materials:  true,
+        textures:   true,
+    });
+
+    USER.open(function(err, database){
+        if (err) console.error(err);
+    }).then( function(){
+        debugMode && console.log(`Database ${USER.name} (v${USER.version}) opened.`);
+    }).catch(function(err){
+        console.error(err);
+    });
+
+})();
+*/
+</script>
+
 <style>
 
     .helpers-header h2 { 
@@ -906,31 +934,6 @@ $(viewer.contentWindow).on("load", function(){
 
 });
 
-</script>
-
-<script>
-/*
-//  const VERSION = 5;
-    const NAME = "USER";
-
-    var db = new zango.Db( NAME, {
-        current:    true,
-        settings:   true,
-        animations: true,
-        outfits:    true,
-        materials:  true,
-        textures:   true,
-        products:   true,
-    });
-
-    db.open(function(err, database){
-        if (err) console.error(err);
-    }).then( function(){
-        debugMode && console.log(`Database ${db.name} (v${db.version}) opened.`);
-    }).catch(function(err){
-        console.error(err);
-    });
-*/
 </script>
 
 <script>

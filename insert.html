@@ -1625,6 +1625,7 @@ caches.open("textures").then(function(cache){
             xhttp = null;
 
         }).then( async function( response ){
+        //  TODO: REMOVE async/await for backward compitality.
 
             var data = response.data;
             debugMode && console.log({"data": data});

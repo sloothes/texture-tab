@@ -1660,6 +1660,7 @@ caches.open("textures").then(function(cache){
             entry.height = data.height;
             entry.datetime = data.datetime;
             entry.deletehash = data.deletehash;
+            entry.thumbnail = data.link.replace(data.id, data.id + "s");
             entry.endpoint = "https://api.imgur.com/3/image/" + data.id;
             entry.clientID = "60db267c697bb33";  // textures app Client-ID.
 

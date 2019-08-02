@@ -294,11 +294,20 @@
 <script>
 
 //  const viewer = document.getElementById("viewer");
-
+/*
     const NoSrc = "//:0";
-
 // "source: https://stackoverflow.com/questions/5775469/
 //  whats-the-valid-way-to-include-an-image-with-no-src".
+    const noimage = "/img/no-image-avaliable-200x200.png";
+    const LoremIpsum = "Sed ac metus fermentum nisi lacinia sodales. "
+    + "Nullam porta tristique justo et laoreet. Vestibulum pulvinar, "
+    + "purus a finibus commodo, quam lectus imperdiet arcu, "
+    + "vel sollicitudin augue ligula quis lorem. "
+    + "Nunc vehicula lectus nec quam interdum, vitae mattis sapien iaculis. "
+    + "Duis et dui sed lorem hendrerit sollicitudin. "
+    + "Donec ut justo tincidunt, finibus nisi ut, fringilla augue. "
+    + "Donec a nibh nec libero pellentesque semper et vel lacus. Integer quis magna quam";
+*/
 
     function generateUUID(){
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
@@ -516,7 +525,8 @@
 
 $(viewer.contentWindow).on("load", function(){
 
-    var contentWindow = this;
+    const NoSrc = "//:0";
+    const contentWindow = this;
 
 //  const viewer = document.getElementById("viewer");
     const titleTextfield = $("input#material-title").get(0);

@@ -1575,7 +1575,7 @@ caches.open("textures").then(function(cache){
         }
 
         if ( !textureDroplist.value ) {
-            var err = "There isn&#39;t selected texture to upload.";
+            var err = "There isn't any selected texture to upload.";
             debugMode && console.error(err);
             return bootbox.dialog( errorDialogOptions(err) );
         }

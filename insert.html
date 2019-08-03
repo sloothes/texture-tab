@@ -1227,7 +1227,7 @@ caches.open("textures").then(function(cache){
         clearTimeout(this.interval);
         this.interval = setTimeout(async function(){
 
-            await count();
+            await count(); //  TODO: REMOVE async/await for backward compitality.
 
             if ( max && max > 0 ) {
 

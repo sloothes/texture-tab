@@ -1910,7 +1910,7 @@ caches.open("textures").then(function(cache){
 
         function callback(result){
             var msg = `Save aborted.`;
-            var err = `Name is required. Save cancelled.`;
+            var err = `Name is required. Save canceled.`;
             debugMode && console.log({"result":result});
 
             if ( result == defaultValue ) {
@@ -1929,7 +1929,7 @@ caches.open("textures").then(function(cache){
     avatarSaveButtonClicked.add( function(name){
 
         const contentWindow = viewer.contentWindow;
-        var err = `Name is required. Save cancelled.`;
+        var err = `Name is required. Save canceled.`;
         var msg = `Avatar ${name} saved successfully!`;
 
         if ( !name ) {

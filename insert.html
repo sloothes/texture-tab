@@ -1769,30 +1769,64 @@ caches.open("textures").then(function(cache){
 //  BUTTON REMOVE.
 
     $(textureRemoveBtn).on("click", function(){
-        textureRemoveBtnClicked.dispatch();
-        textureMapDroplist.value = "";
+
+        if ( !outfitDroplist.value ) {
+            var err = `Outfit slot is not selected.`;
+            return bootbox.dialog( errorDialogOptions(err) );
+        }
+
+        if (!textureMapDroplist.value) {
+            var err = `Texture map is not selected.`;
+            return bootbox.dialog( errorDialogOptions(err) );
+        }
+
+        clearTimeout(this.interval);
+        this.interval = setTimeout(function(){
+            textureRemoveBtnClicked.dispatch();
+        //  textureMapDroplist.value = "";
+        }, delay);
+
     });
 
     textureRemoveBtnClicked.add(function(){
 
         const contentWindow = viewer.contentWindow;
+        const checkSelector = "input[type=checkbox].texture-checkbox-control";
 
-    //  Overwrite gender droplist value.
-        genderDroplist.value = contentWindow.localPlayer.outfit.getGender();
+    //  Update gender droplist value.
 
-        if (!outfitDroplist.value) return;
-        if (!genderDroplist.value) return;
-        if (!textureMapDroplist.value) return;
+        var gender = contentWindow.localPlayer.outfit.getGender();
+
+        if (!gender) genderDroplist.value = "";
+        else genderDroplist.value = gender;
+
+        if ( !gender ) throw "Outfit gender is not selected.";
+        if ( !outfitDroplist.value ) throw "Outfit slot is not selected.";
+        if ( !genderDroplist.value ) throw "Outfit gender is not selected.";
+        if ( !textureMapDroplist.value ) throw "Texture map is not selected.";
+
+    //  return bootbox.dialog( errorDialogOptions(err) );
+
+        var map = textureMapDroplist.value
+        var slot = outfitDroplist.value;
 
         var data = {
-            map: textureMapDroplist.value,
-            slot: outfitDroplist.value,
-            gender: genderDroplist.value,
+            map: map,
+            slot: slot,
+            gender: gender,
         };
 
         contentWindow.localPlayerTextureRemoveHandler(data);
 
+    //  Reset map droplist.
+        textureMapDroplist.value = "";
+
     });
+
+    //  if (contentWindow[ gender ][ slot ].material[ map ] == null) {
+    //      var msg = `${gender} ${slot} ${map} removed.`;
+    //      return userNotificationDialogMessage( msg );
+    //  }
 
 
 //  BUTTON COPY (texture).

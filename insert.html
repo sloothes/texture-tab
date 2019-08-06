@@ -797,7 +797,7 @@ $(viewer.contentWindow).on("load", function(){
     <div style="height:35px;margin-top:10px;">
         <div id="texture-remove-button" class="form-control btn btn-danger btn-white-outline gradient-btn" style="max-width:fit-content;">Remove</div>
         <div style="max-width:fit-content;display:inline-block;float:right;">
-            <select id="texture-map-droplist" class="form-control texture-map-droplist" readonly>
+            <select id="texture-map-droplist" class="form-control texture-map-droplist" title="Select texture map to copy or remove." readonly>
                 <option value="">Select map:</option>
                 <option value="map">map</option>
                 <option value="bumpMap">bumpMap</option>
@@ -820,7 +820,7 @@ $(viewer.contentWindow).on("load", function(){
     <div style="height:35px;margin-bottom:10px;">
         <h4><span style="vertical-align:-0.5rem;">Select property:</span>
             <div style="width:40%;display:inline-block;float:right;">
-                <select id="texture-property" class="form-control texture-property-droplist" readonly>
+                <select id="texture-property" class="form-control texture-property-droplist" title="Select texture property key to edit." readonly>
                     <option value="">Select key:</option>
                     <option value="_id">_id</option>
                     <option value="uuid">uuid</option>
@@ -849,17 +849,17 @@ $(viewer.contentWindow).on("load", function(){
         </h4>
     </div>
 
-    <div id="texture-property-controls" class="well"></div>
+    <div id="texture-property-controls" class="well" title="Edit texture property."></div>
 
 </div>
 
 <hr/>
 
 <div style="margin-bottom:10px;">
-    <div id="new-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn pull-left" style="width:24%;">New</div>
-    <div id="copy-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn" style="width:24%;margin-left:1%;">Copy</div>
-    <div id="apply-texture-button" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;">Apply</div>
-    <div id="save-avatar-button" class="form-control btn btn-success btn-white-outline gradient-btn pull-right" style="width:24%;">Save</div>
+    <div id="new-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn pull-left" style="width:24%;" title="Create new texture object.">New</div>
+    <div id="copy-texture-button" class="form-control btn btn-primary btn-white-outline gradient-btn" style="width:24%;margin-left:1%;" title="Copy selected texture map.">Copy</div>
+    <div id="apply-texture-button" class="form-control btn btn-info btn-white-outline gradient-btn" style="width:24%;" title="Apply checked texture maps.">Apply</div>
+    <div id="save-avatar-button" class="form-control btn btn-success btn-white-outline gradient-btn pull-right" style="width:24%;" title="Save avatar.">Save</div>
 </div>
 
 <script>
@@ -1024,8 +1024,9 @@ caches.open("textures").then(function(cache){
     const textureMapDroplist  = $("select#texture-map-droplist").get(0);
     const textureUploadButton = $("#upload-selected-texture").get(0);
 
-//  const slotDroplist            = outfitDroplist;
-//  const importedTextures        = textureDroplist;
+//  const slotDroplist = outfitDroplist;
+    const mapDroplist = textureMapDroplist;
+//  const importedTextures = textureDroplist;
 
     const pageSelector            = "#texture-pager .page-btn";
     const textureControlSelector  = "#texture-map-controls";
@@ -1800,7 +1801,15 @@ caches.open("textures").then(function(cache){
 
     $(textureCopyButton).on("click", function(){
 
-        if ( !outfitDroplist.value ) return;
+        if ( !outfitDroplist.value ) {
+            var err = `Outfit slot is not selected.`;
+            return bootbox.dialog( errorDialogOptions(err) );
+        }
+
+        if (!textureMapDroplist.value) {
+            var err = `Texture map is not selected.`;
+            return bootbox.dialog( errorDialogOptions(err) );
+        }
 
         clearTimeout(this.interval);
         this.interval = setTimeout(function(){
@@ -1809,6 +1818,63 @@ caches.open("textures").then(function(cache){
 
     });
 
+    textureCopyBtnClicked.add(function(){
+
+        const contentWindow = viewer.contentWindow;
+        const checkSelector = "input[type=checkbox].texture-checkbox-control";
+
+    //  Update gender droplist value.
+
+        var gender = contentWindow.localPlayer.outfit.getGender();
+
+        if (!gender) genderDroplist.value = "";
+        else genderDroplist.value = gender;
+
+        if ( !outfitDroplist.value ) throw "Can't copy null outfit texture;
+        if ( !genderDroplist.value ) throw "Can't copy null gender texture;
+        if ( !textureMapDroplist.value ) throw "Can't copy null map texture;
+
+    //  return bootbox.dialog( errorDialogOptions(err) );
+
+        var map = textureMapDroplist.value
+        var slot = outfitDroplist.value;
+        var gender = contentWindow.localPlayer.outfit.getGender();
+
+        var outfit, material;
+        if ( gender && slot ) outfit = contentWindow[ gender ][ slot ];
+        if ( outfit ) material = outfit.material;
+
+        if ( !outfit ) throw "Can't copy null outfit texture";
+        if ( !material ) throw "Can't copy null material texture";
+        if ( !material[ map ] ) throw "Can't copy null texture map";
+        if ( !material[ map ].sourceFile ) throw "Can't copy null texture sourceFile";
+
+        if ( material && material[ map ] && material[ map ].sourceFile ) {
+ 
+            json = {};  // reset texture json.
+            json._id = ObjectId();
+            json.uuid = generateUUID();
+            json.sourceFile = material[ map ].sourceFile;
+            debugMode && console.log({"copy":json});
+
+        //  Reset map droplist.
+            textureMapDroplist.value = "";
+
+        //  Reset property controls.
+            propDroplist.value = "";
+            $(propControls).children().remove();
+
+        //  Uncheck all checkboxes.
+            $(textureMapControls).find(checkSelector).attr({"checked":false});
+
+            var msg = `${gender} ${slot} ${map} copied.`;
+            return userNotificationDialogMessage( msg );
+
+        }
+
+    });
+
+/*
     textureCopyBtnClicked.add(function(){
 
         const contentWindow = viewer.contentWindow;
@@ -1886,7 +1952,7 @@ caches.open("textures").then(function(cache){
         return bootbox.dialog( errorDialogOptions(err) );
 
     });
-
+*/
 
 //  BUTTON SAVE (avatar).
 

@@ -2274,10 +2274,11 @@ caches.open("textures").then(function(cache){
 
     propertiesDroplistChanged.add(function (key){
 
+        $(propControls).children().remove();
+
         if ( !key ) return;
 
         $(propControls).css({height:""});
-        $(propControls).children().remove();
 
         switch (key) {
 

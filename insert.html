@@ -1628,27 +1628,11 @@ caches.open("textures").then(function(cache){
             xhttp.send(formdata);
             xhttp = null;
 
-        }).then( async function( response ){
+        }).then( function( response ){
         //  TODO: REMOVE async/await for backward compitality.
 
             var data = response.data;
             debugMode && console.log({"data": data});
-
-        //  Add to cache.
-
-            await cache.add(data.link).then(count);
-            json.sourceFile = data.link; // important!
-
-        //  Preview texture.
-            cache.match(data.link).then(function(response){
-                return response.blob();
-            }).then(function(blob){
-                texturePreview.src = window.URL.createObjectURL(blob);
-            });
-
-            return data;
-
-        }).then( function(data){
 
             var entry = {};
 
@@ -1674,9 +1658,31 @@ caches.open("textures").then(function(cache){
             }).catch(function(err){
                 console.error(err);
             });
-            
-            return data.link;
 
+            return data;
+
+        }).then( function(data){
+
+            json.sourceFile = data.link; // important!
+
+        //  Add to cache.
+
+            return cache.add(data.link)
+            .then(count).then(function(){
+                return data;
+            });
+
+        }).then( function(data){
+
+        //  Preview texture.
+            return cache.match(data.link).then(function(response){
+                return response.blob();
+            }).then(function(blob){
+                texturePreview.src = window.URL.createObjectURL(blob);
+            }).then(function(){
+                return data.link;
+            });
+            
         }).then( function(url){
             debugMode && console.log(url);
 
